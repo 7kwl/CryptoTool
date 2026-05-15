@@ -1,6 +1,6 @@
 # CryptoTool 桌面加密工具
 
-这是一个功能完整的桌面加密工具，支持RSA和SM4国密算法的各种加密、解密、签名和验签操作。
+这是一个基于 Windows Forms 的桌面加密工具，当前主代码链路由 `CryptoTool.Win` 和 `CryptoTool.Algorithm` 组成，测试入口为 `CryptoTool.UnitTests`。
 
 ## 功能特性
 
@@ -16,6 +16,13 @@
 - **加密模式**: 支持ECB和CBC两种加密模式
 - **填充模式**: 支持PKCS7、PKCS5、NoPadding三种填充模式
 - **加密解密**: 完整的SM4对称加密解密功能
+
+### 自动化测试
+- `CryptoTool.UnitTests` 覆盖了 RSA 参数/格式转换、AES/SM4 UI 参数映射、PEM/PKCS 转换、`MedicareUtil`、`AliyunCSBUtil` 以及工厂/算法 smoke tests
+- 推荐命令：
+  ```bash
+  dotnet test CryptoTool.UnitTests/CryptoTool.UnitTests.csproj
+  ```
 
 ## 界面说明
 
@@ -71,7 +78,7 @@
 
 1. **生成密钥对**:
    - 选择合适的密钥长度（建议2048位或更高）
-   - 选择密钥格式（一般情况下选XML格式即可）
+  - 选择密钥格式（一般情况下建议使用 PKCS8）
    - 点击"生成密钥对"按钮
 
 2. **加密操作**:

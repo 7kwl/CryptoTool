@@ -1,4 +1,5 @@
 using CryptoTool.Algorithm.Algorithms.RSA;
+using CryptoTool.Algorithm.Enums;
 using CryptoTool.Win.Helpers;
 using System.Text;
 
@@ -39,24 +40,16 @@ namespace CryptoTool.Win
             {
                 SetStatus("正在生成RSA密钥对...");
 
-                string keySizeStr = comboRSAKeySize.SelectedItem.ToString();
-                var keyFormat = comboRSAKeyFormat.SelectedItem.ToString().ToLower();
-                var keyOutputFormat = comboRSAKeyOutputFormat.SelectedItem.ToString().ToLower();
-                if (keyOutputFormat.ToLowerInvariant() == "pem")
-                {
-                    MessageBox.Show($"RSA密钥生成失败，暂不支持{keyOutputFormat}格式显示！", "失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    textRSAPublicKey.Text = "";
-                    textRSAPrivateKey.Text = "";
-                    return;
-                }
+                string keySizeStr = comboRSAKeySize.SelectedItem?.ToString() ?? "2048";
+                var keyFormat = comboRSAKeyFormat.SelectedItem?.ToString() ?? "PKCS8";
+                var keyOutputFormat = comboRSAKeyOutputFormat.SelectedItem?.ToString() ?? "Base64";
                 int keySize = int.Parse(keySizeStr);
 
-                var rsaCrypto = new RsaCrypto(keySize, keyFormat);
+                var rsaCrypto = new RsaCrypto(keySize, keyFormat.ToLowerInvariant());
                 var keyPair = rsaCrypto.GenerateKeyPair();
 
-                var uiOutputFormat = FormatConversionHelper.ParseOutputFormat(keyOutputFormat);
-                textRSAPublicKey.Text = FormatConversionHelper.BytesToString(keyPair.PublicKey, uiOutputFormat);
-                textRSAPrivateKey.Text = FormatConversionHelper.BytesToString(keyPair.PrivateKey, uiOutputFormat);
+                textRSAPublicKey.Text = RsaUiHelper.WriteKeyText(keyPair.PublicKey, keyOutputFormat, false, keyFormat);
+                textRSAPrivateKey.Text = RsaUiHelper.WriteKeyText(keyPair.PrivateKey, keyOutputFormat, true, keyFormat);
 
                 SetStatus($"RSA密钥对生成完成 - {keySize}位 {comboRSAKeyFormat.SelectedItem}格式");
             }
@@ -79,24 +72,20 @@ namespace CryptoTool.Win
                     if (openFileDialog.ShowDialog() == DialogResult.OK)
                     {
                         string content = File.ReadAllText(openFileDialog.FileName, Encoding.UTF8);
-                        string[] lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                        var (publicKey, privateKey) = RsaUiHelper.ParseKeyFileContent(content);
 
-                        if (lines.Length >= 2)
+                        if (!string.IsNullOrWhiteSpace(publicKey))
+                            textRSAPublicKey.Text = publicKey;
+
+                        if (!string.IsNullOrWhiteSpace(privateKey))
+                            textRSAPrivateKey.Text = privateKey;
+
+                        if ((publicKey != null && RsaUiHelper.LooksLikePem(publicKey))
+                            || (privateKey != null && RsaUiHelper.LooksLikePem(privateKey)))
                         {
-                            textRSAPublicKey.Text = lines[0].Trim();
-                            textRSAPrivateKey.Text = lines[1].Trim();
-                        }
-                        else if (lines.Length == 1)
-                        {
-                            string keyContent = lines[0].Trim();
-                            if (keyContent.Contains("PRIVATE"))
-                            {
-                                textRSAPrivateKey.Text = keyContent;
-                            }
-                            else
-                            {
-                                textRSAPublicKey.Text = keyContent;
-                            }
+                            comboRSAKeyOutputFormat.SelectedItem = "PEM";
+                            var pemText = publicKey ?? privateKey ?? string.Empty;
+                            comboRSAKeyFormat.SelectedItem = RsaCrypto.DetectRsaKeyFormatFromPem(pemText).ToUpperInvariant();
                         }
 
                         SetStatus("RSA密钥文件导入完成");
@@ -132,14 +121,29 @@ namespace CryptoTool.Win
                         StringBuilder content = new StringBuilder();
                         if (!string.IsNullOrEmpty(textRSAPublicKey.Text))
                         {
-                            content.AppendLine("# RSA公钥");
-                            content.AppendLine(textRSAPublicKey.Text);
-                            content.AppendLine();
+                            if (RsaUiHelper.LooksLikePem(textRSAPublicKey.Text))
+                            {
+                                content.AppendLine(textRSAPublicKey.Text.Trim());
+                                content.AppendLine();
+                            }
+                            else
+                            {
+                                content.AppendLine("# RSA公钥");
+                                content.AppendLine(textRSAPublicKey.Text);
+                                content.AppendLine();
+                            }
                         }
                         if (!string.IsNullOrEmpty(textRSAPrivateKey.Text))
                         {
-                            content.AppendLine("# RSA私钥");
-                            content.AppendLine(textRSAPrivateKey.Text);
+                            if (RsaUiHelper.LooksLikePem(textRSAPrivateKey.Text))
+                            {
+                                content.AppendLine(textRSAPrivateKey.Text.Trim());
+                            }
+                            else
+                            {
+                                content.AppendLine("# RSA私钥");
+                                content.AppendLine(textRSAPrivateKey.Text);
+                            }
                         }
 
                         File.WriteAllText(saveFileDialog.FileName, content.ToString(), Encoding.UTF8);
@@ -174,11 +178,20 @@ namespace CryptoTool.Win
                 SetStatus("正在进行RSA加密...");
 
                 var rsaCrypto = new RsaCrypto();
-                byte[] publicKeyBytes = Convert.FromBase64String(textRSAPublicKey.Text);
+                byte[] publicKeyBytes = RsaUiHelper.ReadKeyBytes(
+                    textRSAPublicKey.Text,
+                    comboRSAKeyOutputFormat.SelectedItem?.ToString(),
+                    false,
+                    comboRSAKeyFormat.SelectedItem?.ToString());
                 byte[] dataBytes = Encoding.UTF8.GetBytes(textRSAPlainText.Text);
-                byte[] encryptedBytes = rsaCrypto.Encrypt(dataBytes, publicKeyBytes);
+                byte[] encryptedBytes = rsaCrypto.Encrypt(
+                    dataBytes,
+                    publicKeyBytes,
+                    RsaUiHelper.ParsePadding(comboRSAKeyPadding.SelectedItem?.ToString()));
 
-                textRSACipherText.Text = Convert.ToBase64String(encryptedBytes);
+                textRSACipherText.Text = RsaUiHelper.WriteBinaryText(
+                    encryptedBytes,
+                    comboRSAEncryptOutputFormat.SelectedItem?.ToString());
 
                 SetStatus($"RSA加密完成 - 使用{comboRSAKeyPadding.SelectedItem}填充，输出{comboRSAEncryptOutputFormat.SelectedItem}格式");
             }
@@ -208,9 +221,18 @@ namespace CryptoTool.Win
                 SetStatus("正在进行RSA解密...");
 
                 var rsaCrypto = new RsaCrypto();
-                byte[] privateKeyBytes = Convert.FromBase64String(textRSAPrivateKey.Text);
-                byte[] cipherBytes = Convert.FromBase64String(textRSACipherText.Text);
-                byte[] decryptedBytes = rsaCrypto.Decrypt(cipherBytes, privateKeyBytes);
+                byte[] privateKeyBytes = RsaUiHelper.ReadKeyBytes(
+                    textRSAPrivateKey.Text,
+                    comboRSAKeyOutputFormat.SelectedItem?.ToString(),
+                    true,
+                    comboRSAKeyFormat.SelectedItem?.ToString());
+                byte[] cipherBytes = RsaUiHelper.ReadBinaryText(
+                    textRSACipherText.Text,
+                    comboRSAEncryptOutputFormat.SelectedItem?.ToString());
+                byte[] decryptedBytes = rsaCrypto.Decrypt(
+                    cipherBytes,
+                    privateKeyBytes,
+                    RsaUiHelper.ParsePadding(comboRSAKeyPadding.SelectedItem?.ToString()));
 
                 textRSAPlainText.Text = Encoding.UTF8.GetString(decryptedBytes);
 
@@ -242,11 +264,20 @@ namespace CryptoTool.Win
                 SetStatus("正在进行RSA签名...");
 
                 var rsaCrypto = new RsaCrypto();
-                byte[] privateKeyBytes = Convert.FromBase64String(textRSAPrivateKey.Text);
+                byte[] privateKeyBytes = RsaUiHelper.ReadKeyBytes(
+                    textRSAPrivateKey.Text,
+                    comboRSAKeyOutputFormat.SelectedItem?.ToString(),
+                    true,
+                    comboRSAKeyFormat.SelectedItem?.ToString());
                 byte[] dataBytes = Encoding.UTF8.GetBytes(textRSASignData.Text);
-                byte[] signatureBytes = rsaCrypto.Sign(dataBytes, privateKeyBytes);
+                byte[] signatureBytes = rsaCrypto.Sign(
+                    dataBytes,
+                    privateKeyBytes,
+                    RsaUiHelper.ParseSignatureAlgorithm(comboRSASignAlgmFormat.SelectedItem?.ToString()));
 
-                textRSASignature.Text = Convert.ToBase64String(signatureBytes);
+                textRSASignature.Text = RsaUiHelper.WriteBinaryText(
+                    signatureBytes,
+                    comboRSASignOutputFormat.SelectedItem?.ToString());
 
                 SetStatus($"RSA签名完成 - 使用{comboRSASignAlgmFormat.SelectedItem}算法，输出{comboRSASignOutputFormat.SelectedItem}格式");
             }
@@ -306,10 +337,20 @@ namespace CryptoTool.Win
                 SetStatus("正在进行RSA验签...");
 
                 var rsaCrypto = new RsaCrypto();
-                byte[] publicKeyBytes = Convert.FromBase64String(textRSAPublicKey.Text);
+                byte[] publicKeyBytes = RsaUiHelper.ReadKeyBytes(
+                    textRSAPublicKey.Text,
+                    comboRSAKeyOutputFormat.SelectedItem?.ToString(),
+                    false,
+                    comboRSAKeyFormat.SelectedItem?.ToString());
                 byte[] dataBytes = Encoding.UTF8.GetBytes(verifyData);
-                byte[] signatureBytes = Convert.FromBase64String(verifySignature);
-                bool isValid = rsaCrypto.VerifySign(dataBytes, signatureBytes, publicKeyBytes);
+                byte[] signatureBytes = RsaUiHelper.ReadBinaryText(
+                    verifySignature,
+                    comboRSASignOutputFormat.SelectedItem?.ToString());
+                bool isValid = rsaCrypto.VerifySign(
+                    dataBytes,
+                    signatureBytes,
+                    publicKeyBytes,
+                    RsaUiHelper.ParseSignatureAlgorithm(comboRSASignAlgmFormat.SelectedItem?.ToString()));
 
                 labelRSAVerifyResult.Text = isValid ? "验证通过" : "验证失败";
                 labelRSAVerifyResult.ForeColor = isValid ? Color.Green : Color.Red;

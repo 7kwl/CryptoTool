@@ -40,11 +40,27 @@ namespace CryptoTool.Algorithm.Factory
             if (string.IsNullOrEmpty(algorithmName))
                 throw new ArgumentException("算法名称不能为空", nameof(algorithmName));
 
-            if (!_algorithmTypes.TryGetValue(algorithmName.ToUpper(), out var algorithmType))
+            var normalizedName = algorithmName.ToUpper();
+            if (!_algorithmTypes.TryGetValue(normalizedName, out var algorithmType))
                 throw new AlgorithmNotSupportedException($"不支持的算法: {algorithmName}");
 
             try
             {
+                if (parameters == null || parameters.Length == 0)
+                {
+                    return normalizedName switch
+                    {
+                        "RSA" => new RsaCrypto(),
+                        "AES" => new AesCrypto(),
+                        "DES" => new DesCrypto(),
+                        "MD5" => new Md5Hash(),
+                        "SM2" => new Sm2Crypto(),
+                        "SM3" => new Sm3Hash(),
+                        "SM4" => new Sm4Crypto(),
+                        _ => throw new AlgorithmNotSupportedException($"不支持的算法: {algorithmName}")
+                    };
+                }
+
                 return (ICryptoAlgorithm)Activator.CreateInstance(algorithmType, parameters);
             }
             catch (Exception ex)

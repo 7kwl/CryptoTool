@@ -230,7 +230,6 @@ namespace CryptoTool.Algorithm.Algorithms.SM4
             {
                 SymmetricPaddingMode.PKCS5 => new Pkcs7Padding(),  // PKCS5等同于PKCS7
                 SymmetricPaddingMode.PKCS7 => new Pkcs7Padding(),
-                SymmetricPaddingMode.None => new ZeroBytePadding(),
                 SymmetricPaddingMode.Zeros => new ZeroBytePadding(),
                 _ => new Pkcs7Padding()
             };
@@ -247,10 +246,14 @@ namespace CryptoTool.Algorithm.Algorithms.SM4
             switch (_mode)
             {
                 case SymmetricCipherMode.CBC:
-                    cipher = new PaddedBufferedBlockCipher(new CbcBlockCipher(engine), CreatePadding());
+                    cipher = _padding == SymmetricPaddingMode.None
+                        ? new BufferedBlockCipher(new CbcBlockCipher(engine))
+                        : new PaddedBufferedBlockCipher(new CbcBlockCipher(engine), CreatePadding());
                     break;
                 case SymmetricCipherMode.ECB:
-                    cipher = new PaddedBufferedBlockCipher(new EcbBlockCipher(engine), CreatePadding());
+                    cipher = _padding == SymmetricPaddingMode.None
+                        ? new BufferedBlockCipher(new EcbBlockCipher(engine))
+                        : new PaddedBufferedBlockCipher(new EcbBlockCipher(engine), CreatePadding());
                     break;
                 case SymmetricCipherMode.CFB:
                     cipher = new BufferedBlockCipher(new CfbBlockCipher(engine, SM4_BLOCK_SIZE_BYTES * 8)); // 128位

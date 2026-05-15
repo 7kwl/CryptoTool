@@ -73,6 +73,7 @@ namespace CryptoTool.Algorithm.Algorithms.AES
                 aes.Mode = _mode;
                 aes.Padding = _padding;
                 aes.Key = key;
+                bool shouldEmbedIv = _mode != CipherMode.ECB && iv == null;
 
                 if (iv != null)
                 {
@@ -80,7 +81,7 @@ namespace CryptoTool.Algorithm.Algorithms.AES
                         throw new KeyException($"IV长度必须为{AES_BLOCK_SIZE_BYTES}字节");
                     aes.IV = iv;
                 }
-                else
+                else if (_mode != CipherMode.ECB)
                 {
                     aes.GenerateIV();
                 }
@@ -89,7 +90,7 @@ namespace CryptoTool.Algorithm.Algorithms.AES
                 var encrypted = encryptor.TransformFinalBlock(data, 0, data.Length);
 
                 // 如果IV是自动生成的，需要将IV和加密数据一起返回
-                if (iv == null)
+                if (shouldEmbedIv)
                 {
                     var result = new byte[aes.IV.Length + encrypted.Length];
                     Array.Copy(aes.IV, 0, result, 0, aes.IV.Length);
@@ -142,7 +143,7 @@ namespace CryptoTool.Algorithm.Algorithms.AES
                 aes.Key = key;
 
                 // 如果IV为null，说明IV包含在加密数据的前面
-                if (iv == null)
+                if (_mode != CipherMode.ECB && iv == null)
                 {
                     if (encryptedData.Length < AES_BLOCK_SIZE_BYTES)
                         throw new DataException("加密数据长度不足，无法提取IV");
@@ -155,7 +156,7 @@ namespace CryptoTool.Algorithm.Algorithms.AES
                     Array.Copy(encryptedData, extractedIV.Length, actualEncryptedData, 0, actualEncryptedData.Length);
                     encryptedData = actualEncryptedData;
                 }
-                else
+                else if (_mode != CipherMode.ECB)
                 {
                     if (iv.Length != AES_BLOCK_SIZE_BYTES)
                         throw new KeyException($"IV长度必须为{AES_BLOCK_SIZE_BYTES}字节");

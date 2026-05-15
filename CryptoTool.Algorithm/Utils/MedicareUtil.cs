@@ -108,11 +108,11 @@ namespace CryptoTool.Algorithm.Utils
             string jStr = SerializeObjectCanonicalJson(dataObject);
 
             // 2) 派生SM4密钥
-            string derived16 = GetSm4Key16(appId, appSecret);
+            byte[] derived16 = GetSm4Key16Bytes(appId, appSecret);
 
             // 3) 使用派生密钥加密jStr，得到Base64，再转Hex大写
             var sm4Crypto = new Sm4Crypto(Enums.SymmetricCipherMode.ECB);
-            byte[] cipherBytes = sm4Crypto.Encrypt(Encoding.UTF8.GetBytes(jStr), Encoding.UTF8.GetBytes(derived16));
+            byte[] cipherBytes = sm4Crypto.Encrypt(Encoding.UTF8.GetBytes(jStr), derived16);
             string encHex = StringUtil.BytesToHex(cipherBytes, true);
             return encHex;
         }
@@ -131,8 +131,7 @@ namespace CryptoTool.Algorithm.Utils
             if (string.IsNullOrEmpty(appId)) throw new ArgumentNullException(nameof(appId));
             if (string.IsNullOrEmpty(appSecret)) throw new ArgumentNullException(nameof(appSecret));
 
-            string derived16 = GetSm4Key16(appId, appSecret);
-            byte[] derived16Bytes = StringUtil.HexToBytes(derived16);
+            byte[] derived16Bytes = GetSm4Key16Bytes(appId, appSecret);
             byte[] cipherBytes = StringUtil.HexToBytes(encDataHex);
             var sm4Crypto = new Sm4Crypto(Enums.SymmetricCipherMode.ECB);
             byte[] decryptBytes = sm4Crypto.Decrypt(cipherBytes, derived16Bytes);
@@ -229,8 +228,13 @@ namespace CryptoTool.Algorithm.Utils
         /// </summary>
         /// <param name="appId"></param>
         /// <param name="appSecret"></param>
-        /// <returns>返回Hex</returns>
+        /// <returns>返回16字节密钥的Hex表示（32个十六进制字符）</returns>
         public static string GetSm4Key16(string appId, string appSecret)
+        {
+            return StringUtil.BytesToHex(GetSm4Key16Bytes(appId, appSecret), true);
+        }
+
+        private static byte[] GetSm4Key16Bytes(string appId, string appSecret)
         {
             // 以appId(渠道id)作为Key，对appSecret加密，得到新秘钥串
             if (appId.Length < 16)
@@ -241,7 +245,13 @@ namespace CryptoTool.Algorithm.Utils
             byte[] appSecretBytes = Encoding.UTF8.GetBytes(appSecret);
             var sm4Crypto = new Sm4Crypto(Enums.SymmetricCipherMode.ECB);
             byte[] newEncryptedData = sm4Crypto.Encrypt(appSecretBytes, appIdBytes16);
-            string derived16 = Hex.ToHexString(newEncryptedData).ToUpper().Substring(0, 16);
+            if (newEncryptedData.Length < 16)
+            {
+                throw new InvalidOperationException("派生SM4密钥失败，结果长度不足16字节");
+            }
+
+            var derived16 = new byte[16];
+            Buffer.BlockCopy(newEncryptedData, 0, derived16, 0, 16);
             return derived16;
         }
     }

@@ -67,7 +67,9 @@ namespace CryptoTool.Win
 
                 UIOutputFormat ivFormat = FormatConversionHelper.ParseOutputFormat(comboAESIVFormat.SelectedItem?.ToString() ?? "");
 
-                var aesCrypto = new AesCrypto();
+                string keySizeText = comboAESKeySize.SelectedItem?.ToString() ?? "AES256";
+                int keySize = int.Parse(keySizeText.Replace("AES", "").Replace("位", ""));
+                var aesCrypto = new AesCrypto(keySize);
                 byte[] ivBytes = aesCrypto.GenerateIV();
 
                 // 转换为用户指定的格式
@@ -120,7 +122,11 @@ namespace CryptoTool.Win
                 byte[]? ivBytes = string.IsNullOrEmpty(textAESIV.Text) ? null : FormatConversionHelper.StringToBytes(textAESIV.Text, ivFormat);
 
                 // 创建AES加密器
-                var aesCrypto = new AesCrypto();
+                var aesCrypto = SymmetricCryptoOptionHelper.CreateAesCrypto(
+                    comboAESKeySize.SelectedItem?.ToString(),
+                    keyBytes,
+                    comboAESMode.SelectedItem?.ToString(),
+                    comboAESPadding.SelectedItem?.ToString());
 
                 // 执行加密
                 byte[] dataBytes = Encoding.UTF8.GetBytes(plaintext);
@@ -258,7 +264,11 @@ namespace CryptoTool.Win
                         byte[] keyBytes = FormatConversionHelper.StringToBytes(textAESKey.Text, keyFormat);
                         byte[]? ivBytes = string.IsNullOrEmpty(textAESIV.Text) ? null : FormatConversionHelper.StringToBytes(textAESIV.Text, ivFormat);
 
-                        var aesCrypto = new AesCrypto();
+                        var aesCrypto = SymmetricCryptoOptionHelper.CreateAesCrypto(
+                            comboAESKeySize.SelectedItem?.ToString(),
+                            keyBytes,
+                            comboAESMode.SelectedItem?.ToString(),
+                            comboAESPadding.SelectedItem?.ToString());
                         byte[] fileData = File.ReadAllBytes(openDialog.FileName);
                         byte[] encryptedData = aesCrypto.Encrypt(fileData, keyBytes, ivBytes);
                         File.WriteAllBytes(saveDialog.FileName, encryptedData);
@@ -322,7 +332,11 @@ namespace CryptoTool.Win
                         byte[] keyBytes = FormatConversionHelper.StringToBytes(textAESKey.Text, keyFormat);
                         byte[]? ivBytes = string.IsNullOrEmpty(textAESIV.Text) ? null : FormatConversionHelper.StringToBytes(textAESIV.Text, ivFormat);
 
-                        var aesCrypto = new AesCrypto();
+                        var aesCrypto = SymmetricCryptoOptionHelper.CreateAesCrypto(
+                            comboAESKeySize.SelectedItem?.ToString(),
+                            keyBytes,
+                            comboAESMode.SelectedItem?.ToString(),
+                            comboAESPadding.SelectedItem?.ToString());
                         byte[] encryptedData = File.ReadAllBytes(openDialog.FileName);
                         byte[] decryptedData = aesCrypto.Decrypt(encryptedData, keyBytes, ivBytes);
                         File.WriteAllBytes(saveDialog.FileName, decryptedData);

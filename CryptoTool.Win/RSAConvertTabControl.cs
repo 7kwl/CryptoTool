@@ -52,12 +52,7 @@ namespace CryptoTool.Win
 
                 SetStatus("正在验证密钥对...");
 
-                // 解析密钥
-                var rsaCrypto = new RsaCrypto();
-
-                // 使用加密解密测试来验证密钥对匹配性
-                // bool isValid = ValidateKeyPairByEncryption(rsaCrypto, publicKeyBytes, privateKeyBytes);
-                bool isValid = true; // 临时占位，实际实现需要补充 
+                bool isValid = RsaKeyConversionService.ValidateKeyPair(_publicKeyForValidation, _privateKeyForValidation);
                 labelValidationResult.Text = isValid ? "验证结果: 密钥对匹配" : "验证结果: 密钥对不匹配";
                 labelValidationResult.ForeColor = isValid ? Color.Green : Color.Red;
 
@@ -90,21 +85,12 @@ namespace CryptoTool.Win
 
                 SetStatus("正在从私钥提取公钥...");
 
-                var inputKeyType = FormatConversionHelper.ParseInputFormat(comboInputKeyType.SelectedIndex.ToString());
-                var inputFormat = FormatConversionHelper.ParseInputFormat(comboInputFormat.SelectedItem.ToString());
-                var outputKeyType = FormatConversionHelper.ParseOutputFormat(comboOutputKeyType.SelectedIndex.ToString());
-                var outputFormat = FormatConversionHelper.ParseOutputFormat(comboOutputFormat.SelectedIndex.ToString());
-
-                // 转换私钥为字节数组
-                byte[] privateKeyBytes = FormatConversionHelper.StringToBytes(textInputKey.Text, inputFormat);
-
-                var rsaCrypto = new RsaCrypto();
-
-                // 从私钥提取公钥
-                byte[] publicKeyBytes = null; // rsaCrypto.ExtractPublicKeyFromPrivate(privateKeyBytes);
-
-                // 生成公钥字符串
-                string publicKeyString = FormatConversionHelper.BytesToString(publicKeyBytes, outputFormat);
+                string publicKeyString = RsaKeyConversionService.ExtractPublicKeyFromPrivate(
+                    textInputKey.Text,
+                    comboInputKeyType.SelectedItem?.ToString() ?? "PKCS8",
+                    comboInputFormat.SelectedItem?.ToString() ?? "PEM",
+                    comboOutputKeyType.SelectedItem?.ToString() ?? "PKCS8",
+                    comboOutputFormat.SelectedItem?.ToString() ?? "Base64");
 
                 textOutputKey.Text = publicKeyString;
 
@@ -142,22 +128,26 @@ namespace CryptoTool.Win
 
                 SetStatus("正在进行格式转换...");
 
-                var inputKeyType = FormatConversionHelper.ParseInputFormat(comboInputKeyType.SelectedItem.ToString());
-                var inputFormat = FormatConversionHelper.ParseInputFormat(comboInputFormat.SelectedItem.ToString());
-                var outputKeyType = FormatConversionHelper.ParseOutputFormat(comboOutputKeyType.SelectedItem.ToString());
-                var outputFormat = FormatConversionHelper.ParseOutputFormat(comboOutputFormat.SelectedItem.ToString());
-
                 bool isPrivateKey = radioPrivateKey.Checked;
-                string convertedKey;
-
-                // 转换输入密钥为字节数组
-                byte[] inputKeyBytes = FormatConversionHelper.StringToBytes(textInputKey.Text, inputFormat);
-
-                // 直接使用字节数组进行格式转换
-                convertedKey = FormatConversionHelper.BytesToString(inputKeyBytes, outputFormat);
+                string convertedKey = RsaKeyConversionService.ConvertKey(
+                    textInputKey.Text,
+                    isPrivateKey,
+                    comboInputKeyType.SelectedItem?.ToString() ?? "PKCS8",
+                    comboInputFormat.SelectedItem?.ToString() ?? "PEM",
+                    comboOutputKeyType.SelectedItem?.ToString() ?? "PKCS8",
+                    comboOutputFormat.SelectedItem?.ToString() ?? "Base64");
 
                 textOutputKey.Text = convertedKey;
-                SetStatus($"格式转换完成 - {inputKeyType}/{inputFormat} -> {outputKeyType}/{outputFormat}");
+                if (isPrivateKey)
+                {
+                    _privateKeyForValidation = convertedKey;
+                }
+                else
+                {
+                    _publicKeyForValidation = convertedKey;
+                }
+
+                SetStatus($"格式转换完成 - {comboInputKeyType.SelectedItem}/{comboInputFormat.SelectedItem} -> {comboOutputKeyType.SelectedItem}/{comboOutputFormat.SelectedItem}");
             }
             catch (InvalidCastException ex)
             {

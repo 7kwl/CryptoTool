@@ -72,7 +72,6 @@ function Update-ProjectVersion {
 
 # Update all project files
 Update-ProjectVersion "CryptoTool.Win\CryptoTool.Win.csproj" $NewVersion
-Update-ProjectVersion "CryptoTool.Test\CryptoTool.Test.csproj" $NewVersion
 Update-ProjectVersion "CryptoTool.Algorithm\CryptoTool.Algorithm.csproj" $NewVersion
 
 # Clean previous build outputs

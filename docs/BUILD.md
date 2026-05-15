@@ -45,7 +45,6 @@
 #### 可执行文件
 - `CryptoTool-v{version}-win-x64-SelfContained.exe` - 自包含版本，无需安装 .NET 运行时
 - `CryptoTool-v{version}-win-x64-FrameworkDependent.exe` - 需要 .NET 8 运行时
-- `CryptoTool.Test-v{version}-win-x64.exe` - 控制台应用程序
 
 #### 安装包
 - `CryptoTool-v{version}-win-x64-Setup.msi` - Windows 安装包，自动创建桌面和开始菜单快捷方式
@@ -53,7 +52,6 @@
 #### 压缩包
 - `CryptoTool-v{version}-SelfContained-Release.zip` - 自包含版本的完整文件
 - `CryptoTool-v{version}-FrameworkDependent-Release.zip` - 框架依赖版本的完整文件
-- `CryptoTool.Test-v{version}-Release.zip` - 控制台应用程序的完整文件
 
 ## 本地构建
 
@@ -120,6 +118,13 @@ wix build installer/CryptoTool.wxs -o CryptoTool-Setup.msi
 - 应用程序图标
 - 产品描述
 - 公司信息
+
+### 自动化测试
+- 主测试入口为 `CryptoTool.UnitTests/CryptoTool.UnitTests.csproj`
+- 本地推荐执行：
+  ```bash
+  dotnet test CryptoTool.UnitTests/CryptoTool.UnitTests.csproj
+  ```
 
 ## 故障排除
 

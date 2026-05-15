@@ -128,7 +128,6 @@ jobs:
         
         $projects = @(
           "CryptoTool.Win\CryptoTool.Win.csproj",
-          "CryptoTool.Test\CryptoTool.Test.csproj",
           "CryptoTool.Algorithm\CryptoTool.Algorithm.csproj"
         )
         
@@ -201,22 +200,6 @@ jobs:
           -p:DebugSymbols=false `
           -p:InvariantGlobalization=false
 
-    # Publish the Console App
-    - name: Publish Console App
-      shell: pwsh
-      run: |
-        $env:DOTNET_CLI_UI_LANGUAGE = "en-US"
-        dotnet publish CryptoTool.Test\CryptoTool.Test.csproj `
-          --configuration ${{ matrix.configuration }} `
-          --runtime win-x64 `
-          --self-contained true `
-          --output ./publish/CryptoTool.Test `
-          -p:PublishSingleFile=true `
-          -p:PublishTrimmed=false `
-          -p:DebugType=None `
-          -p:DebugSymbols=false `
-          -p:InvariantGlobalization=false
-
     # Rename executables with version info
     - name: Rename executables
       shell: pwsh
@@ -230,10 +213,6 @@ jobs:
         if (Test-Path "./publish/CryptoTool.Win-FrameworkDependent/CryptoTool.Win.exe") {
           Rename-Item "./publish/CryptoTool.Win-FrameworkDependent/CryptoTool.Win.exe" "CryptoTool-v$version-win-x64-FrameworkDependent.exe"
           Write-Host "Renamed framework-dependent executable"
-        }
-        if (Test-Path "./publish/CryptoTool.Test/CryptoTool.Test.exe") {
-          Rename-Item "./publish/CryptoTool.Test/CryptoTool.Test.exe" "CryptoTool.Test-v$version-win-x64.exe"
-          Write-Host "Renamed console app executable"
         }
 
     # Create WiX source files for MSI packaging
@@ -365,13 +344,6 @@ jobs:
           Write-Host "Created: $zipPath"
         }
         
-        # Create ZIP for console app
-        if (Test-Path "./publish/CryptoTool.Test") {
-          $zipPath = "./publish/CryptoTool.Test-v$version-${{ matrix.configuration }}.zip"
-          Compress-Archive -Path "./publish/CryptoTool.Test/*" -DestinationPath $zipPath
-          Write-Host "Created: $zipPath"
-        }
-
     # List all files in publish directory
     - name: List Publish Directory Contents
       shell: pwsh
@@ -459,12 +431,11 @@ jobs:
           - **CryptoTool-v${{ needs.build.outputs.version }}-win-x64-SelfContained.exe**: 自包含可执行文件，无需安装.NET运行时
           - **CryptoTool-v${{ needs.build.outputs.version }}-win-x64-FrameworkDependent.exe**: 框架依赖可执行文件，需要.NET 8运行时
           - **CryptoTool-v${{ needs.build.outputs.version }}-win-x64-Setup.msi**: Windows安装包，包含桌面和开始菜单快捷方式
-          - **CryptoTool.Test-v${{ needs.build.outputs.version }}-win-x64.exe**: 控制台应用程序
           - **ZIP文件**: 包含完整发布文件的压缩包
           
           ### 功能特性 / Features
           - 支持RSA、SM2、SM3、SM4等多种加解密算法
-          - 提供Windows Forms图形界面和控制台应用
+          - 提供Windows Forms图形界面与自动化回归测试
           - 支持密钥格式转换和证书管理
           
           ### 系统要求 / System Requirements

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36414.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoTool.Test", "CryptoTool.Test\CryptoTool.Test.csproj", "{384CA9D9-76C3-49CF-A0B3-B14B40430D8D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoTool.UnitTests", "CryptoTool.UnitTests\CryptoTool.UnitTests.csproj", "{C8EDB0DE-E46D-41D1-8BEE-BECC7F25A302}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoTool.Win", "CryptoTool.Win\CryptoTool.Win.csproj", "{4090BC13-E8C0-4E45-93BE-E765B08241CC}"
 EndProject
@@ -17,10 +17,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{384CA9D9-76C3-49CF-A0B3-B14B40430D8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{384CA9D9-76C3-49CF-A0B3-B14B40430D8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{384CA9D9-76C3-49CF-A0B3-B14B40430D8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{384CA9D9-76C3-49CF-A0B3-B14B40430D8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8EDB0DE-E46D-41D1-8BEE-BECC7F25A302}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8EDB0DE-E46D-41D1-8BEE-BECC7F25A302}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8EDB0DE-E46D-41D1-8BEE-BECC7F25A302}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8EDB0DE-E46D-41D1-8BEE-BECC7F25A302}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4090BC13-E8C0-4E45-93BE-E765B08241CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4090BC13-E8C0-4E45-93BE-E765B08241CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4090BC13-E8C0-4E45-93BE-E765B08241CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
