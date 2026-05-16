@@ -300,7 +300,7 @@ namespace CryptoTool.Win
             // 
             comboSM2CipherFormat.DropDownStyle = ComboBoxStyle.DropDownList;
             comboSM2CipherFormat.FormattingEnabled = true;
-            comboSM2CipherFormat.Items.AddRange(new object[] { "C1C3C2", "C1C2C3", "ASN1" });
+            comboSM2CipherFormat.Items.AddRange(new object[] { "C1C3C2", "C1C2C3" });
             comboSM2CipherFormat.Location = new Point(80, 4);
             comboSM2CipherFormat.Margin = new Padding(4);
             comboSM2CipherFormat.Name = "comboSM2CipherFormat";

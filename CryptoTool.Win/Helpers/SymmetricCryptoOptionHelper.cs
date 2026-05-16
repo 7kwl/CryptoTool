@@ -1,4 +1,5 @@
 using CryptoTool.Algorithm.Algorithms.AES;
+using CryptoTool.Algorithm.Algorithms.DES;
 using CryptoTool.Algorithm.Algorithms.SM4;
 using CryptoTool.Algorithm.Enums;
 using System.Security.Cryptography;
@@ -11,6 +12,11 @@ internal static class SymmetricCryptoOptionHelper
     {
         var keySize = ParseAesKeySize(keySizeText, keyBytes);
         return new AesCrypto(keySize, ParseAesMode(modeText), ParseAesPadding(paddingText));
+    }
+
+    public static DesCrypto CreateDesCrypto(string? modeText, string? paddingText)
+    {
+        return new DesCrypto(ParseDesMode(modeText), ParseDesPadding(paddingText));
     }
 
     public static Sm4Crypto CreateSm4Crypto(string? modeText, string? paddingText)
@@ -46,6 +52,31 @@ internal static class SymmetricCryptoOptionHelper
     }
 
     private static PaddingMode ParseAesPadding(string? paddingText)
+    {
+        return paddingText?.Trim().ToUpperInvariant() switch
+        {
+            "PKCS7" => PaddingMode.PKCS7,
+            "PKCS5" => PaddingMode.PKCS7,
+            "ZEROS" => PaddingMode.Zeros,
+            "ISO10126" => PaddingMode.ISO10126,
+            "ANSIX923" => PaddingMode.ANSIX923,
+            "NONE" => PaddingMode.None,
+            _ => PaddingMode.PKCS7
+        };
+    }
+
+    private static CipherMode ParseDesMode(string? modeText)
+    {
+        return modeText?.Trim().ToUpperInvariant() switch
+        {
+            "ECB" => CipherMode.ECB,
+            "CBC" => CipherMode.CBC,
+            "CFB" => CipherMode.CFB,
+            _ => CipherMode.CBC
+        };
+    }
+
+    private static PaddingMode ParseDesPadding(string? paddingText)
     {
         return paddingText?.Trim().ToUpperInvariant() switch
         {

@@ -58,4 +58,15 @@ public class RsaTabControlTests
 
         Assert.Equal(plaintextTextBox.Text, Encoding.UTF8.GetString(decryptedBytes));
     }
+
+    [StaFact]
+    public void PaddingOptionsShouldNotExposeUnsupportedNoPadding()
+    {
+        using var control = new CryptoTool.Win.RSATabControl();
+
+        var paddingCombo = WinFormsTestHelper.GetPrivateField<ComboBox>(control, "comboRSAKeyPadding");
+        var items = paddingCombo.Items.Cast<object>().Select(item => item.ToString()).ToArray();
+
+        Assert.DoesNotContain("NoPadding", items);
+    }
 }

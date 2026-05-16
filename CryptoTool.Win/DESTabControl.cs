@@ -117,7 +117,9 @@ namespace CryptoTool.Win
                 byte[]? ivBytes = string.IsNullOrEmpty(textDESIV.Text) ? null : FormatConversionHelper.StringToBytes(textDESIV.Text, ivFormat);
 
                 // 创建DES加密器
-                var desCrypto = new DesCrypto();
+                var desCrypto = SymmetricCryptoOptionHelper.CreateDesCrypto(
+                    comboDESMode.SelectedItem?.ToString(),
+                    comboDESPadding.SelectedItem?.ToString());
 
                 // 执行加密
                 byte[] dataBytes = Encoding.UTF8.GetBytes(plaintext);
@@ -174,7 +176,9 @@ namespace CryptoTool.Win
                 byte[]? ivBytes = string.IsNullOrEmpty(textDESIV.Text) ? null : FormatConversionHelper.StringToBytes(textDESIV.Text, ivFormat);
 
                 // 创建DES加密器
-                var desCrypto = new DesCrypto();
+                var desCrypto = SymmetricCryptoOptionHelper.CreateDesCrypto(
+                    comboDESMode.SelectedItem?.ToString(),
+                    comboDESPadding.SelectedItem?.ToString());
 
                 // 执行解密
                 byte[] decryptedBytes = desCrypto.Decrypt(cipherBytes, keyBytes, ivBytes);
@@ -324,7 +328,9 @@ namespace CryptoTool.Win
                         byte[] keyBytes = FormatConversionHelper.StringToBytes(textDESKey.Text, keyFormat);
                         byte[]? ivBytes = string.IsNullOrEmpty(textDESIV.Text) ? null : FormatConversionHelper.StringToBytes(textDESIV.Text, ivFormat);
 
-                        var desCrypto = new DesCrypto();
+                        var desCrypto = SymmetricCryptoOptionHelper.CreateDesCrypto(
+                            comboDESMode.SelectedItem?.ToString(),
+                            comboDESPadding.SelectedItem?.ToString());
                         byte[] fileData = File.ReadAllBytes(openDialog.FileName);
                         byte[] encryptedData = desCrypto.Encrypt(fileData, keyBytes, ivBytes);
                         File.WriteAllBytes(saveDialog.FileName, encryptedData);
@@ -388,7 +394,9 @@ namespace CryptoTool.Win
                         byte[] keyBytes = FormatConversionHelper.StringToBytes(textDESKey.Text, keyFormat);
                         byte[]? ivBytes = string.IsNullOrEmpty(textDESIV.Text) ? null : FormatConversionHelper.StringToBytes(textDESIV.Text, ivFormat);
 
-                        var desCrypto = new DesCrypto();
+                        var desCrypto = SymmetricCryptoOptionHelper.CreateDesCrypto(
+                            comboDESMode.SelectedItem?.ToString(),
+                            comboDESPadding.SelectedItem?.ToString());
                         byte[] encryptedData = File.ReadAllBytes(openDialog.FileName);
                         byte[] decryptedData = desCrypto.Decrypt(encryptedData, keyBytes, ivBytes);
                         File.WriteAllBytes(saveDialog.FileName, decryptedData);

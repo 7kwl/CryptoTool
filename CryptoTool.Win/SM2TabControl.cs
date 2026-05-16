@@ -1,5 +1,6 @@
 using CryptoTool.Algorithm.Algorithms.SM2;
 using CryptoTool.Algorithm.Utils;
+using CryptoTool.Win.Helpers;
 using System.Text;
 
 namespace CryptoTool.Win
@@ -71,12 +72,12 @@ namespace CryptoTool.Win
                     if (openFileDialog.ShowDialog() == DialogResult.OK)
                     {
                         string content = File.ReadAllText(openFileDialog.FileName, Encoding.UTF8);
-                        string[] lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                        var (publicKey, privateKey) = Sm2UiHelper.ParseKeyFileContent(content);
 
-                        if (lines.Length >= 2)
+                        if (!string.IsNullOrWhiteSpace(publicKey) && !string.IsNullOrWhiteSpace(privateKey))
                         {
-                            textSM2PublicKey.Text = lines[0].Trim();
-                            textSM2PrivateKey.Text = lines[1].Trim();
+                            textSM2PublicKey.Text = publicKey;
+                            textSM2PrivateKey.Text = privateKey;
                             SetStatus("SM2密钥导入成功");
                         }
                         else
@@ -111,7 +112,7 @@ namespace CryptoTool.Win
 
                     if (saveFileDialog.ShowDialog() == DialogResult.OK)
                     {
-                        string content = $"公钥：\r\n{textSM2PublicKey.Text}\r\n\r\n私钥：\r\n{textSM2PrivateKey.Text}";
+                        string content = Sm2UiHelper.BuildKeyFileContent(textSM2PublicKey.Text, textSM2PrivateKey.Text);
                         File.WriteAllText(saveFileDialog.FileName, content, Encoding.UTF8);
                         SetStatus("SM2密钥导出成功");
                     }
@@ -157,11 +158,13 @@ namespace CryptoTool.Win
                     publicKeyBytes = StringUtil.HexToBytes(textSM2PublicKey.Text);
                 }
 
-                byte[] encryptedBytes = sm2Crypto.Encrypt(dataBytes, publicKeyBytes);
+                var cipherFormat = Sm2UiHelper.ParseCipherFormatSelection(
+                    comboSM2CipherFormat.SelectedItem?.ToString());
+                byte[] encryptedBytes = sm2Crypto.Encrypt(dataBytes, publicKeyBytes, cipherFormat);
                 string cipherText = Convert.ToBase64String(encryptedBytes);
 
                 textSM2CipherText.Text = cipherText;
-                SetStatus($"SM2加密完成 - 使用{formatText}格式");
+                SetStatus($"SM2加密完成 - 密钥{formatText}格式，密文{comboSM2CipherFormat.SelectedItem}格式");
             }
             catch (Exception ex)
             {
@@ -203,11 +206,13 @@ namespace CryptoTool.Win
                     privateKeyBytes = StringUtil.HexToBytes(textSM2PrivateKey.Text);
                 }
 
-                byte[] decryptedBytes = sm2Crypto.Decrypt(cipherBytes, privateKeyBytes);
+                var cipherFormat = Sm2UiHelper.ParseCipherFormatSelection(
+                    comboSM2CipherFormat.SelectedItem?.ToString());
+                byte[] decryptedBytes = sm2Crypto.Decrypt(cipherBytes, privateKeyBytes, cipherFormat);
                 string plainText = Encoding.UTF8.GetString(decryptedBytes);
 
                 textSM2PlainText.Text = plainText;
-                SetStatus($"SM2解密完成 - 使用{formatText}格式");
+                SetStatus($"SM2解密完成 - 密钥{formatText}格式");
             }
             catch (Exception ex)
             {
@@ -250,10 +255,13 @@ namespace CryptoTool.Win
                 }
 
                 byte[] signatureBytes = sm2Crypto.Sign(dataBytes, privateKeyBytes);
+                signatureBytes = Sm2UiHelper.ConvertSignatureForOutput(
+                    signatureBytes,
+                    comboSM2SignFormat.SelectedItem?.ToString());
                 string signature = Convert.ToBase64String(signatureBytes);
 
                 textSM2Signature.Text = signature;
-                SetStatus($"SM2签名完成 - 使用{formatText}格式");
+                SetStatus($"SM2签名完成 - 密钥{formatText}格式，签名{comboSM2SignFormat.SelectedItem}格式");
             }
             catch (Exception ex)
             {
@@ -292,6 +300,9 @@ namespace CryptoTool.Win
                 byte[] publicKeyBytes;
                 byte[] dataBytes = Encoding.UTF8.GetBytes(textSM2SignData.Text);
                 byte[] signatureBytes = Convert.FromBase64String(textSM2Signature.Text);
+                signatureBytes = Sm2UiHelper.NormalizeSignatureForVerify(
+                    signatureBytes,
+                    comboSM2SignFormat.SelectedItem?.ToString());
 
                 if (formatText == "Base64")
                 {

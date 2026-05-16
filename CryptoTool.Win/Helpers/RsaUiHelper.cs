@@ -19,8 +19,8 @@ internal static class RsaUiHelper
         {
             "PKCS1" => AsymmetricPaddingMode.PKCS1,
             "OAEP" => AsymmetricPaddingMode.OAEP,
-            "NOPADDING" => AsymmetricPaddingMode.None,
-            "NONE" => AsymmetricPaddingMode.None,
+            "NOPADDING" => throw new NotSupportedException("RSA NoPadding 当前未实现，请使用 PKCS1 或 OAEP"),
+            "NONE" => throw new NotSupportedException("RSA NoPadding 当前未实现，请使用 PKCS1 或 OAEP"),
             _ => AsymmetricPaddingMode.PKCS1
         };
     }

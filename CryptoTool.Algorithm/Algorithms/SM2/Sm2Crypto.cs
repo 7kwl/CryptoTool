@@ -38,12 +38,20 @@ namespace CryptoTool.Algorithm.Algorithms.SM2
         /// <exception cref="CryptoException"></exception>
         public byte[] Encrypt(byte[] data, byte[] publicKey)
         {
+            return Encrypt(data, publicKey, SM2CipherFormat.C1C2C3);
+        }
+
+        /// <summary>
+        /// 使用指定密文格式加密
+        /// </summary>
+        public byte[] Encrypt(byte[] data, byte[] publicKey, SM2CipherFormat cipherFormat)
+        {
             ValidateEncryptInput(data, publicKey);
 
             try
             {
                 var ecPublicKey = ParsePublicKey(publicKey);
-                var sm2Engine = new SM2Engine();
+                var sm2Engine = new SM2Engine(ToEngineMode(cipherFormat));
                 sm2Engine.Init(true, new ParametersWithRandom(ecPublicKey, new SecureRandom()));
 
                 return sm2Engine.ProcessBlock(data, 0, data.Length);
@@ -63,12 +71,20 @@ namespace CryptoTool.Algorithm.Algorithms.SM2
         /// <exception cref="CryptoException"></exception>
         public byte[] Decrypt(byte[] encryptedData, byte[] privateKey)
         {
+            return Decrypt(encryptedData, privateKey, SM2CipherFormat.C1C2C3);
+        }
+
+        /// <summary>
+        /// 使用指定密文格式解密
+        /// </summary>
+        public byte[] Decrypt(byte[] encryptedData, byte[] privateKey, SM2CipherFormat cipherFormat)
+        {
             ValidateDecryptInput(encryptedData, privateKey);
 
             try
             {
                 var ecPrivateKey = ParsePrivateKey(privateKey);
-                var sm2Engine = new SM2Engine();
+                var sm2Engine = new SM2Engine(ToEngineMode(cipherFormat));
                 sm2Engine.Init(false, ecPrivateKey);
 
                 return sm2Engine.ProcessBlock(encryptedData, 0, encryptedData.Length);
@@ -498,6 +514,16 @@ namespace CryptoTool.Algorithm.Algorithms.SM2
             {
                 throw new CryptoException("签名格式转换失败", ex);
             }
+        }
+
+        private static SM2Engine.Mode ToEngineMode(SM2CipherFormat cipherFormat)
+        {
+            return cipherFormat switch
+            {
+                SM2CipherFormat.C1C2C3 => SM2Engine.Mode.C1C2C3,
+                SM2CipherFormat.C1C3C2 => SM2Engine.Mode.C1C3C2,
+                _ => throw new CryptoException($"不支持的SM2密文格式: {cipherFormat}")
+            };
         }
 
         #endregion

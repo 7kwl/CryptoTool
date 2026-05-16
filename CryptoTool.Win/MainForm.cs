@@ -29,7 +29,9 @@ namespace CryptoTool.Win
             this.MinimumSize = new Size(1400, 800);
 
             InitializeTabControls();
-            //InitializeUpdateService();
+            InitializeUpdateService();
+            Load += MainForm_Load;
+            FormClosed += MainForm_FormClosed;
         }
 
         private void InitializeTabControls()
@@ -105,27 +107,30 @@ namespace CryptoTool.Win
             medicareTabControl.SM4KeyGenerated += (key) => sm4TabControl.UpdateKeyFromMedicare(key);
         }
 
-        //        private void Form1_Load(object sender, EventArgs e)
-        //        {
-        //            SetStatus("就绪");
+        private void MainForm_Load(object? sender, EventArgs e)
+        {
+            SetStatus("就绪");
 
-        //            // 启动后台更新检测服务
-        //            try
-        //            {
-        //                updateService?.Start(5000, 7200000); // 5秒后开始检测，然后每2小时检测一次
-        //                SetStatus("后台更新检测已启动");
-        //            }
-        //            catch (Exception ex)
-        //            {
-        //                SetStatus($"启动后台更新检测失败: {ex.Message}");
-        //            }
+            try
+            {
+                updateService?.Start(5000, 7200000);
+                SetStatus("后台更新检测已启动");
+            }
+            catch (Exception ex)
+            {
+                SetStatus($"启动后台更新检测失败: {ex.Message}");
+            }
 
-        //            // 在调试模式下，添加快捷键手动触发检测更新
-        //#if DEBUG
-        //            this.KeyPreview = true;
-        //            this.KeyDown += MainForm_KeyDown;
-        //#endif
-        //        }
+#if DEBUG
+            this.KeyPreview = true;
+            this.KeyDown += MainForm_KeyDown;
+#endif
+        }
+
+        private void MainForm_FormClosed(object? sender, FormClosedEventArgs e)
+        {
+            updateService?.Dispose();
+        }
 
 #if DEBUG
         /// <summary>
@@ -139,7 +144,10 @@ namespace CryptoTool.Win
                 SetStatus("手动触发更新检测...");
                 try
                 {
-                    await updateService?.ManualCheckAsync();
+                    if (updateService != null)
+                    {
+                        await updateService.ManualCheckAsync();
+                    }
                 }
                 catch (Exception ex)
                 {

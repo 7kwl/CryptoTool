@@ -183,7 +183,11 @@ namespace CryptoTool.Win
                 byte[]? ivBytes = string.IsNullOrEmpty(textAESIV.Text) ? null : FormatConversionHelper.StringToBytes(textAESIV.Text, ivFormat);
 
                 // 创建AES加密器
-                var aesCrypto = new AesCrypto();
+                var aesCrypto = SymmetricCryptoOptionHelper.CreateAesCrypto(
+                    comboAESKeySize.SelectedItem?.ToString(),
+                    keyBytes,
+                    comboAESMode.SelectedItem?.ToString(),
+                    comboAESPadding.SelectedItem?.ToString());
 
                 // 执行解密
                 byte[] decryptedBytes = aesCrypto.Decrypt(cipherBytes, keyBytes, ivBytes);

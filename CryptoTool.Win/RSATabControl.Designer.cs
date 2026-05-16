@@ -359,7 +359,7 @@ namespace CryptoTool.Win
             // 
             comboRSAKeyPadding.DropDownStyle = ComboBoxStyle.DropDownList;
             comboRSAKeyPadding.FormattingEnabled = true;
-            comboRSAKeyPadding.Items.AddRange(new object[] { "PKCS1", "OAEP", "NoPadding" });
+            comboRSAKeyPadding.Items.AddRange(new object[] { "PKCS1", "OAEP" });
             comboRSAKeyPadding.Location = new Point(80, 4);
             comboRSAKeyPadding.Margin = new Padding(4);
             comboRSAKeyPadding.Name = "comboRSAKeyPadding";

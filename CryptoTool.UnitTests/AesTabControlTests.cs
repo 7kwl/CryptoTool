@@ -50,4 +50,27 @@ public class AesTabControlTests
         var ciphertextBytes = Convert.FromBase64String(cipherTextBox.Text);
         Assert.Equal(16, ciphertextBytes.Length);
     }
+
+    [StaFact]
+    public void EncryptThenDecryptWithEcbSelection_ShouldRoundTrip()
+    {
+        using var control = new CryptoTool.Win.AESTabControl();
+
+        var modeCombo = WinFormsTestHelper.GetPrivateField<ComboBox>(control, "comboAESMode");
+        var plaintextTextBox = WinFormsTestHelper.GetPrivateField<TextBox>(control, "textAESPlainText");
+        var keyTextBox = WinFormsTestHelper.GetPrivateField<TextBox>(control, "textAESKey");
+        var cipherTextBox = WinFormsTestHelper.GetPrivateField<TextBox>(control, "textAESCipherText");
+
+        modeCombo.SelectedItem = "ECB";
+        plaintextTextBox.Text = "AES ECB roundtrip";
+        keyTextBox.Text = Convert.ToBase64String(Enumerable.Range(1, 32).Select(i => (byte)i).ToArray());
+
+        WinFormsTestHelper.ClickButton(control, "btnAESEncrypt");
+        Assert.False(string.IsNullOrWhiteSpace(cipherTextBox.Text));
+
+        plaintextTextBox.Clear();
+        WinFormsTestHelper.ClickButton(control, "btnAESDecrypt");
+
+        Assert.Equal("AES ECB roundtrip", plaintextTextBox.Text);
+    }
 }
