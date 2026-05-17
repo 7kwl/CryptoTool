@@ -158,8 +158,9 @@ namespace CryptoTool.Algorithm.Algorithms.AES
                 }
                 else if (_mode != CipherMode.ECB)
                 {
-                    if (iv.Length != AES_BLOCK_SIZE_BYTES)
+                    if (iv == null || iv.Length != AES_BLOCK_SIZE_BYTES)
                         throw new KeyException($"IV长度必须为{AES_BLOCK_SIZE_BYTES}字节");
+
                     aes.IV = iv;
                 }
 

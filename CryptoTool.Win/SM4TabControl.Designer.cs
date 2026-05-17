@@ -215,7 +215,6 @@ namespace CryptoTool.Win
             comboSM4IVFormat.Name = "comboSM4IVFormat";
             comboSM4IVFormat.Size = new Size(127, 28);
             comboSM4IVFormat.TabIndex = 10;
-            comboSM4IVFormat.SelectedIndexChanged += comboSM4IVFormat_SelectedIndexChanged;
             // 
             // btnGenerateSM4IV
             // 

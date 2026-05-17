@@ -386,7 +386,6 @@ namespace CryptoTool.Win
             comboRSAEncryptOutputFormat.Name = "comboRSAEncryptOutputFormat";
             comboRSAEncryptOutputFormat.Size = new Size(173, 28);
             comboRSAEncryptOutputFormat.TabIndex = 15;
-            comboRSAEncryptOutputFormat.SelectedIndexChanged += ComboRSAEncryptOutputFormat_SelectedIndexChanged;
             // 
             // btnRSAEncrypt
             // 
@@ -545,7 +544,6 @@ namespace CryptoTool.Win
             comboRSASignOutputFormat.Name = "comboRSASignOutputFormat";
             comboRSASignOutputFormat.Size = new Size(173, 28);
             comboRSASignOutputFormat.TabIndex = 16;
-            comboRSASignOutputFormat.SelectedIndexChanged += ComboRSASignOutputFormat_SelectedIndexChanged;
             // 
             // btnRSASign
             // 

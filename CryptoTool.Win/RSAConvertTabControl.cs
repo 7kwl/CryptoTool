@@ -7,7 +7,7 @@ namespace CryptoTool.Win
 {
     public partial class RSAConvertTabControl : UserControl
     {
-        public event Action<string> StatusChanged;
+        public event Action<string>? StatusChanged;
 
         // 存储导入的公钥和私钥用于验证
         private string _publicKeyForValidation = string.Empty;
@@ -178,7 +178,8 @@ namespace CryptoTool.Win
 
                 using (SaveFileDialog saveFileDialog = new SaveFileDialog())
                 {
-                    var outputFormat = FormatConversionHelper.ParseOutputFormat(comboOutputFormat.SelectedItem.ToString());
+                    var outputFormatText = comboOutputFormat.SelectedItem?.ToString() ?? "Base64";
+                    var outputFormat = FormatConversionHelper.ParseOutputFormat(outputFormatText);
                     var keyType = radioPrivateKey.Checked ? "private" : "public";
 
                     string extension = outputFormat switch

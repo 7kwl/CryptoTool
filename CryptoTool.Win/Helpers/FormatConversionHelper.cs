@@ -20,7 +20,7 @@ namespace CryptoTool.Win.Helpers
         /// <param name="format">输入格式</param>
         /// <param name="encoding">字符编码</param>
         /// <returns>字节数组</returns>
-        public static byte[] StringToBytes(string str, UIInputFormat format, Encoding encoding = null)
+        public static byte[] StringToBytes(string str, UIInputFormat format, Encoding? encoding = null)
         {
             if (string.IsNullOrEmpty(str))
                 throw new ArgumentException("输入字符串不能为空", nameof(str));
@@ -43,7 +43,7 @@ namespace CryptoTool.Win.Helpers
         /// <param name="format">输出格式</param>
         /// <param name="encoding">字符编码</param>
         /// <returns>字符串</returns>
-        public static string BytesToString(byte[] bytes, UIOutputFormat format, Encoding encoding = null)
+        public static string BytesToString(byte[] bytes, UIOutputFormat format, Encoding? encoding = null)
         {
             if (bytes == null || bytes.Length == 0)
                 throw new ArgumentException("字节数组不能为空", nameof(bytes));
@@ -112,7 +112,7 @@ namespace CryptoTool.Win.Helpers
         /// <param name="toFormat">目标格式</param>
         /// <param name="encoding">字符编码</param>
         /// <returns>转换后的字符串</returns>
-        public static string ConvertStringFormat(string input, UIInputFormat fromFormat, UIOutputFormat toFormat, Encoding encoding = null)
+        public static string ConvertStringFormat(string input, UIInputFormat fromFormat, UIOutputFormat toFormat, Encoding? encoding = null)
         {
             if (string.IsNullOrEmpty(input))
                 return string.Empty;

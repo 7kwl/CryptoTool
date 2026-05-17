@@ -69,4 +69,30 @@ public class RsaTabControlTests
 
         Assert.DoesNotContain("NoPadding", items);
     }
+
+    [StaFact]
+    public void VerifyShouldUseVisibleSignatureInputs()
+    {
+        using var control = new CryptoTool.Win.RSATabControl();
+        var rsa = new RsaCrypto(2048, "pkcs8");
+        var (publicKey, privateKey) = rsa.GenerateKeyPair();
+
+        var dataTextBox = WinFormsTestHelper.GetPrivateField<TextBox>(control, "textRSASignData");
+        var signatureTextBox = WinFormsTestHelper.GetPrivateField<TextBox>(control, "textRSASignature");
+        var publicKeyTextBox = WinFormsTestHelper.GetPrivateField<TextBox>(control, "textRSAPublicKey");
+        var privateKeyTextBox = WinFormsTestHelper.GetPrivateField<TextBox>(control, "textRSAPrivateKey");
+        var resultLabel = WinFormsTestHelper.GetPrivateField<Label>(control, "labelRSAVerifyResult");
+
+        dataTextBox.Text = "verify payload";
+        publicKeyTextBox.Text = Convert.ToBase64String(publicKey);
+        privateKeyTextBox.Text = Convert.ToBase64String(privateKey);
+
+        WinFormsTestHelper.ClickButton(control, "btnRSASign");
+        Assert.False(string.IsNullOrWhiteSpace(signatureTextBox.Text));
+
+        WinFormsTestHelper.ClickButton(control, "btnRSAVerify");
+
+        Assert.Equal("验证通过", resultLabel.Text);
+        Assert.Equal(Color.Green, resultLabel.ForeColor);
+    }
 }

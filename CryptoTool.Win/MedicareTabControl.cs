@@ -4,13 +4,14 @@ using CryptoTool.Algorithm.Enums;
 using CryptoTool.Algorithm.Utils;
 using Newtonsoft.Json;
 using System.Text;
+using CryptoTool.Win.Helpers;
 
 namespace CryptoTool.Win
 {
     public partial class MedicareTabControl : UserControl
     {
-        public event Action<string> StatusChanged;
-        public event Action<string> SM4KeyGenerated;
+        public event Action<string>? StatusChanged;
+        public event Action<string>? SM4KeyGenerated;
 
         public MedicareTabControl()
         {
@@ -84,12 +85,12 @@ namespace CryptoTool.Win
                     if (openFileDialog.ShowDialog() == DialogResult.OK)
                     {
                         string content = File.ReadAllText(openFileDialog.FileName, Encoding.UTF8);
-                        string[] lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                        var (publicKey, privateKey) = Sm2UiHelper.ParseKeyFileContent(content);
 
-                        if (lines.Length >= 2)
+                        if (!string.IsNullOrWhiteSpace(publicKey) && !string.IsNullOrWhiteSpace(privateKey))
                         {
-                            textMedicarePublicKey.Text = lines[0].Trim();
-                            textMedicarePrivateKey.Text = lines[1].Trim();
+                            textMedicarePublicKey.Text = publicKey;
+                            textMedicarePrivateKey.Text = privateKey;
                             SetStatus("医保密钥导入成功");
                         }
                         else
@@ -124,7 +125,7 @@ namespace CryptoTool.Win
 
                     if (saveFileDialog.ShowDialog() == DialogResult.OK)
                     {
-                        string content = $"公钥：\r\n{textMedicarePublicKey.Text}\r\n\r\n私钥：\r\n{textMedicarePrivateKey.Text}";
+                        string content = Sm2UiHelper.BuildKeyFileContent(textMedicarePublicKey.Text, textMedicarePrivateKey.Text);
                         File.WriteAllText(saveFileDialog.FileName, content, Encoding.UTF8);
                         SetStatus("医保密钥导出成功");
                     }
@@ -149,7 +150,7 @@ namespace CryptoTool.Win
                     var parameters = BuildMedicareParameters();
 
                     // 解析私钥
-                    var privateKey = StringUtil.HexToBytes(textMedicarePrivateKey.Text);
+                    var privateKey = ParseMedicareKeyBytes(textMedicarePrivateKey.Text);
                     string appSecret = textMedicareAppSecret.Text.Trim();
 
                     // 构造签名字符串
@@ -182,7 +183,7 @@ namespace CryptoTool.Win
                     var parameters = BuildMedicareParameters();
 
                     // 解析公钥
-                    var publicKey = StringUtil.HexToBytes(textMedicarePublicKey.Text);
+                    var publicKey = ParseMedicareKeyBytes(textMedicarePublicKey.Text);
                     string appSecret = textMedicareAppSecret.Text.Trim();
                     string signData = textMedicareSignData.Text.Trim();
 
@@ -227,7 +228,7 @@ namespace CryptoTool.Win
                     }
 
                     // 加密数据
-                    string encData = MedicareUtil.EncryptData(dataObject, appId, appSecret);
+                    string encData = MedicareUtil.EncryptData(dataObject ?? textMedicareData.Text, appId, appSecret);
                     textMedicareEncData.Text = encData;
 
                     SetStatus("医保数据加密完成");
@@ -377,7 +378,7 @@ namespace CryptoTool.Win
                 {
                     // 尝试解析为JSON对象
                     var dataObject = JsonConvert.DeserializeObject(textMedicareData.Text);
-                    parameters["data"] = dataObject;
+                    parameters["data"] = dataObject ?? textMedicareData.Text.Trim();
                 }
                 catch (JsonException)
                 {
@@ -467,6 +468,23 @@ namespace CryptoTool.Win
             string finalKey = hexResult.Substring(0, Math.Min(32, hexResult.Length));
 
             return finalKey;
+        }
+
+        private static byte[] ParseMedicareKeyBytes(string keyText)
+        {
+            if (string.IsNullOrWhiteSpace(keyText))
+                throw new ArgumentException("密钥不能为空", nameof(keyText));
+
+            var normalized = keyText.Trim();
+            if (LooksLikeHex(normalized))
+                return StringUtil.HexToBytes(normalized);
+
+            return Convert.FromBase64String(normalized);
+        }
+
+        private static bool LooksLikeHex(string value)
+        {
+            return value.Length % 2 == 0 && value.All(Uri.IsHexDigit);
         }
 
         #endregion

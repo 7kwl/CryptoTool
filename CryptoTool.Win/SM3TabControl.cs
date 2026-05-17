@@ -6,7 +6,7 @@ namespace CryptoTool.Win
 {
     public partial class SM3TabControl : UserControl
     {
-        public event Action<string> StatusChanged;
+        public event Action<string>? StatusChanged;
 
         public SM3TabControl()
         {
@@ -134,17 +134,7 @@ namespace CryptoTool.Win
                     _ => StringUtil.BytesToHex(hashBytes, false)
                 };
 
-                // 假设控件名称应该是textSM3FileHash而不是textSM3FileHashResult
-                if (FindControlByName("textSM3FileHash") != null)
-                {
-                    var textBox = FindControlByName("textSM3FileHash") as TextBox;
-                    if (textBox != null) textBox.Text = result;
-                }
-                else
-                {
-                    // 如果找不到控件，显示在消息框中
-                    MessageBox.Show($"文件哈希值: {result}", "计算结果", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
+                textSM3FileHash.Text = result;
                 SetStatus($"文件SM3哈希计算完成 - 输出格式：{outputFormat}");
             }
             catch (Exception ex)
@@ -240,17 +230,7 @@ namespace CryptoTool.Win
                     _ => StringUtil.BytesToHex(hmacBytes, false)
                 };
 
-                // 假设控件名称应该是textSM3HMAC而不是textSM3HMACResult
-                if (FindControlByName("textSM3HMAC") != null)
-                {
-                    var textBox = FindControlByName("textSM3HMAC") as TextBox;
-                    if (textBox != null) textBox.Text = result;
-                }
-                else
-                {
-                    // 如果找不到控件，显示在消息框中
-                    MessageBox.Show($"HMAC-SM3值: {result}", "计算结果", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
+                textSM3HMACOutput.Text = result;
                 SetStatus($"HMAC-SM3计算完成 - 输出格式：{outputFormat}");
             }
             catch (Exception ex)
@@ -273,57 +253,6 @@ namespace CryptoTool.Win
                 "Hex" => StringUtil.HexToBytes(data),
                 _ => Encoding.UTF8.GetBytes(data)
             };
-        }
-
-        /// <summary>
-        /// 通过名称查找控件
-        /// </summary>
-        private Control? FindControlByName(string name)
-        {
-            return FindControlByName(this, name);
-        }
-
-        /// <summary>
-        /// 递归查找控件
-        /// </summary>
-        private Control? FindControlByName(Control parent, string name)
-        {
-            if (parent.Name == name)
-                return parent;
-
-            foreach (Control child in parent.Controls)
-            {
-                var found = FindControlByName(child, name);
-                if (found != null)
-                    return found;
-            }
-
-            return null;
-        }
-
-        #endregion
-
-        #region 事件处理器
-
-        private void ComboSM3VerifyHashFormat_TabIndexChanged(object sender, EventArgs e)
-        {
-            // 验证哈希格式改变时的处理逻辑
-        }
-
-        private void ComboSM3HMACDataFormat_TabIndexChanged(object sender, EventArgs e)
-        {
-            // HMAC数据格式改变时的处理逻辑
-        }
-
-        private void ComboSM3HMACOutputFormat_TabIndexChanged(object sender, EventArgs e)
-        {
-            // HMAC输出格式改变时的处理逻辑
-        }
-
-        private void btnSM3HMAC_Click(object sender, EventArgs e)
-        {
-            // 这个事件处理器已经在代码中实现了，这里只是占位符
-            btnSM3ComputeHMAC_Click(sender, e);
         }
 
         #endregion

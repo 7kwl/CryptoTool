@@ -7,7 +7,7 @@ namespace CryptoTool.Win
 {
     public partial class RSATabControl : UserControl
     {
-        public event Action<string> StatusChanged;
+        public event Action<string>? StatusChanged;
 
         public RSATabControl()
         {
@@ -292,29 +292,8 @@ namespace CryptoTool.Win
         {
             try
             {
-                // 使用可能的控件名称
-                string verifyData = "";
-                string verifySignature = "";
-
-                // 尝试查找不同的可能控件名称
-                var dataControl = FindControlByName("textRSAVerifyData") ?? FindControlByName("textRSASignData");
-                var signatureControl = FindControlByName("textRSAVerifySignature") ?? FindControlByName("textRSASignature");
-
-                if (dataControl is TextBox dataTextBox)
-                    verifyData = dataTextBox.Text;
-                else
-                {
-                    MessageBox.Show("找不到验证数据输入控件！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                if (signatureControl is TextBox signatureTextBox)
-                    verifySignature = signatureTextBox.Text;
-                else
-                {
-                    MessageBox.Show("找不到签名输入控件！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
+                string verifyData = textRSASignData.Text;
+                string verifySignature = textRSASignature.Text;
 
                 if (string.IsNullOrEmpty(verifyData))
                 {
@@ -368,48 +347,5 @@ namespace CryptoTool.Win
 
         #endregion
 
-        #region 辅助方法
-
-        /// <summary>
-        /// 通过名称查找控件
-        /// </summary>
-        private Control? FindControlByName(string name)
-        {
-            return FindControlByName(this, name);
-        }
-
-        /// <summary>
-        /// 递归查找控件
-        /// </summary>
-        private Control? FindControlByName(Control parent, string name)
-        {
-            if (parent.Name == name)
-                return parent;
-
-            foreach (Control child in parent.Controls)
-            {
-                var found = FindControlByName(child, name);
-                if (found != null)
-                    return found;
-            }
-
-            return null;
-        }
-
-        #endregion
-
-        #region 事件处理器
-
-        private void ComboRSAEncryptOutputFormat_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            // 输出格式改变时的处理逻辑
-        }
-
-        private void ComboRSASignOutputFormat_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            // 签名输出格式改变时的处理逻辑
-        }
-
-        #endregion
     }
 }

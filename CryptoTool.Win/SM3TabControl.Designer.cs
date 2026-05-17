@@ -701,7 +701,7 @@ namespace CryptoTool.Win
             btnSM3HMAC.TabIndex = 10;
             btnSM3HMAC.Text = "计算HMAC";
             btnSM3HMAC.UseVisualStyleBackColor = true;
-            //btnSM3HMAC.Click += btnSM3HMAC_Click;
+            btnSM3HMAC.Click += btnSM3ComputeHMAC_Click;
             // 
             // label7
             // 

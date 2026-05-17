@@ -161,7 +161,7 @@ namespace CryptoTool.Win
                 var md5Hash = new Md5Hash();
                 bool isValid = md5Hash.VerifyHash(dataBytes, expectedHashBytes);
 
-                labelMD5VerifyResult.Text = isValid ? "��֤ͨ��" : "��֤ʧ��";
+                labelMD5VerifyResult.Text = isValid ? "验证通过" : "验证失败";
                 labelMD5VerifyResult.ForeColor = isValid ? Color.Green : Color.Red;
 
                 SetStatus($"MD5哈希验证完成 - 结果：{(isValid ? "通过" : "失败")}");

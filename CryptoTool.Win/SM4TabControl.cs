@@ -8,7 +8,7 @@ namespace CryptoTool.Win
 {
     public partial class SM4TabControl : UserControl
     {
-        public event Action<string> StatusChanged;
+        public event Action<string>? StatusChanged;
 
         public SM4TabControl()
         {
@@ -209,26 +209,11 @@ namespace CryptoTool.Win
             textSM4IV.Enabled = isCBC;
             btnGenerateSM4IV.Enabled = isCBC;
             comboSM4IVFormat.Enabled = isCBC;
+            labelSM4IVFormat.Enabled = isCBC;
 
             if (!isCBC)
             {
                 textSM4IV.Text = "";
-            }
-        }
-
-        private void comboSM4IVFormat_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            // 当格式变化时，如果当前有IV内容，尝试转换格式
-            if (string.IsNullOrEmpty(textSM4IV.Text)) return;
-
-            try
-            {
-                // 暂不实现自动格式转换，避免错误转换
-                // 用户需要重新生成IV或手动输入正确格式的IV
-            }
-            catch
-            {
-                // 格式转换失败，忽略
             }
         }
 
@@ -280,26 +265,6 @@ namespace CryptoTool.Win
                 {
                     textSM4PlainText.Text = decryptedText; // 如果转换失败，直接显示
                 }
-            }
-        }
-
-        /// <summary>
-        /// 将UI格式的数据转换为Provider需要的格式（UTF8字符串）
-        /// </summary>
-        private string ConvertToProviderFormat(string input, UIInputFormat format)
-        {
-            if (format == UIInputFormat.UTF8)
-                return input;
-
-            try
-            {
-                byte[] bytes = FormatConversionHelper.StringToBytes(input, format);
-                return Encoding.UTF8.GetString(bytes);
-            }
-            catch
-            {
-                // 如果转换失败，直接返回原始输入
-                return input;
             }
         }
 

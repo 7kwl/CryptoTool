@@ -4,20 +4,20 @@ namespace CryptoTool.Win
 {
     public partial class MainForm : Form
     {
-        private RSATabControl rsaTabControl;
-        private RSAConvertTabControl rsaConvertTabControl;
-        private AESTabControl aesTabControl;
-        private DESTabControl desTabControl;
-        private SM4TabControl sm4TabControl;
-        private SM2TabControl sm2TabControl;
-        private SM3TabControl sm3TabControl;
-        private MD5TabControl md5TabControl;
-        private MedicareTabControl medicareTabControl;
-        private AboutTabControl aboutTabControl;
+        private RSATabControl rsaTabControl = null!;
+        private RSAConvertTabControl rsaConvertTabControl = null!;
+        private AESTabControl aesTabControl = null!;
+        private DESTabControl desTabControl = null!;
+        private SM4TabControl sm4TabControl = null!;
+        private SM2TabControl sm2TabControl = null!;
+        private SM3TabControl sm3TabControl = null!;
+        private MD5TabControl md5TabControl = null!;
+        private MedicareTabControl medicareTabControl = null!;
+        private AboutTabControl aboutTabControl = null!;
 
         // 后台更新服务和通知控件
-        private BackgroundUpdateService updateService;
-        private UpdateNotificationControl updateNotification;
+        private BackgroundUpdateService updateService = null!;
+        private UpdateNotificationControl updateNotification = null!;
         private Release? pendingRelease;
 
         public MainForm()

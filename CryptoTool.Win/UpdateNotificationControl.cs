@@ -21,10 +21,10 @@ namespace CryptoTool.Win
 
         #region 私有字段
 
-        private Label lblMessage;
-        private Button btnUpdate;
-        private Button btnClose;
-        private Panel mainPanel;
+        private Label lblMessage = null!;
+        private Button btnUpdate = null!;
+        private Button btnClose = null!;
+        private Panel mainPanel = null!;
 
         #endregion
 

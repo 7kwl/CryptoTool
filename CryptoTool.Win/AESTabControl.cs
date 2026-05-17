@@ -7,7 +7,7 @@ namespace CryptoTool.Win
 {
     public partial class AESTabControl : UserControl
     {
-        public event Action<string> StatusChanged;
+        public event Action<string>? StatusChanged;
 
         public AESTabControl()
         {
@@ -405,26 +405,6 @@ namespace CryptoTool.Win
                 {
                     textAESPlainText.Text = decryptedText; // 如果转换失败，直接显示
                 }
-            }
-        }
-
-        /// <summary>
-        /// 将UI格式的数据转换为Provider需要的格式（UTF8字符串）
-        /// </summary>
-        private string ConvertToProviderFormat(string input, UIInputFormat format)
-        {
-            if (format == UIInputFormat.UTF8)
-                return input;
-
-            try
-            {
-                byte[] bytes = FormatConversionHelper.StringToBytes(input, format);
-                return Encoding.UTF8.GetString(bytes);
-            }
-            catch
-            {
-                // 如果转换失败，直接返回原始输入
-                return input;
             }
         }
 

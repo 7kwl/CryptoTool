@@ -7,7 +7,7 @@ namespace CryptoTool.Win
 {
     public partial class SM2TabControl : UserControl
     {
-        public event Action<string> StatusChanged;
+        public event Action<string>? StatusChanged;
 
         public SM2TabControl()
         {
