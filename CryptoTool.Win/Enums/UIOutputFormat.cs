@@ -15,7 +15,15 @@
         /// </summary>
         Base64,
         /// <summary>
-        /// 十六进制字符串格式
+        /// 十六进制字符串格式（大写）
+        /// </summary>
+        HexUpper,
+        /// <summary>
+        /// 十六进制字符串格式（小写）
+        /// </summary>
+        HexLower,
+        /// <summary>
+        /// 十六进制字符串格式（兼容旧版，小写）
         /// </summary>
         Hex,
         /// <summary>

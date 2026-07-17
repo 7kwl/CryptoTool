@@ -54,7 +54,9 @@ namespace CryptoTool.Win.Helpers
             {
                 UIOutputFormat.UTF8 => encoding.GetString(bytes),
                 UIOutputFormat.Base64 => Convert.ToBase64String(bytes),
-                UIOutputFormat.Hex => StringUtil.BytesToHex(bytes),
+                UIOutputFormat.HexUpper => StringUtil.BytesToHex(bytes, upperCase: true),
+                UIOutputFormat.HexLower => StringUtil.BytesToHex(bytes, upperCase: false),
+                UIOutputFormat.Hex => StringUtil.BytesToHex(bytes, upperCase: false),
                 UIOutputFormat.PEM => Convert.ToBase64String(bytes), // PEM使用Base64编码
                 _ => throw new ArgumentException($"不支持的输出格式: {format}")
             };
@@ -92,6 +94,8 @@ namespace CryptoTool.Win.Helpers
             {
                 "BASE64" => UIOutputFormat.Base64,
                 "HEX" => UIOutputFormat.Hex,
+                "HEX大写" => UIOutputFormat.HexUpper,
+                "HEX小写" => UIOutputFormat.HexLower,
                 "UTF8" => UIOutputFormat.UTF8,
                 "TEXT" => UIOutputFormat.UTF8, // 兼容旧版本
                 "PEM" => UIOutputFormat.PEM,

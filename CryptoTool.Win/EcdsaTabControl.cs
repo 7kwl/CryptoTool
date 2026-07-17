@@ -28,20 +28,288 @@ namespace CryptoTool.Win
 
         private byte[]? _derivedEncKey = null;
         private byte[]? _lastEncIV = null;
+        private System.Windows.Forms.Timer _resizeTimer = null!;
+        private int _lastWidth = -1;
+        private int _lastHeight = -1;
 
         public EcdsaTabControl()
         {
             InitializeComponent();
+            InitializeEncryptLayout();
             InitializeDefaults();
+            InitializeResizeTimer();
+            EnableDoubleBuffering();
+            InitializeResultHeaders();
 
-            // ✅ 窗口加载后用真实宽度修正拆分容器为50%
-            this.Load += (_, __) =>
+            // ✅ 初始加载时保持拆分容器为50%
+            this.Load += (_, __) => ApplySplitterRatios();
+            // ✅ 缩放时防抖更新分隔条，避免每像素都触发完整布局导致卡顿
+            this.SizeChanged += OnResizeTimerRestart;
+        }
+
+        private void OnResizeTimerRestart(object? sender, EventArgs e)
+        {
+            // 如果尺寸没有实质变化，避免重新布局
+            if (this.Width == _lastWidth && this.Height == _lastHeight)
+                return;
+
+            _resizeTimer.Stop();
+            _resizeTimer.Start();
+        }
+
+        private void InitializeResizeTimer()
+        {
+            // 将 Timer 加入 components 容器，由设计器生成的 Dispose 统一释放
+            components ??= new System.ComponentModel.Container();
+            _resizeTimer = new System.Windows.Forms.Timer(components);
+            // 150ms 防抖，覆盖全屏/拖拽等连续尺寸变化，只在缩放稳定后重算一次
+            _resizeTimer.Interval = 150;
+            _resizeTimer.Tick += (_, __) =>
             {
-                if (splitSignEncrypt.Width > 0)
-                    splitSignEncrypt.SplitterDistance = splitSignEncrypt.Width / 2;
-                if (splitFileResult.Width > 0)
-                    splitFileResult.SplitterDistance = splitFileResult.Width / 2;
+                _resizeTimer.Stop();
+                ApplySplitterRatios();
             };
+        }
+
+        private void EnableDoubleBuffering()
+        {
+            // 开启双缓冲，减少缩放时因多次重绘造成的闪烁和卡顿
+            this.SetStyle(ControlStyles.OptimizedDoubleBuffer
+                | ControlStyles.AllPaintingInWmPaint
+                | ControlStyles.UserPaint
+                | ControlStyles.ResizeRedraw, true);
+            this.UpdateStyles();
+
+            // 对 SplitContainer 也开启双缓冲（DoubleBuffered 是 protected，使用反射）
+            SetControlDoubleBuffered(splitSignEncrypt);
+            SetControlDoubleBuffered(splitFileResult);
+            SetControlDoubleBuffered(mainTableLayout);
+        }
+
+        private void InitializeResultHeaders()
+        {
+            // 清空 GroupBox 标题，用左右两列的标题代替，避免重复显示
+            groupRunResult.Text = string.Empty;
+
+            // 为运行结果区域的左右两列增加标题
+            var labelRunResult = new Label
+            {
+                Name = "labelRunResultHeader",
+                Text = "运行结果",
+                Dock = DockStyle.Fill,
+                TextAlign = ContentAlignment.MiddleLeft,
+                AutoSize = false,
+                Font = new Font(this.Font, FontStyle.Bold)
+            };
+            var labelCalcResult = new Label
+            {
+                Name = "labelCalcResultHeader",
+                Text = "计算结果",
+                Dock = DockStyle.Fill,
+                TextAlign = ContentAlignment.MiddleLeft,
+                AutoSize = false,
+                Font = new Font(this.Font, FontStyle.Bold)
+            };
+
+            tableRunResult.SuspendLayout();
+            try
+            {
+                // 将原有控件从第一行移除，改为两行：标题 + 内容
+                tableRunResult.Controls.Remove(labelValidationResult);
+                tableRunResult.Controls.Remove(textKeyResult);
+                tableRunResult.RowStyles.Clear();
+                tableRunResult.RowCount = 2;
+                tableRunResult.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
+                tableRunResult.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+
+                tableRunResult.Controls.Add(labelRunResult, 0, 0);
+                tableRunResult.Controls.Add(labelCalcResult, 1, 0);
+                tableRunResult.Controls.Add(labelValidationResult, 0, 1);
+                tableRunResult.Controls.Add(textKeyResult, 1, 1);
+            }
+            finally
+            {
+                tableRunResult.ResumeLayout(true);
+            }
+        }
+
+        private void InitializeEncryptLayout()
+        {
+            // 重建加密/解密区域布局，避免设计器把多个控件堆在同一单元格导致重叠
+            tableLayoutEncrypt.SuspendLayout();
+            try
+            {
+                tableLayoutEncrypt.Controls.Clear();
+                tableLayoutEncrypt.ColumnStyles.Clear();
+                tableLayoutEncrypt.RowStyles.Clear();
+
+                tableLayoutEncrypt.ColumnCount = 1;
+                tableLayoutEncrypt.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+
+                tableLayoutEncrypt.RowCount = 9;
+                tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
+                tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
+                tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
+                tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
+                tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 22F));
+                tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Percent, 35F));
+                tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 22F));
+                tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Percent, 35F));
+                tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 44F));
+
+                // 原左侧结果框已废弃，改为输出到下方运行结果区域
+                labelEncResult.Visible = false;
+                labelEncResult.Enabled = false;
+
+                // 右侧：加密模式
+                tableLayoutEncrypt.Controls.Add(CreateLabelControlRow(labelEncMode, comboEncMode), 0, 0);
+
+                // 右侧：输入/输出格式放在同一行
+                tableLayoutEncrypt.Controls.Add(CreateFormatRow(
+                    labelEncInputFormat, comboEncInputFormat,
+                    labelEncOutputFormat, comboEncOutputFormat), 0, 1);
+
+                // 右侧：对称密钥
+                tableLayoutEncrypt.Controls.Add(CreateLabelControlRow(labelEncKey, textEncKey), 0, 2);
+
+                // 右侧：IV/Nonce
+                tableLayoutEncrypt.Controls.Add(CreateLabelControlRow(labelEncIV, textEncIV), 0, 3);
+
+                // 右侧：明文/密文输入标签
+                labelEncInput.Dock = DockStyle.Fill;
+                labelEncInput.TextAlign = ContentAlignment.MiddleLeft;
+                tableLayoutEncrypt.Controls.Add(labelEncInput, 0, 4);
+
+                // 右侧：明文/密文输入框
+                tableLayoutEncrypt.Controls.Add(textEncInput, 0, 5);
+
+                // 右侧：加密/解密结果标签
+                labelEncOutputLabel.Dock = DockStyle.Fill;
+                labelEncOutputLabel.TextAlign = ContentAlignment.MiddleLeft;
+                tableLayoutEncrypt.Controls.Add(labelEncOutputLabel, 0, 6);
+
+                // 右侧：加密/解密结果框
+                tableLayoutEncrypt.Controls.Add(textEncOutput, 0, 7);
+
+                // 右侧：按钮
+                tableLayoutEncrypt.Controls.Add(panelEncBtns, 0, 8);
+
+                // 文件加密/解密已在其他区域提供，此处不再重复显示
+                groupEncFile.Visible = false;
+                groupEncFile.Enabled = false;
+            }
+            finally
+            {
+                tableLayoutEncrypt.ResumeLayout(true);
+            }
+        }
+
+        private static Control CreateLabelControlRow(Label label, Control control)
+        {
+            var panel = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 2,
+                RowCount = 1,
+                Margin = new Padding(0),
+                Padding = new Padding(0)
+            };
+            panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+            panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            panel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+
+            label.AutoSize = true;
+            label.Dock = DockStyle.Fill;
+            label.TextAlign = ContentAlignment.MiddleLeft;
+            label.Margin = new Padding(0, 0, 4, 0);
+
+            control.Dock = DockStyle.Fill;
+            control.Margin = new Padding(0);
+
+            panel.Controls.Add(label, 0, 0);
+            panel.Controls.Add(control, 1, 0);
+            return panel;
+        }
+
+        private static Control CreateFormatRow(Label inputLabel, ComboBox inputCombo, Label outputLabel, ComboBox outputCombo)
+        {
+            var panel = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0),
+                Padding = new Padding(0),
+                WrapContents = false
+            };
+
+            inputLabel.AutoSize = true;
+            inputLabel.Margin = new Padding(0, 0, 2, 0);
+            inputLabel.TextAlign = ContentAlignment.MiddleLeft;
+            inputCombo.Margin = new Padding(0, 0, 16, 0);
+            inputCombo.Width = 120;
+            inputCombo.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+
+            outputLabel.AutoSize = true;
+            outputLabel.Margin = new Padding(0, 0, 2, 0);
+            outputLabel.TextAlign = ContentAlignment.MiddleLeft;
+            outputCombo.Margin = new Padding(0);
+            outputCombo.Width = 120;
+            outputCombo.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+
+            panel.Controls.Add(inputLabel);
+            panel.Controls.Add(inputCombo);
+            panel.Controls.Add(outputLabel);
+            panel.Controls.Add(outputCombo);
+            return panel;
+        }
+
+        private static void SetControlDoubleBuffered(Control control)
+        {
+            if (control == null) return;
+            typeof(Control).GetProperty("DoubleBuffered",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                ?.SetValue(control, true);
+        }
+
+        private void ApplySplitterRatios()
+        {
+            _lastWidth = this.Width;
+            _lastHeight = this.Height;
+
+            this.SuspendLayout();
+            try
+            {
+                SetSplitRatio(splitSignEncrypt, 0.5);
+                SetSplitRatio(splitFileResult, 0.5);
+            }
+            finally
+            {
+                this.ResumeLayout(true);
+            }
+        }
+
+        private void SetSplitRatio(SplitContainer split, double ratio)
+        {
+            if (split.Width <= 0 || split.Height <= 0) return;
+            int min = split.Panel1MinSize;
+            int max = split.Width - split.Panel2MinSize - split.SplitterWidth;
+            if (max <= min) return;
+            int distance = (int)(split.Width * ratio);
+            if (distance < min) distance = min;
+            if (distance > max) distance = max;
+
+            // 如果距离变化很小，不强制重新布局，减少不必要的绘制
+            if (Math.Abs(split.SplitterDistance - distance) <= 2)
+                return;
+
+            split.SuspendLayout();
+            try
+            {
+                split.SplitterDistance = distance;
+            }
+            finally
+            {
+                split.ResumeLayout(true);
+            }
         }
 
         #region 初始化与级联下拉框逻辑
@@ -63,21 +331,22 @@ namespace CryptoTool.Win
             if (comboCategory.Items.Count > 0)
                 comboCategory.SelectedIndex = 0;
 
+            comboHashAlgorithm.Items.Clear();
             comboHashAlgorithm.Items.AddRange(new object[] { "SHA256", "SHA384", "SHA512" });
             comboHashAlgorithm.SelectedIndex = 0;
 
-            comboInputFormat.Items.AddRange(new object[] { "PEM", "Base64", "Hex" });
-            comboInputFormat.SelectedIndex = 0;
-
-            comboOutputFormat.Items.AddRange(new object[] { "PEM", "Base64", "Hex" });
+            comboOutputFormat.Items.Clear();
+            comboOutputFormat.Items.AddRange(new object[] { "PEM", "Base64", "Hex大写", "Hex小写" });
             comboOutputFormat.SelectedIndex = 0;
 
+            comboSignatureFormat.Items.Clear();
             comboSignatureFormat.Items.AddRange(new object[] { "Base64", "Hex" });
             comboSignatureFormat.SelectedIndex = 0;
 
             radioPrivateKey.Checked = true;
-            labelValidationResult.Text = "验证结果: 未验证";
-            labelValidationResult.ForeColor = Color.Gray;
+            ResetValidationResult("未验证", Color.Gray);
+            textKeyResult.Text = "从私钥提取/曲线检测：\n等待操作...";
+            textKeyResult.ForeColor = Color.Gray;
         }
 
         private void ComboCategory_SelectedIndexChanged(object? sender, EventArgs e)
@@ -160,25 +429,36 @@ namespace CryptoTool.Win
             {
                 if (string.IsNullOrWhiteSpace(textPrivateKey.Text))
                 {
-                    SetGenerateResult(GetSelectedCurve(), "❌ 私钥为空，无法提取公钥");
+                    AppendKeyResult("❌ 私钥为空，无法提取公钥", Color.Red);
+                    SetStatus("私钥为空，无法提取公钥");
                     return;
                 }
 
                 SetStatus("正在从私钥提取公钥...");
 
                 var priv = EcdsaKeyHelper.ImportPrivateKeyPem(textPrivateKey.Text.Trim());
+
+                // 提取公钥前先判断私钥曲线是否可识别
+                string curveName = EcdsaKeyHelper.GetCurveName(priv);
+                if (curveName == "未知曲线")
+                {
+                    AppendKeyResult("❌ 私钥生成逻辑非法，不符合标准 OpenSSL", Color.Red);
+                    SetStatus("私钥曲线无法识别，不符合标准 OpenSSL");
+                    return;
+                }
+
                 var pub = EcdsaAlgorithm.GetPublicKey(priv);
 
                 _privateKeyPem = textPrivateKey.Text.Trim();
                 _publicKeyPem = EcdsaKeyHelper.ExportPublicKeyPem(pub);
 
                 RefreshKeyDisplay();
-                SetGenerateResult(GetSelectedCurve(), "密钥对匹配（从私钥提取）");
+                AppendKeyResult("✅ 密钥对匹配（从私钥提取）", Color.Green, GetSelectedCurve());
                 SetStatus("从私钥提取公钥完成");
             }
             catch (Exception ex)
             {
-                SetGenerateResult(GetSelectedCurve(), $"❌ 提取公钥失败: {ex.Message}");
+                AppendKeyResult($"❌ 提取公钥失败: {ex.Message}", Color.Red, GetSelectedCurve());
                 SetStatus("提取公钥失败");
             }
         }
@@ -191,8 +471,7 @@ namespace CryptoTool.Win
             {
                 if (string.IsNullOrWhiteSpace(textPrivateKey.Text))
                 {
-                    labelValidationResult.Text = "曲线类型检测结果:\r\n检测时间: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "\r\n❌ 私钥为空，无法获取曲线类型";
-                    labelValidationResult.ForeColor = Color.Red;
+                    AppendKeyResult("❌ 私钥为空，无法获取曲线类型", Color.Red);
                     SetStatus("获取曲线类型失败：私钥为空");
                     return;
                 }
@@ -203,14 +482,12 @@ namespace CryptoTool.Win
                 string curveName = EcdsaKeyHelper.GetCurveName(priv);
                 string displayName = EcdsaCurveNames.GetDisplayName(curveName);
 
-                labelValidationResult.Text = "曲线类型检测结果:\r\n检测时间: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "\r\n曲线名称: " + curveName + "\r\n显示名称: " + displayName;
-                labelValidationResult.ForeColor = Color.Green;
+                AppendKeyResult($"曲线名称: {curveName}\n显示名称: {displayName}", Color.Green);
                 SetStatus("获取曲线类型完成 - " + displayName);
             }
             catch (Exception ex)
             {
-                labelValidationResult.Text = "曲线类型检测结果:\r\n检测时间: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "\r\n❌ 获取曲线类型失败: " + ex.Message;
-                labelValidationResult.ForeColor = Color.Red;
+                AppendKeyResult($"❌ 获取曲线类型失败: {ex.Message}", Color.Red);
                 SetStatus("获取曲线类型失败");
             }
         }
@@ -358,27 +635,45 @@ namespace CryptoTool.Win
                 if (string.IsNullOrWhiteSpace(targetBox.Text))
                 { MessageBox.Show("请先输入要转换的密钥！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
 
-                string cf = comboInputFormat.SelectedItem?.ToString() ?? "PEM";
+                string input = targetBox.Text.Trim();
+                string inputFormat = DetectKeyFormat(input);
                 string tf = comboOutputFormat.SelectedItem?.ToString() ?? "Base64";
-                if (cf == tf)
-                { MessageBox.Show($"输入格式和输出格式相同（{cf}），无需转换！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information); return; }
+                if (inputFormat == tf)
+                { MessageBox.Show($"输入格式和输出格式相同（{inputFormat}），无需转换！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information); return; }
 
                 targetBox.Text = FormatConversionHelper.ConvertStringFormat(
-                    targetBox.Text,
-                    FormatConversionHelper.ParseInputFormat(cf),
+                    input,
+                    FormatConversionHelper.ParseInputFormat(inputFormat),
                     FormatConversionHelper.ParseOutputFormat(tf));
 
                 if (radioPrivateKey.Checked) _privateKeyPem = targetBox.Text;
                 else _publicKeyPem = targetBox.Text;
 
-                ResetValidationResult("未验证（格式已转换）", Color.Gray);
-                SetStatus($"格式转换完成 - {cf} → {tf}");
+                AppendValidationResult("格式已转换", Color.Gray);
+                SetStatus($"格式转换完成 - {inputFormat} → {tf}");
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"格式转换失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 SetStatus("格式转换失败");
             }
+        }
+
+        private string DetectKeyFormat(string input)
+        {
+            if (input.Contains("BEGIN", StringComparison.OrdinalIgnoreCase) || input.Contains("END", StringComparison.OrdinalIgnoreCase))
+                return "PEM";
+
+            string stripped = input.Replace("\r", "").Replace("\n", "").Replace(" ", "");
+            if (string.IsNullOrEmpty(stripped)) return "PEM";
+
+            bool isHex = stripped.All(c => "0123456789abcdefABCDEF".Contains(c));
+            if (isHex) return "Hex";
+
+            bool isBase64 = stripped.All(c => "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".Contains(c));
+            if (isBase64) return "Base64";
+
+            return "PEM";
         }
         #endregion
 
@@ -427,12 +722,12 @@ namespace CryptoTool.Win
                         byte[] fd = File.ReadAllBytes(od.FileName); s.BlockUpdate(fd, 0, fd.Length);
                         string sigText = File.ReadAllText(sd.FileName).Trim();
                         byte[] sig = (comboSignatureFormat.SelectedItem?.ToString() == "Hex") ? Convert.FromHexString(sigText) : Convert.FromBase64String(sigText);
-                        if (s.VerifySignature(sig)) ResetValidationResult($"✅ 文件签名验证通过（{ha}）", Color.Green);
-                        else ResetValidationResult("❌ 文件签名验证失败", Color.Red);
+                        if (s.VerifySignature(sig)) AppendValidationResult($"✅ 文件签名验证通过（{ha}）", Color.Green);
+                        else AppendValidationResult("❌ 文件签名验证失败", Color.Red);
                     }
                 }
             }
-            catch (Exception ex) { MessageBox.Show($"文件验签失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error); ResetValidationResult("文件验签异常", Color.Red); }
+            catch (Exception ex) { MessageBox.Show($"文件验签失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error); AppendValidationResult("❌ 文件验签异常", Color.Red); }
         }
         #endregion
 
@@ -453,7 +748,7 @@ namespace CryptoTool.Win
                     UIOutputFormat fmt = GetCurrentOutputFormat();
                     if (isPrivate) { _privateKeyPem = c; textPrivateKey.Text = FormatKeyForDisplay(_privateKeyPem, fmt); }
                     else { _publicKeyPem = c; textPublicKey.Text = FormatKeyForDisplay(_publicKeyPem, fmt); }
-                    ResetValidationResult("未验证（新密钥已导入）", Color.Gray);
+                    AppendValidationResult("新密钥已导入", Color.Gray);
                     SetStatus($"{(isPrivate ? "私钥" : "公钥")}导入完成");
                 }
             }
@@ -482,7 +777,11 @@ namespace CryptoTool.Win
         {
             textPrivateKey.Clear(); textPublicKey.Clear(); textPlainData.Clear(); textSignature.Clear();
             _privateKeyPem = _publicKeyPem = _lastSignHashAlgorithm = string.Empty;
-            ResetValidationResult("未验证", Color.Gray); SetStatus("已清空所有内容");
+            ResetValidationResult("未验证", Color.Gray);
+            textKeyResult.Clear();
+            textKeyResult.Text = "从私钥提取/曲线检测：\n等待操作...";
+            textKeyResult.ForeColor = Color.Gray;
+            SetStatus("已清空所有内容");
         }
 
         private void btnPastePrivateKey_Click(object? s, EventArgs e)
@@ -501,35 +800,35 @@ namespace CryptoTool.Win
 
         private void btnClearPublicKey_Click(object? s, EventArgs e) { textPublicKey.Clear(); _publicKeyPem = string.Empty; SetStatus("公钥已清空"); }
 
-    // ✅ 新增：复制私钥按钮点击事件
-    private void btnCopyPrivateKey_Click(object? sender, EventArgs e)
-    {
-        if (!string.IsNullOrEmpty(textPrivateKey.Text))
+        // ✅ 新增：复制私钥按钮点击事件
+        private void btnCopyPrivateKey_Click(object? sender, EventArgs e)
         {
-            Clipboard.SetText(textPrivateKey.Text);
-            SetStatus("私钥已复制到剪贴板");
+            if (!string.IsNullOrEmpty(textPrivateKey.Text))
+            {
+                Clipboard.SetText(textPrivateKey.Text);
+                SetStatus("私钥已复制到剪贴板");
+            }
+            else
+            {
+                MessageBox.Show("私钥为空，无法复制！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                SetStatus("复制私钥失败：私钥为空");
+            }
         }
-        else
-        {
-            MessageBox.Show("私钥为空，无法复制！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            SetStatus("复制私钥失败：私钥为空");
-        }
-    }
 
-    // ✅ 新增：复制公钥按钮点击事件
-    private void btnCopyPublicKey_Click(object? sender, EventArgs e)
-    {
-        if (!string.IsNullOrEmpty(textPublicKey.Text))
+        // ✅ 新增：复制公钥按钮点击事件
+        private void btnCopyPublicKey_Click(object? sender, EventArgs e)
         {
-            Clipboard.SetText(textPublicKey.Text);
-            SetStatus("公钥已复制到剪贴板");
+            if (!string.IsNullOrEmpty(textPublicKey.Text))
+            {
+                Clipboard.SetText(textPublicKey.Text);
+                SetStatus("公钥已复制到剪贴板");
+            }
+            else
+            {
+                MessageBox.Show("公钥为空，无法复制！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                SetStatus("复制公钥失败：公钥为空");
+            }
         }
-        else
-        {
-            MessageBox.Show("公钥为空，无法复制！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            SetStatus("复制公钥失败：公钥为空");
-        }
-    }
         #endregion
 
         #region 控件事件
@@ -537,28 +836,66 @@ namespace CryptoTool.Win
 
         private void textPrivateKey_TextChanged(object? s, EventArgs e)
         {
-            if (labelValidationResult.Text.Contains("匹配") || labelValidationResult.Text.Contains("通过") || labelValidationResult.Text.Contains("失败"))
-                ResetValidationResult("未验证", Color.Gray);
+            // 不再自动清空左侧运行结果历史，保证生成/验证等记录持续累积
         }
         #endregion
 
         #region 辅助方法
         private void SetGenerateResult(string curveName, string status)
         {
-            labelValidationResult.Text = $"验证结果: {status}\r\n生成时间: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\r\n使用曲线: {EcdsaCurveNames.GetDisplayName(curveName)}";
-            labelValidationResult.ForeColor = Color.Green;
+            Color color = status.Contains("❌") ? Color.Red : Color.Green;
+            AppendValidationResult($"{status}\n生成时间: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n使用曲线: {EcdsaCurveNames.GetDisplayName(curveName)}", color);
         }
 
         private void SetSignResult(string status, Color color)
         {
-            labelValidationResult.Text = $"验证结果: {status}\r\n生成时间: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\r\n使用曲线: {EcdsaCurveNames.GetDisplayName(GetSelectedCurve())}（{GetSelectedHash()}）";
-            labelValidationResult.ForeColor = color;
+            AppendValidationResult($"{status}\n生成时间: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n使用曲线: {EcdsaCurveNames.GetDisplayName(GetSelectedCurve())}（{GetSelectedHash()}）", color);
         }
 
         private void ResetValidationResult(string text, Color color)
         {
-            labelValidationResult.Text = "验证结果: " + text;
-            labelValidationResult.ForeColor = color;
+            labelValidationResult.Clear();
+            labelValidationResult.SelectionStart = 0;
+            labelValidationResult.SelectionLength = 0;
+            labelValidationResult.SelectionColor = color;
+            labelValidationResult.SelectedText = "验证结果: " + text;
+        }
+
+        private void AppendValidationResult(string message, Color color)
+        {
+            if (labelValidationResult.Text.Contains("未验证") || labelValidationResult.Text.Contains("等待操作"))
+                labelValidationResult.Clear();
+
+            string entry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss}  {message}{Environment.NewLine}{Environment.NewLine}";
+
+            // 与右侧运行结果一致：上面新、下面旧
+            labelValidationResult.Select(0, 0);
+            labelValidationResult.SelectionColor = color;
+            labelValidationResult.SelectedText = entry;
+
+            labelValidationResult.SelectionStart = 0;
+            labelValidationResult.ScrollToCaret();
+        }
+
+        private void AppendKeyResult(string message, Color color, string? curveName = null)
+        {
+            if (textKeyResult.Text.Contains("等待操作"))
+                textKeyResult.Clear();
+
+            string detail = message;
+            if (!string.IsNullOrEmpty(curveName))
+            {
+                detail += $"\n生成时间: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n使用曲线: {EcdsaCurveNames.GetDisplayName(curveName)}";
+            }
+
+            string entry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss}  {detail}{Environment.NewLine}{Environment.NewLine}";
+
+            textKeyResult.Select(0, 0);
+            textKeyResult.SelectionColor = color;
+            textKeyResult.SelectedText = entry;
+
+            textKeyResult.SelectionStart = 0;
+            textKeyResult.ScrollToCaret();
         }
 
         private void RefreshKeyDisplay()
@@ -571,7 +908,8 @@ namespace CryptoTool.Win
         private UIOutputFormat GetCurrentOutputFormat() => comboOutputFormat.SelectedItem?.ToString() switch
         {
             "Base64" => UIOutputFormat.Base64,
-            "Hex" => UIOutputFormat.Hex,
+            "Hex大写" => UIOutputFormat.HexUpper,
+            "Hex小写" => UIOutputFormat.HexLower,
             _ => UIOutputFormat.PEM
         };
 
@@ -582,7 +920,10 @@ namespace CryptoTool.Win
             foreach (var line in pem.Split('\n'))
                 if (!line.StartsWith("-----")) sb.Append(line.Trim());
             string b64 = sb.ToString();
-            return format == UIOutputFormat.Base64 ? b64 : Convert.ToHexString(Convert.FromBase64String(b64)).ToLowerInvariant();
+            if (format == UIOutputFormat.Base64) return b64;
+
+            string hex = Convert.ToHexString(Convert.FromBase64String(b64));
+            return format == UIOutputFormat.HexUpper ? hex : hex.ToLowerInvariant();
         }
         #endregion
 
@@ -742,14 +1083,12 @@ namespace CryptoTool.Win
                     ? Convert.ToHexString(cipher).ToLowerInvariant()
                     : Convert.ToBase64String(cipher);
 
-                labelEncResult.Text = $"✅ 加密成功\r\n算法: {mode}\r\nIV: {Convert.ToHexString(iv).ToLowerInvariant()}\r\n长度: {cipher.Length}字节";
-                labelEncResult.ForeColor = Color.Green;
+                AppendValidationResult($"✅ 加密成功\r\n算法: {mode}\r\nIV: {Convert.ToHexString(iv).ToLowerInvariant()}\r\n长度: {cipher.Length}字节", Color.Green);
                 SetStatus("加密完成");
             }
             catch (Exception ex)
             {
-                labelEncResult.Text = $"❌ 加密失败: {ex.Message}";
-                labelEncResult.ForeColor = Color.Red;
+                AppendValidationResult($"❌ 加密失败: {ex.Message}", Color.Red);
                 SetStatus("加密失败");
             }
         }
@@ -778,14 +1117,12 @@ namespace CryptoTool.Win
                 };
 
                 textEncOutput.Text = Encoding.UTF8.GetString(plain);
-                labelEncResult.Text = $"✅ 解密成功\r\n算法: {mode}\r\n明文长度: {plain.Length}字节";
-                labelEncResult.ForeColor = Color.Green;
+                AppendValidationResult($"✅ 解密成功\r\n算法: {mode}\r\n明文长度: {plain.Length}字节", Color.Green);
                 SetStatus("解密完成");
             }
             catch (Exception ex)
             {
-                labelEncResult.Text = $"❌ 解密失败: {ex.Message}";
-                labelEncResult.ForeColor = Color.Red;
+                AppendValidationResult($"❌ 解密失败: {ex.Message}", Color.Red);
                 SetStatus("解密失败");
             }
         }
@@ -796,8 +1133,6 @@ namespace CryptoTool.Win
             textEncOutput.Clear();
             textEncKey.Clear();
             textEncIV.Clear();
-            labelEncResult.Text = "加密结果:\r\n等待操作...";
-            labelEncResult.ForeColor = Color.Gray;
             _derivedEncKey = null;
             _lastEncIV = null;
         }
@@ -854,14 +1189,12 @@ namespace CryptoTool.Win
                 fs.Write(iv, 0, iv.Length);
                 fs.Write(cipher, 0, cipher.Length);
 
-                labelEncResult.Text = $"✅ 文件加密成功\r\n{Path.GetFileName(openDlg.FileName)} → {Path.GetFileName(saveDlg.FileName)}";
-                labelEncResult.ForeColor = Color.Green;
+                AppendValidationResult($"✅ 文件加密成功\r\n{Path.GetFileName(openDlg.FileName)} → {Path.GetFileName(saveDlg.FileName)}", Color.Green);
                 SetStatus("文件加密完成");
             }
             catch (Exception ex)
             {
-                labelEncResult.Text = $"❌ 文件加密失败: {ex.Message}";
-                labelEncResult.ForeColor = Color.Red;
+                AppendValidationResult($"❌ 文件加密失败: {ex.Message}", Color.Red);
                 SetStatus("文件加密失败");
             }
         }
@@ -902,19 +1235,27 @@ namespace CryptoTool.Win
 
                 File.WriteAllBytes(saveDlg.FileName, plain);
                 textEncIV.Text = Convert.ToHexString(iv).ToLowerInvariant();
-                labelEncResult.Text = $"✅ 文件解密成功\r\n{Path.GetFileName(openDlg.FileName)} → {Path.GetFileName(saveDlg.FileName)}";
-                labelEncResult.ForeColor = Color.Green;
+                AppendValidationResult($"✅ 文件解密成功\r\n{Path.GetFileName(openDlg.FileName)} → {Path.GetFileName(saveDlg.FileName)}", Color.Green);
                 SetStatus("文件解密完成");
             }
             catch (Exception ex)
             {
-                labelEncResult.Text = $"❌ 文件解密失败: {ex.Message}";
-                labelEncResult.ForeColor = Color.Red;
+                AppendValidationResult($"❌ 文件解密失败: {ex.Message}", Color.Red);
                 SetStatus("文件解密失败");
             }
         }
         #endregion
 
         #endregion
+
+        private void labelCurveHeader_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void labelCurve_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

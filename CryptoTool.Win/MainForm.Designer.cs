@@ -56,6 +56,7 @@ namespace CryptoTool.Win
             // 
             // tabControl1
             // 
+            tabControl1.Controls.Add(tabEcdsa);   // ECDSA 放在首位
             tabControl1.Controls.Add(tabRSA);
             tabControl1.Controls.Add(tabRSAConvert);
             tabControl1.Controls.Add(tabAES);
@@ -63,7 +64,6 @@ namespace CryptoTool.Win
             tabControl1.Controls.Add(tabSM4);
             tabControl1.Controls.Add(tabSM2);
             tabControl1.Controls.Add(tabSM3);
-            tabControl1.Controls.Add(tabEcdsa);   // ✅ 加入 TabControl
             tabControl1.Controls.Add(tabMD5);
             tabControl1.Controls.Add(tabMedicare);
             tabControl1.Controls.Add(tabAbout);
@@ -84,7 +84,7 @@ namespace CryptoTool.Win
             tabRSA.Name = "tabRSA";
             tabRSA.Padding = new Padding(4);
             tabRSA.Size = new Size(1278, 1022);
-            tabRSA.TabIndex = 0;
+            tabRSA.TabIndex = 1;
             tabRSA.Text = "RSA算法";
             tabRSA.UseVisualStyleBackColor = true;
 
@@ -96,7 +96,7 @@ namespace CryptoTool.Win
             tabRSAConvert.Name = "tabRSAConvert";
             tabRSAConvert.Padding = new Padding(4);
             tabRSAConvert.Size = new Size(1278, 1022);
-            tabRSAConvert.TabIndex = 5;
+            tabRSAConvert.TabIndex = 2;
             tabRSAConvert.Text = "RSA格式转换";
             tabRSAConvert.UseVisualStyleBackColor = true;
 
@@ -108,7 +108,7 @@ namespace CryptoTool.Win
             tabAES.Name = "tabAES";
             tabAES.Padding = new Padding(4);
             tabAES.Size = new Size(1278, 1022);
-            tabAES.TabIndex = 6;
+            tabAES.TabIndex = 3;
             tabAES.Text = "AES算法";
             tabAES.UseVisualStyleBackColor = true;
 
@@ -120,7 +120,7 @@ namespace CryptoTool.Win
             tabDES.Name = "tabDES";
             tabDES.Padding = new Padding(4);
             tabDES.Size = new Size(1278, 1022);
-            tabDES.TabIndex = 7;
+            tabDES.TabIndex = 4;
             tabDES.Text = "DES算法";
             tabDES.UseVisualStyleBackColor = true;
 
@@ -132,7 +132,7 @@ namespace CryptoTool.Win
             tabSM4.Name = "tabSM4";
             tabSM4.Padding = new Padding(4);
             tabSM4.Size = new Size(1278, 1022);
-            tabSM4.TabIndex = 8;
+            tabSM4.TabIndex = 5;
             tabSM4.Text = "SM4算法";
             tabSM4.UseVisualStyleBackColor = true;
 
@@ -144,7 +144,7 @@ namespace CryptoTool.Win
             tabSM2.Name = "tabSM2";
             tabSM2.Padding = new Padding(4);
             tabSM2.Size = new Size(1278, 1022);
-            tabSM2.TabIndex = 1;
+            tabSM2.TabIndex = 6;
             tabSM2.Text = "SM2算法";
             tabSM2.UseVisualStyleBackColor = true;
 
@@ -156,7 +156,7 @@ namespace CryptoTool.Win
             tabSM3.Name = "tabSM3";
             tabSM3.Padding = new Padding(4);
             tabSM3.Size = new Size(1278, 1022);
-            tabSM3.TabIndex = 2;
+            tabSM3.TabIndex = 7;
             tabSM3.Text = "SM3算法";
             tabSM3.UseVisualStyleBackColor = true;
 
@@ -168,7 +168,7 @@ namespace CryptoTool.Win
             tabEcdsa.Name = "tabEcdsa";
             tabEcdsa.Padding = new Padding(4);
             tabEcdsa.Size = new Size(1278, 1022);
-            tabEcdsa.TabIndex = 9;
+            tabEcdsa.TabIndex = 0;
             tabEcdsa.Text = "ECDSA算法";
             tabEcdsa.UseVisualStyleBackColor = true;
 
@@ -180,7 +180,7 @@ namespace CryptoTool.Win
             tabMD5.Name = "tabMD5";
             tabMD5.Padding = new Padding(4);
             tabMD5.Size = new Size(1278, 1022);
-            tabMD5.TabIndex = 10;
+            tabMD5.TabIndex = 8;
             tabMD5.Text = "MD5算法";
             tabMD5.UseVisualStyleBackColor = true;
 
@@ -192,7 +192,7 @@ namespace CryptoTool.Win
             tabMedicare.Name = "tabMedicare";
             tabMedicare.Padding = new Padding(3, 4, 3, 4);
             tabMedicare.Size = new Size(1278, 1022);
-            tabMedicare.TabIndex = 3;
+            tabMedicare.TabIndex = 9;
             tabMedicare.Text = "医保接口";
             tabMedicare.UseVisualStyleBackColor = true;
 
@@ -204,7 +204,7 @@ namespace CryptoTool.Win
             tabAbout.Name = "tabAbout";
             tabAbout.Padding = new Padding(3, 4, 3, 4);
             tabAbout.Size = new Size(1278, 1022);
-            tabAbout.TabIndex = 4;
+            tabAbout.TabIndex = 10;
             tabAbout.Text = "关于";
             tabAbout.UseVisualStyleBackColor = true;
 

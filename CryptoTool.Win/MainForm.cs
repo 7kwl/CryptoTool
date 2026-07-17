@@ -24,8 +24,13 @@ namespace CryptoTool.Win
         {
             InitializeComponent();
 
-            this.WindowState = FormWindowState.Maximized;
-            this.MinimumSize = new Size(2400, 1400);
+            // 开启窗体双缓冲，减少缩放全屏时因多次重绘导致的卡顿
+            this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+            this.UpdateStyles();
+
+            this.WindowState = FormWindowState.Normal;
+            this.Size = new Size(2400, 1500);
+            this.MinimumSize = new Size(1200, 800);
 
             InitializeTabControls();
             InitializeUpdateService();
@@ -81,12 +86,12 @@ namespace CryptoTool.Win
             tabSM3.Controls.Add(sm3TabControl);
 
             // ECDSA TabPage - 使用索引避免命名问题
-            // 放在 SM3 之后、MD5 之前（索引 7）
-            if (tabControl1.TabPages.Count >= 8)
+            // 放在首位第一个（索引 0）
+            if (tabControl1.TabPages.Count >= 1)
             {
-                tabControl1.TabPages[7].Controls.Clear();
-                tabControl1.TabPages[7].Controls.Add(ecdsaTabControl);
-                tabControl1.TabPages[7].Text = "ECDSA";
+                tabControl1.TabPages[0].Controls.Clear();
+                tabControl1.TabPages[0].Controls.Add(ecdsaTabControl);
+                tabControl1.TabPages[0].Text = "ECDSA";
             }
 
             tabMD5.Controls.Clear();
