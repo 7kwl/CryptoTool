@@ -45,17 +45,6 @@ namespace CryptoTool.Win
             tableButtonArea = new TableLayoutPanel();
             panelRightScroll = new Panel();
             tableRightActions = new TableLayoutPanel();
-            panelFormatRow = new FlowLayoutPanel();
-            panelKeyTypeRow = new FlowLayoutPanel();
-            labelInputFormat = new Label();
-            comboInputFormat = new ComboBox();
-            labelOutputFormat = new Label();
-            comboOutputFormat = new ComboBox();
-            labelKeyType = new Label();
-            radioPanel = new FlowLayoutPanel();
-            radioPrivateKey = new RadioButton();
-            radioPublicKey = new RadioButton();
-            btnConvertKey = new Button();
             panelKeyControlsContainer = new Panel();
             panelKeyControls = new FlowLayoutPanel();
             btnGenerateKeyPair = new Button();
@@ -63,6 +52,17 @@ namespace CryptoTool.Win
             btnGetPublicKeyFromPrivate = new Button();
             btnGetCurveType = new Button();
             btnClearAll = new Button();
+            panelFormatRow = new FlowLayoutPanel();
+            labelInputFormat = new Label();
+            comboInputFormat = new ComboBox();
+            labelOutputFormat = new Label();
+            comboOutputFormat = new ComboBox();
+            panelKeyTypeRow = new FlowLayoutPanel();
+            labelKeyType = new Label();
+            radioPanel = new FlowLayoutPanel();
+            radioPrivateKey = new RadioButton();
+            radioPublicKey = new RadioButton();
+            btnConvertKey = new Button();
             panelCurveContainer = new Panel();
             labelCurveHeader = new Label();
             panelCurveRow = new FlowLayoutPanel();
@@ -130,11 +130,11 @@ namespace CryptoTool.Win
             tableButtonArea.SuspendLayout();
             panelRightScroll.SuspendLayout();
             tableRightActions.SuspendLayout();
+            panelKeyControlsContainer.SuspendLayout();
+            panelKeyControls.SuspendLayout();
             panelFormatRow.SuspendLayout();
             panelKeyTypeRow.SuspendLayout();
             radioPanel.SuspendLayout();
-            panelKeyControlsContainer.SuspendLayout();
-            panelKeyControls.SuspendLayout();
             panelCurveContainer.SuspendLayout();
             panelCurveRow.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitSignEncrypt).BeginInit();
@@ -508,38 +508,113 @@ namespace CryptoTool.Win
             // 
             // tableRightActions
             // 
-            tableRightActions.AutoSize = true;
-            tableRightActions.ColumnCount = 1;
+            tableRightActions.ColumnCount = 2;
+            tableRightActions.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 180F));
             tableRightActions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableRightActions.Controls.Add(panelFormatAndType, 0, 0);
-            tableRightActions.Controls.Add(panelKeyControlsContainer, 0, 1);
-            tableRightActions.Controls.Add(panelCurveContainer, 0, 2);
+            tableRightActions.Controls.Add(panelKeyControlsContainer, 0, 0);
+            tableRightActions.Controls.Add(panelFormatRow, 1, 0);
+            tableRightActions.Controls.Add(panelKeyTypeRow, 1, 1);
+            tableRightActions.Controls.Add(panelCurveContainer, 1, 2);
             tableRightActions.Dock = DockStyle.Top;
             tableRightActions.Location = new Point(6, 6);
             tableRightActions.Name = "tableRightActions";
             tableRightActions.RowCount = 3;
-            tableRightActions.RowStyles.Add(new RowStyle(SizeType.Absolute, 54F));
-            tableRightActions.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableRightActions.RowStyles.Add(new RowStyle(SizeType.Absolute, 79F));
-            tableRightActions.Size = new Size(1264, 195);
+            tableRightActions.RowStyles.Add(new RowStyle(SizeType.Absolute, 58F));
+            tableRightActions.RowStyles.Add(new RowStyle(SizeType.Absolute, 58F));
+            tableRightActions.RowStyles.Add(new RowStyle(SizeType.Absolute, 73F));
+            tableRightActions.Size = new Size(1264, 633);
             tableRightActions.TabIndex = 0;
             // 
-            // panelFormatAndType
+            // panelKeyControlsContainer
             // 
-            panelFormatAndType.AutoSize = true;
-            panelFormatAndType.Controls.Add(labelInputFormat);
-            panelFormatAndType.Controls.Add(comboInputFormat);
-            panelFormatAndType.Controls.Add(labelOutputFormat);
-            panelFormatAndType.Controls.Add(comboOutputFormat);
-            panelFormatAndType.Controls.Add(labelKeyType);
-            panelFormatAndType.Controls.Add(radioPanel);
-            panelFormatAndType.Controls.Add(btnConvertKey);
-            panelFormatAndType.Dock = DockStyle.Top;
-            panelFormatAndType.Location = new Point(3, 3);
-            panelFormatAndType.Name = "panelFormatAndType";
-            panelFormatAndType.Padding = new Padding(6, 6, 6, 8);
-            panelFormatAndType.Size = new Size(1258, 48);
-            panelFormatAndType.TabIndex = 0;
+            panelKeyControlsContainer.Controls.Add(panelKeyControls);
+            panelKeyControlsContainer.Dock = DockStyle.Fill;
+            panelKeyControlsContainer.Location = new Point(3, 3);
+            panelKeyControlsContainer.Name = "panelKeyControlsContainer";
+            panelKeyControlsContainer.Padding = new Padding(6, 4, 6, 8);
+            tableRightActions.SetRowSpan(panelKeyControlsContainer, 3);
+            panelKeyControlsContainer.Size = new Size(174, 627);
+            panelKeyControlsContainer.TabIndex = 1;
+            // 
+            // panelKeyControls
+            // 
+            panelKeyControls.Controls.Add(btnGenerateKeyPair);
+            panelKeyControls.Controls.Add(btnValidateKeyPair);
+            panelKeyControls.Controls.Add(btnGetPublicKeyFromPrivate);
+            panelKeyControls.Controls.Add(btnGetCurveType);
+            panelKeyControls.Controls.Add(btnClearAll);
+            panelKeyControls.Dock = DockStyle.Fill;
+            panelKeyControls.FlowDirection = FlowDirection.TopDown;
+            panelKeyControls.Location = new Point(6, 4);
+            panelKeyControls.Name = "panelKeyControls";
+            panelKeyControls.Padding = new Padding(0, 4, 0, 0);
+            panelKeyControls.Size = new Size(162, 615);
+            panelKeyControls.TabIndex = 1;
+            panelKeyControls.WrapContents = false;
+            // 
+            // btnGenerateKeyPair
+            // 
+            btnGenerateKeyPair.Location = new Point(0, 9);
+            btnGenerateKeyPair.Margin = new Padding(0, 5, 6, 4);
+            btnGenerateKeyPair.Name = "btnGenerateKeyPair";
+            btnGenerateKeyPair.Size = new Size(150, 40);
+            btnGenerateKeyPair.TabIndex = 0;
+            btnGenerateKeyPair.Text = "生成密钥对";
+            btnGenerateKeyPair.Click += btnGenerateKeyPair_Click;
+            // 
+            // btnValidateKeyPair
+            // 
+            btnValidateKeyPair.Location = new Point(0, 63);
+            btnValidateKeyPair.Margin = new Padding(0, 10, 6, 4);
+            btnValidateKeyPair.Name = "btnValidateKeyPair";
+            btnValidateKeyPair.Size = new Size(150, 40);
+            btnValidateKeyPair.TabIndex = 1;
+            btnValidateKeyPair.Text = "验证密钥对";
+            btnValidateKeyPair.Click += btnValidateKeyPair_Click;
+            // 
+            // btnGetPublicKeyFromPrivate
+            // 
+            btnGetPublicKeyFromPrivate.Location = new Point(0, 117);
+            btnGetPublicKeyFromPrivate.Margin = new Padding(0, 10, 6, 4);
+            btnGetPublicKeyFromPrivate.Name = "btnGetPublicKeyFromPrivate";
+            btnGetPublicKeyFromPrivate.Size = new Size(150, 40);
+            btnGetPublicKeyFromPrivate.TabIndex = 2;
+            btnGetPublicKeyFromPrivate.Text = "从私钥提取公钥";
+            btnGetPublicKeyFromPrivate.Click += btnGetPublicKeyFromPrivate_Click;
+            // 
+            // btnGetCurveType
+            // 
+            btnGetCurveType.Location = new Point(0, 171);
+            btnGetCurveType.Margin = new Padding(0, 10, 6, 4);
+            btnGetCurveType.Name = "btnGetCurveType";
+            btnGetCurveType.Size = new Size(150, 40);
+            btnGetCurveType.TabIndex = 3;
+            btnGetCurveType.Text = "获取私钥曲线类型";
+            btnGetCurveType.Click += btnGetCurveType_Click;
+            // 
+            // btnClearAll
+            // 
+            btnClearAll.Location = new Point(0, 225);
+            btnClearAll.Margin = new Padding(0, 10, 6, 4);
+            btnClearAll.Name = "btnClearAll";
+            btnClearAll.Size = new Size(150, 40);
+            btnClearAll.TabIndex = 4;
+            btnClearAll.Text = "清空全部";
+            btnClearAll.Click += btnClearAll_Click;
+            // 
+            // panelFormatRow
+            // 
+            panelFormatRow.AutoSize = true;
+            panelFormatRow.Controls.Add(labelInputFormat);
+            panelFormatRow.Controls.Add(comboInputFormat);
+            panelFormatRow.Controls.Add(labelOutputFormat);
+            panelFormatRow.Controls.Add(comboOutputFormat);
+            panelFormatRow.Dock = DockStyle.Fill;
+            panelFormatRow.Location = new Point(183, 3);
+            panelFormatRow.Name = "panelFormatRow";
+            panelFormatRow.Padding = new Padding(6, 6, 6, 8);
+            panelFormatRow.Size = new Size(1078, 52);
+            panelFormatRow.TabIndex = 0;
             // 
             // labelInputFormat
             // 
@@ -584,10 +659,23 @@ namespace CryptoTool.Win
             comboOutputFormat.TabIndex = 3;
             comboOutputFormat.SelectedIndexChanged += comboOutputFormat_SelectedIndexChanged;
             // 
+            // panelKeyTypeRow
+            // 
+            panelKeyTypeRow.AutoSize = true;
+            panelKeyTypeRow.Controls.Add(labelKeyType);
+            panelKeyTypeRow.Controls.Add(radioPanel);
+            panelKeyTypeRow.Controls.Add(btnConvertKey);
+            panelKeyTypeRow.Dock = DockStyle.Fill;
+            panelKeyTypeRow.Location = new Point(183, 61);
+            panelKeyTypeRow.Name = "panelKeyTypeRow";
+            panelKeyTypeRow.Padding = new Padding(6, 6, 6, 8);
+            panelKeyTypeRow.Size = new Size(1078, 52);
+            panelKeyTypeRow.TabIndex = 1;
+            // 
             // labelKeyType
             // 
             labelKeyType.AutoSize = true;
-            labelKeyType.Location = new Point(426, 10);
+            labelKeyType.Location = new Point(14, 10);
             labelKeyType.Margin = new Padding(8, 4, 2, 4);
             labelKeyType.Name = "labelKeyType";
             labelKeyType.Size = new Size(100, 24);
@@ -599,7 +687,7 @@ namespace CryptoTool.Win
             radioPanel.AutoSize = true;
             radioPanel.Controls.Add(radioPrivateKey);
             radioPanel.Controls.Add(radioPublicKey);
-            radioPanel.Location = new Point(528, 9);
+            radioPanel.Location = new Point(116, 9);
             radioPanel.Margin = new Padding(0, 3, 8, 3);
             radioPanel.Name = "radioPanel";
             radioPanel.Size = new Size(157, 34);
@@ -629,7 +717,7 @@ namespace CryptoTool.Win
             // btnConvertKey
             // 
             btnConvertKey.AutoSize = true;
-            btnConvertKey.Location = new Point(705, 9);
+            btnConvertKey.Location = new Point(293, 9);
             btnConvertKey.Margin = new Padding(12, 3, 4, 3);
             btnConvertKey.MinimumSize = new Size(80, 26);
             btnConvertKey.Name = "btnConvertKey";
@@ -638,115 +726,16 @@ namespace CryptoTool.Win
             btnConvertKey.Text = "转换";
             btnConvertKey.Click += btnConvertKey_Click;
             // 
-            // panelKeyControlsContainer
-            // 
-            panelKeyControlsContainer.AutoSize = true;
-            panelKeyControlsContainer.Controls.Add(panelKeyControls);
-            panelKeyControlsContainer.Dock = DockStyle.Fill;
-            panelKeyControlsContainer.Location = new Point(3, 57);
-            panelKeyControlsContainer.Name = "panelKeyControlsContainer";
-            panelKeyControlsContainer.Padding = new Padding(6, 4, 6, 8);
-            panelKeyControlsContainer.Size = new Size(1258, 56);
-            panelKeyControlsContainer.TabIndex = 1;
-            // 
-            // panelKeyControls
-            // 
-            panelKeyControls.AutoSize = true;
-            panelKeyControls.Controls.Add(btnGenerateKeyPair);
-            panelKeyControls.Controls.Add(btnValidateKeyPair);
-            panelKeyControls.Controls.Add(btnGetPublicKeyFromPrivate);
-            panelKeyControls.Controls.Add(btnGetCurveType);
-            panelKeyControls.Controls.Add(btnClearAll);
-            panelKeyControls.Controls.Add(labelKeyControlsHeader);
-            panelKeyControls.Dock = DockStyle.Fill;
-            panelKeyControls.Location = new Point(6, 4);
-            panelKeyControls.Name = "panelKeyControls";
-            panelKeyControls.Padding = new Padding(0, 4, 0, 0);
-            panelKeyControls.Size = new Size(1246, 44);
-            panelKeyControls.TabIndex = 1;
-            // 
-            // btnGenerateKeyPair
-            // 
-            btnGenerateKeyPair.AutoSize = true;
-            btnGenerateKeyPair.Location = new Point(0, 4);
-            btnGenerateKeyPair.Margin = new Padding(0, 0, 6, 4);
-            btnGenerateKeyPair.MinimumSize = new Size(140, 32);
-            btnGenerateKeyPair.Name = "btnGenerateKeyPair";
-            btnGenerateKeyPair.Size = new Size(140, 36);
-            btnGenerateKeyPair.TabIndex = 0;
-            btnGenerateKeyPair.Text = "生成密钥对";
-            btnGenerateKeyPair.Click += btnGenerateKeyPair_Click;
-            // 
-            // btnValidateKeyPair
-            // 
-            btnValidateKeyPair.AutoSize = true;
-            btnValidateKeyPair.Location = new Point(146, 4);
-            btnValidateKeyPair.Margin = new Padding(0, 0, 6, 4);
-            btnValidateKeyPair.MinimumSize = new Size(140, 32);
-            btnValidateKeyPair.Name = "btnValidateKeyPair";
-            btnValidateKeyPair.Size = new Size(140, 36);
-            btnValidateKeyPair.TabIndex = 1;
-            btnValidateKeyPair.Text = "验证密钥对";
-            btnValidateKeyPair.Click += btnValidateKeyPair_Click;
-            // 
-            // btnGetPublicKeyFromPrivate
-            // 
-            btnGetPublicKeyFromPrivate.AutoSize = true;
-            btnGetPublicKeyFromPrivate.Location = new Point(292, 4);
-            btnGetPublicKeyFromPrivate.Margin = new Padding(0, 0, 6, 4);
-            btnGetPublicKeyFromPrivate.MinimumSize = new Size(160, 32);
-            btnGetPublicKeyFromPrivate.Name = "btnGetPublicKeyFromPrivate";
-            btnGetPublicKeyFromPrivate.Size = new Size(160, 36);
-            btnGetPublicKeyFromPrivate.TabIndex = 2;
-            btnGetPublicKeyFromPrivate.Text = "从私钥提取公钥";
-            btnGetPublicKeyFromPrivate.Click += btnGetPublicKeyFromPrivate_Click;
-            // 
-            // btnGetCurveType
-            // 
-            btnGetCurveType.AutoSize = true;
-            btnGetCurveType.Location = new Point(458, 4);
-            btnGetCurveType.Margin = new Padding(0, 0, 6, 4);
-            btnGetCurveType.MinimumSize = new Size(160, 32);
-            btnGetCurveType.Name = "btnGetCurveType";
-            btnGetCurveType.Size = new Size(164, 36);
-            btnGetCurveType.TabIndex = 3;
-            btnGetCurveType.Text = "获取私钥曲线类型";
-            btnGetCurveType.Click += btnGetCurveType_Click;
-            // 
-            // btnClearAll
-            // 
-            btnClearAll.AutoSize = true;
-            btnClearAll.Location = new Point(628, 4);
-            btnClearAll.Margin = new Padding(0, 0, 6, 4);
-            btnClearAll.MinimumSize = new Size(120, 32);
-            btnClearAll.Name = "btnClearAll";
-            btnClearAll.Size = new Size(120, 36);
-            btnClearAll.TabIndex = 4;
-            btnClearAll.Text = "清空全部";
-            btnClearAll.Click += btnClearAll_Click;
-            // 
-            // labelKeyControlsHeader
-            // 
-            labelKeyControlsHeader.AutoSize = true;
-            labelKeyControlsHeader.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            labelKeyControlsHeader.ForeColor = Color.FromArgb(80, 80, 80);
-            labelKeyControlsHeader.Location = new Point(758, 8);
-            labelKeyControlsHeader.Margin = new Padding(4, 4, 4, 6);
-            labelKeyControlsHeader.Name = "labelKeyControlsHeader";
-            labelKeyControlsHeader.Size = new Size(123, 25);
-            labelKeyControlsHeader.TabIndex = 0;
-            labelKeyControlsHeader.Text = "⚙️ 密钥操作";
-            // 
             // panelCurveContainer
             // 
             panelCurveContainer.AutoSize = true;
             panelCurveContainer.Controls.Add(labelCurveHeader);
             panelCurveContainer.Controls.Add(panelCurveRow);
             panelCurveContainer.Dock = DockStyle.Top;
-            panelCurveContainer.Location = new Point(3, 119);
+            panelCurveContainer.Location = new Point(183, 119);
             panelCurveContainer.Name = "panelCurveContainer";
             panelCurveContainer.Padding = new Padding(6, 4, 6, 8);
-            panelCurveContainer.Size = new Size(1258, 73);
+            panelCurveContainer.Size = new Size(1078, 79);
             panelCurveContainer.TabIndex = 2;
             // 
             // labelCurveHeader
@@ -1463,19 +1452,16 @@ namespace CryptoTool.Win
             panelButtonArea.ResumeLayout(false);
             tableButtonArea.ResumeLayout(false);
             panelRightScroll.ResumeLayout(false);
-            panelRightScroll.PerformLayout();
             tableRightActions.ResumeLayout(false);
             tableRightActions.PerformLayout();
+            panelKeyControlsContainer.ResumeLayout(false);
+            panelKeyControls.ResumeLayout(false);
             panelFormatRow.ResumeLayout(false);
             panelFormatRow.PerformLayout();
             panelKeyTypeRow.ResumeLayout(false);
             panelKeyTypeRow.PerformLayout();
             radioPanel.ResumeLayout(false);
             radioPanel.PerformLayout();
-            panelKeyControlsContainer.ResumeLayout(false);
-            panelKeyControlsContainer.PerformLayout();
-            panelKeyControls.ResumeLayout(false);
-            panelKeyControls.PerformLayout();
             panelCurveContainer.ResumeLayout(false);
             panelCurveContainer.PerformLayout();
             panelCurveRow.ResumeLayout(false);
