@@ -11,11 +11,11 @@ namespace CryptoTool.Win
         private SM4TabControl sm4TabControl = null!;
         private SM2TabControl sm2TabControl = null!;
         private SM3TabControl sm3TabControl = null!;
+        private EcdsaTabControl ecdsaTabControl = null!;
         private MD5TabControl md5TabControl = null!;
         private MedicareTabControl medicareTabControl = null!;
         private AboutTabControl aboutTabControl = null!;
 
-        // 后台更新服务和通知控件
         private BackgroundUpdateService updateService = null!;
         private UpdateNotificationControl updateNotification = null!;
         private Release? pendingRelease;
@@ -24,9 +24,8 @@ namespace CryptoTool.Win
         {
             InitializeComponent();
 
-            // 设置窗口可调整大小
             this.WindowState = FormWindowState.Maximized;
-            this.MinimumSize = new Size(1400, 800);
+            this.MinimumSize = new Size(2400, 1400);
 
             InitializeTabControls();
             InitializeUpdateService();
@@ -36,7 +35,6 @@ namespace CryptoTool.Win
 
         private void InitializeTabControls()
         {
-            // 创建各个用户控件
             rsaTabControl = new RSATabControl();
             rsaConvertTabControl = new RSAConvertTabControl();
             aesTabControl = new AESTabControl();
@@ -44,11 +42,11 @@ namespace CryptoTool.Win
             sm4TabControl = new SM4TabControl();
             sm2TabControl = new SM2TabControl();
             sm3TabControl = new SM3TabControl();
+            ecdsaTabControl = new EcdsaTabControl();
             md5TabControl = new MD5TabControl();
             medicareTabControl = new MedicareTabControl();
             aboutTabControl = new AboutTabControl();
 
-            // 设置控件尺寸和位置
             rsaTabControl.Dock = DockStyle.Fill;
             rsaConvertTabControl.Dock = DockStyle.Fill;
             aesTabControl.Dock = DockStyle.Fill;
@@ -56,11 +54,11 @@ namespace CryptoTool.Win
             sm4TabControl.Dock = DockStyle.Fill;
             sm2TabControl.Dock = DockStyle.Fill;
             sm3TabControl.Dock = DockStyle.Fill;
+            ecdsaTabControl.Dock = DockStyle.Fill;
             md5TabControl.Dock = DockStyle.Fill;
             medicareTabControl.Dock = DockStyle.Fill;
             aboutTabControl.Dock = DockStyle.Fill;
 
-            // 将控件添加到对应的TabPage中
             tabRSA.Controls.Clear();
             tabRSA.Controls.Add(rsaTabControl);
 
@@ -82,6 +80,15 @@ namespace CryptoTool.Win
             tabSM3.Controls.Clear();
             tabSM3.Controls.Add(sm3TabControl);
 
+            // ECDSA TabPage - 使用索引避免命名问题
+            // 放在 SM3 之后、MD5 之前（索引 7）
+            if (tabControl1.TabPages.Count >= 8)
+            {
+                tabControl1.TabPages[7].Controls.Clear();
+                tabControl1.TabPages[7].Controls.Add(ecdsaTabControl);
+                tabControl1.TabPages[7].Text = "ECDSA";
+            }
+
             tabMD5.Controls.Clear();
             tabMD5.Controls.Add(md5TabControl);
 
@@ -91,7 +98,6 @@ namespace CryptoTool.Win
             tabAbout.Controls.Clear();
             tabAbout.Controls.Add(aboutTabControl);
 
-            // 绑定状态更新事件
             rsaTabControl.StatusChanged += SetStatus;
             rsaConvertTabControl.StatusChanged += SetStatus;
             aesTabControl.StatusChanged += SetStatus;
@@ -99,11 +105,11 @@ namespace CryptoTool.Win
             sm4TabControl.StatusChanged += SetStatus;
             sm2TabControl.StatusChanged += SetStatus;
             sm3TabControl.StatusChanged += SetStatus;
+            ecdsaTabControl.StatusChanged += SetStatus;
             md5TabControl.StatusChanged += SetStatus;
             medicareTabControl.StatusChanged += SetStatus;
             aboutTabControl.StatusChanged += SetStatus;
 
-            // 绑定医保SM4密钥生成事件到SM4控件
             medicareTabControl.SM4KeyGenerated += (key) => sm4TabControl.UpdateKeyFromMedicare(key);
         }
 
@@ -133,12 +139,8 @@ namespace CryptoTool.Win
         }
 
 #if DEBUG
-        /// <summary>
-        /// 调试模式下的快捷键处理（用于测试）
-        /// </summary>
         private async void MainForm_KeyDown(object? sender, KeyEventArgs e)
         {
-            // Ctrl+U 手动触发更新检测
             if (e.Control && e.KeyCode == Keys.U)
             {
                 SetStatus("手动触发更新检测...");
@@ -167,38 +169,29 @@ namespace CryptoTool.Win
 
         #endregion
 
-        /// <summary>
-        /// 初始化后台更新服务
-        /// </summary>
         private void InitializeUpdateService()
         {
             try
             {
-                // 创建后台更新服务
                 updateService = new BackgroundUpdateService();
                 updateService.NewVersionFound += OnNewVersionFound;
                 updateService.StatusUpdated += OnUpdateStatusChanged;
 
-                // 创建更新通知控件
                 updateNotification = new UpdateNotificationControl
                 {
                     Visible = false,
                     Anchor = AnchorStyles.Top | AnchorStyles.Right
                 };
 
-                // 设置通知控件位置（右上角）
                 updateNotification.Location = new Point(
                     this.ClientSize.Width - updateNotification.Width - 20, 20);
 
-                // 绑定通知控件事件
                 updateNotification.UpdateClicked += OnUpdateNotificationClicked;
                 updateNotification.CloseClicked += OnUpdateNotificationClosed;
 
-                // 添加到主窗体
                 this.Controls.Add(updateNotification);
                 updateNotification.BringToFront();
 
-                // 监听窗体大小变化，调整通知位置
                 this.SizeChanged += MainForm_SizeChanged;
 
                 SetStatus("后台更新检测服务初始化完成");
@@ -209,9 +202,6 @@ namespace CryptoTool.Win
             }
         }
 
-        /// <summary>
-        /// 窗体大小变化时调整通知位置
-        /// </summary>
         private void MainForm_SizeChanged(object? sender, EventArgs e)
         {
             if (updateNotification != null && this.WindowState != FormWindowState.Minimized)
@@ -221,9 +211,6 @@ namespace CryptoTool.Win
             }
         }
 
-        /// <summary>
-        /// 发现新版本时的处理
-        /// </summary>
         private void OnNewVersionFound(Release release)
         {
             if (this.InvokeRequired)
@@ -237,7 +224,6 @@ namespace CryptoTool.Win
                 pendingRelease = release;
                 updateNotification.Message = $"发现新版本 {release.TagName}";
                 updateNotification.ShowNotification();
-
                 SetStatus($"发现新版本 {release.TagName}，点击右上角提示进行更新");
             }
             catch (Exception ex)
@@ -246,12 +232,8 @@ namespace CryptoTool.Win
             }
         }
 
-        /// <summary>
-        /// 更新状态变化时的处理
-        /// </summary>
         private void OnUpdateStatusChanged(string status)
         {
-            // 只在调试模式下显示详细的后台检测状态
 #if DEBUG
             if (this.InvokeRequired)
             {
@@ -264,9 +246,6 @@ namespace CryptoTool.Win
 #endif
         }
 
-        /// <summary>
-        /// 更新通知被点击时的处理
-        /// </summary>
         private async void OnUpdateNotificationClicked(object? sender, EventArgs e)
         {
             if (pendingRelease == null) return;
@@ -274,13 +253,8 @@ namespace CryptoTool.Win
             try
             {
                 updateNotification.HideNotification();
-
-                // 切换到关于选项卡
                 tabControl1.SelectedIndex = tabControl1.TabCount - 1;
-
-                // 开始下载更新
                 await aboutTabControl.StartDownloadUpdateAsync(pendingRelease);
-
                 pendingRelease = null;
             }
             catch (Exception ex)
@@ -291,9 +265,6 @@ namespace CryptoTool.Win
             }
         }
 
-        /// <summary>
-        /// 更新通知被关闭时的处理
-        /// </summary>
         private void OnUpdateNotificationClosed(object? sender, EventArgs e)
         {
             updateNotification.HideNotification();

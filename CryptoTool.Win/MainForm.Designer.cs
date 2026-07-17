@@ -17,7 +17,7 @@ namespace CryptoTool.Win
             {
                 // 释放后台更新服务
                 updateService?.Dispose();
-                
+
                 if (components != null)
                 {
                     components.Dispose();
@@ -42,14 +42,17 @@ namespace CryptoTool.Win
             tabSM4 = new TabPage();
             tabSM2 = new TabPage();
             tabSM3 = new TabPage();
+            tabEcdsa = new TabPage();   // ✅ ECDSA TabPage
             tabMD5 = new TabPage();
             tabMedicare = new TabPage();
             tabAbout = new TabPage();
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
+
             tabControl1.SuspendLayout();
             statusStrip1.SuspendLayout();
             SuspendLayout();
+
             // 
             // tabControl1
             // 
@@ -60,9 +63,11 @@ namespace CryptoTool.Win
             tabControl1.Controls.Add(tabSM4);
             tabControl1.Controls.Add(tabSM2);
             tabControl1.Controls.Add(tabSM3);
+            tabControl1.Controls.Add(tabEcdsa);   // ✅ 加入 TabControl
             tabControl1.Controls.Add(tabMD5);
             tabControl1.Controls.Add(tabMedicare);
             tabControl1.Controls.Add(tabAbout);
+
             tabControl1.Dock = DockStyle.Fill;
             tabControl1.Location = new Point(0, 0);
             tabControl1.Margin = new Padding(4);
@@ -70,6 +75,7 @@ namespace CryptoTool.Win
             tabControl1.SelectedIndex = 0;
             tabControl1.Size = new Size(1286, 1055);
             tabControl1.TabIndex = 0;
+
             // 
             // tabRSA
             // 
@@ -81,6 +87,7 @@ namespace CryptoTool.Win
             tabRSA.TabIndex = 0;
             tabRSA.Text = "RSA算法";
             tabRSA.UseVisualStyleBackColor = true;
+
             // 
             // tabRSAConvert
             // 
@@ -92,6 +99,7 @@ namespace CryptoTool.Win
             tabRSAConvert.TabIndex = 5;
             tabRSAConvert.Text = "RSA格式转换";
             tabRSAConvert.UseVisualStyleBackColor = true;
+
             // 
             // tabAES
             // 
@@ -103,6 +111,7 @@ namespace CryptoTool.Win
             tabAES.TabIndex = 6;
             tabAES.Text = "AES算法";
             tabAES.UseVisualStyleBackColor = true;
+
             // 
             // tabDES
             // 
@@ -114,6 +123,7 @@ namespace CryptoTool.Win
             tabDES.TabIndex = 7;
             tabDES.Text = "DES算法";
             tabDES.UseVisualStyleBackColor = true;
+
             // 
             // tabSM4
             // 
@@ -125,6 +135,7 @@ namespace CryptoTool.Win
             tabSM4.TabIndex = 8;
             tabSM4.Text = "SM4算法";
             tabSM4.UseVisualStyleBackColor = true;
+
             // 
             // tabSM2
             // 
@@ -136,6 +147,7 @@ namespace CryptoTool.Win
             tabSM2.TabIndex = 1;
             tabSM2.Text = "SM2算法";
             tabSM2.UseVisualStyleBackColor = true;
+
             // 
             // tabSM3
             // 
@@ -147,17 +159,31 @@ namespace CryptoTool.Win
             tabSM3.TabIndex = 2;
             tabSM3.Text = "SM3算法";
             tabSM3.UseVisualStyleBackColor = true;
-            //
+
+            // 
+            // tabEcdsa（✅ 完整初始化）
+            // 
+            tabEcdsa.Location = new Point(4, 29);
+            tabEcdsa.Margin = new Padding(4);
+            tabEcdsa.Name = "tabEcdsa";
+            tabEcdsa.Padding = new Padding(4);
+            tabEcdsa.Size = new Size(1278, 1022);
+            tabEcdsa.TabIndex = 9;
+            tabEcdsa.Text = "ECDSA算法";
+            tabEcdsa.UseVisualStyleBackColor = true;
+
+            // 
             // tabMD5
-            //
+            // 
             tabMD5.Location = new Point(4, 29);
             tabMD5.Margin = new Padding(4);
             tabMD5.Name = "tabMD5";
             tabMD5.Padding = new Padding(4);
             tabMD5.Size = new Size(1278, 1022);
-            tabMD5.TabIndex = 9;
+            tabMD5.TabIndex = 10;
             tabMD5.Text = "MD5算法";
             tabMD5.UseVisualStyleBackColor = true;
+
             // 
             // tabMedicare
             // 
@@ -169,6 +195,7 @@ namespace CryptoTool.Win
             tabMedicare.TabIndex = 3;
             tabMedicare.Text = "医保接口";
             tabMedicare.UseVisualStyleBackColor = true;
+
             // 
             // tabAbout
             // 
@@ -180,6 +207,7 @@ namespace CryptoTool.Win
             tabAbout.TabIndex = 4;
             tabAbout.Text = "关于";
             tabAbout.UseVisualStyleBackColor = true;
+
             // 
             // statusStrip1
             // 
@@ -191,12 +219,14 @@ namespace CryptoTool.Win
             statusStrip1.Size = new Size(1286, 26);
             statusStrip1.TabIndex = 1;
             statusStrip1.Text = "statusStrip1";
+
             // 
             // toolStripStatusLabel1
             // 
             toolStripStatusLabel1.Name = "toolStripStatusLabel1";
             toolStripStatusLabel1.Size = new Size(39, 20);
             toolStripStatusLabel1.Text = "就绪";
+
             // 
             // MainForm
             // 
@@ -209,7 +239,6 @@ namespace CryptoTool.Win
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "加解密工具";
-            //Load += Form1_Load;
             tabControl1.ResumeLayout(false);
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
@@ -226,12 +255,13 @@ namespace CryptoTool.Win
         private System.Windows.Forms.TabPage tabDES;
         private System.Windows.Forms.TabPage tabSM4;
         private System.Windows.Forms.TabPage tabSM2;
-        private TabPage tabSM3;
-        private TabPage tabMD5;
-        private TabPage tabMedicare;
-        private TabPage tabAbout;
-        private StatusStrip statusStrip1;
-        private ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.TabPage tabSM3;
+        private System.Windows.Forms.TabPage tabEcdsa;   // ✅ ECDSA 成员变量
+        private System.Windows.Forms.TabPage tabMD5;
+        private System.Windows.Forms.TabPage tabMedicare;
+        private System.Windows.Forms.TabPage tabAbout;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
     }
 
     /// <summary>
@@ -239,10 +269,9 @@ namespace CryptoTool.Win
     /// </summary>
     public class ComboBoxItem
     {
-        public string Text { get; set; }  // 显示的文字
-        public object Value { get; set; } // 关联的值，使用 object 类型更通用
+        public string Text { get; set; }
+        public object Value { get; set; }
 
-        // 可选：重写 ToString 方法，通常绑定后不需要，但有时可备用
         public override string ToString()
         {
             return Text;
