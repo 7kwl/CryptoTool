@@ -45,7 +45,8 @@ namespace CryptoTool.Win
             tableButtonArea = new TableLayoutPanel();
             panelRightScroll = new Panel();
             tableRightActions = new TableLayoutPanel();
-            panelFormatAndType = new FlowLayoutPanel();
+            panelFormatRow = new FlowLayoutPanel();
+            panelKeyTypeRow = new FlowLayoutPanel();
             labelInputFormat = new Label();
             comboInputFormat = new ComboBox();
             labelOutputFormat = new Label();
@@ -62,7 +63,6 @@ namespace CryptoTool.Win
             btnGetPublicKeyFromPrivate = new Button();
             btnGetCurveType = new Button();
             btnClearAll = new Button();
-            labelKeyControlsHeader = new Label();
             panelCurveContainer = new Panel();
             labelCurveHeader = new Label();
             panelCurveRow = new FlowLayoutPanel();
@@ -130,7 +130,8 @@ namespace CryptoTool.Win
             tableButtonArea.SuspendLayout();
             panelRightScroll.SuspendLayout();
             tableRightActions.SuspendLayout();
-            panelFormatAndType.SuspendLayout();
+            panelFormatRow.SuspendLayout();
+            panelKeyTypeRow.SuspendLayout();
             radioPanel.SuspendLayout();
             panelKeyControlsContainer.SuspendLayout();
             panelKeyControls.SuspendLayout();
@@ -1465,8 +1466,10 @@ namespace CryptoTool.Win
             panelRightScroll.PerformLayout();
             tableRightActions.ResumeLayout(false);
             tableRightActions.PerformLayout();
-            panelFormatAndType.ResumeLayout(false);
-            panelFormatAndType.PerformLayout();
+            panelFormatRow.ResumeLayout(false);
+            panelFormatRow.PerformLayout();
+            panelKeyTypeRow.ResumeLayout(false);
+            panelKeyTypeRow.PerformLayout();
             radioPanel.ResumeLayout(false);
             radioPanel.PerformLayout();
             panelKeyControlsContainer.ResumeLayout(false);
@@ -1538,7 +1541,8 @@ namespace CryptoTool.Win
         private System.Windows.Forms.TableLayoutPanel tableButtonArea;
         private System.Windows.Forms.Panel panelRightScroll;
         private System.Windows.Forms.TableLayoutPanel tableRightActions;
-        private System.Windows.Forms.FlowLayoutPanel panelFormatAndType;
+        private System.Windows.Forms.FlowLayoutPanel panelFormatRow;
+        private System.Windows.Forms.FlowLayoutPanel panelKeyTypeRow;
         private System.Windows.Forms.Label labelInputFormat;
         private System.Windows.Forms.ComboBox comboInputFormat;
         private System.Windows.Forms.Label labelOutputFormat;
@@ -1549,7 +1553,6 @@ namespace CryptoTool.Win
         private System.Windows.Forms.RadioButton radioPublicKey;
         private System.Windows.Forms.Button btnConvertKey;
         private System.Windows.Forms.Panel panelKeyControlsContainer;
-        private System.Windows.Forms.Label labelKeyControlsHeader;
         private System.Windows.Forms.FlowLayoutPanel panelKeyControls;
         private System.Windows.Forms.Button btnGenerateKeyPair;
         private System.Windows.Forms.Button btnValidateKeyPair;
