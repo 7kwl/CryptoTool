@@ -38,7 +38,7 @@ namespace CryptoTool.Win
             btnImportPublicKey = new Button();
             btnSavePublicKey = new Button();
             btnClearPublicKey = new Button();
-            groupActionButtons = new GroupBox();
+            panelActionButtons = new Panel();
             tableActionButtons = new TableLayoutPanel();
             panelButtonArea = new Panel();
             tableButtonArea = new TableLayoutPanel();
@@ -71,10 +71,10 @@ namespace CryptoTool.Win
             labelValidationResult = new RichTextBox();
             textKeyResult = new RichTextBox();
             panelViewBar = new FlowLayoutPanel();
+            btnViewEcdh = new Button();
             btnViewSign = new Button();
             btnViewEncrypt = new Button();
             btnViewFile = new Button();
-            btnViewEcdh = new Button();
             panelViewContent = new Panel();
             groupSign = new GroupBox();
             tableLayoutSign = new TableLayoutPanel();
@@ -131,7 +131,7 @@ namespace CryptoTool.Win
             panelPrivateKeyActions.SuspendLayout();
             panelPublicKeyBox.SuspendLayout();
             panelPublicKeyActions.SuspendLayout();
-            groupActionButtons.SuspendLayout();
+            panelActionButtons.SuspendLayout();
             tableActionButtons.SuspendLayout();
             panelButtonArea.SuspendLayout();
             tableButtonArea.SuspendLayout();
@@ -170,7 +170,7 @@ namespace CryptoTool.Win
             mainTableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             mainTableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             mainTableLayout.Controls.Add(groupKey, 0, 0);
-            mainTableLayout.Controls.Add(groupActionButtons, 1, 0);
+            mainTableLayout.Controls.Add(panelActionButtons, 1, 0);
             mainTableLayout.Controls.Add(panelViewBar, 0, 1);
             mainTableLayout.Controls.Add(panelViewContent, 0, 2);
             mainTableLayout.Dock = DockStyle.Fill;
@@ -480,17 +480,16 @@ namespace CryptoTool.Win
             btnClearPublicKey.Text = "清空公钥";
             btnClearPublicKey.Click += BtnClearPublicKey_Click;
             // 
-            // groupActionButtons
+            // panelActionButtons
             // 
-            groupActionButtons.Controls.Add(tableActionButtons);
-            groupActionButtons.Dock = DockStyle.Fill;
-            groupActionButtons.Location = new Point(1646, 11);
-            groupActionButtons.Name = "groupActionButtons";
-            groupActionButtons.Padding = new Padding(8);
-            groupActionButtons.Size = new Size(1630, 687);
-            groupActionButtons.TabIndex = 1;
-            groupActionButtons.TabStop = false;
-            groupActionButtons.Text = "操作按钮";
+            panelActionButtons.Controls.Add(tableActionButtons);
+            panelActionButtons.Dock = DockStyle.Fill;
+            panelActionButtons.Location = new Point(1646, 11);
+            panelActionButtons.Margin = new Padding(0);
+            panelActionButtons.Name = "panelActionButtons";
+            panelActionButtons.Padding = new Padding(0);
+            panelActionButtons.Size = new Size(1630, 687);
+            panelActionButtons.TabIndex = 1;
             // 
             // tableActionButtons
             // 
@@ -499,13 +498,15 @@ namespace CryptoTool.Win
             tableActionButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableActionButtons.Controls.Add(panelButtonArea, 0, 0);
             tableActionButtons.Controls.Add(groupRunResult, 0, 1);
+            tableActionButtons.SetColumnSpan(groupRunResult, 2);
             tableActionButtons.Dock = DockStyle.Fill;
-            tableActionButtons.Location = new Point(8, 31);
+            tableActionButtons.Location = new Point(0, 0);
+            tableActionButtons.Margin = new Padding(0);
             tableActionButtons.Name = "tableActionButtons";
             tableActionButtons.RowCount = 2;
             tableActionButtons.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             tableActionButtons.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableActionButtons.Size = new Size(1614, 648);
+            tableActionButtons.Size = new Size(1630, 687);
             tableActionButtons.TabIndex = 0;
             // 
             // panelButtonArea
@@ -876,9 +877,9 @@ namespace CryptoTool.Win
             panelViewBar.Size = new Size(3265, 54);
             panelViewBar.TabIndex = 10;
             panelViewBar.WrapContents = false;
-            //
+            // 
             // btnViewEcdh
-            //
+            // 
             btnViewEcdh.AutoSize = true;
             btnViewEcdh.FlatStyle = FlatStyle.Flat;
             btnViewEcdh.Location = new Point(6, 6);
@@ -889,9 +890,9 @@ namespace CryptoTool.Win
             btnViewEcdh.TabIndex = 0;
             btnViewEcdh.Text = "ECDH 协商加解密";
             btnViewEcdh.UseVisualStyleBackColor = true;
-            //
+            // 
             // btnViewSign
-            //
+            // 
             btnViewSign.AutoSize = true;
             btnViewSign.FlatStyle = FlatStyle.Flat;
             btnViewSign.Location = new Point(207, 6);
@@ -902,9 +903,9 @@ namespace CryptoTool.Win
             btnViewSign.TabIndex = 1;
             btnViewSign.Text = "签名/验签";
             btnViewSign.UseVisualStyleBackColor = true;
-            //
+            // 
             // btnViewEncrypt
-            //
+            // 
             btnViewEncrypt.AutoSize = true;
             btnViewEncrypt.FlatStyle = FlatStyle.Flat;
             btnViewEncrypt.Location = new Point(343, 6);
@@ -915,9 +916,9 @@ namespace CryptoTool.Win
             btnViewEncrypt.TabIndex = 2;
             btnViewEncrypt.Text = "加密与解密";
             btnViewEncrypt.UseVisualStyleBackColor = true;
-            //
+            // 
             // btnViewFile
-            //
+            // 
             btnViewFile.AutoSize = true;
             btnViewFile.FlatStyle = FlatStyle.Flat;
             btnViewFile.Location = new Point(489, 6);
@@ -1543,7 +1544,7 @@ namespace CryptoTool.Win
             panelPublicKeyBox.PerformLayout();
             panelPublicKeyActions.ResumeLayout(false);
             panelPublicKeyActions.PerformLayout();
-            groupActionButtons.ResumeLayout(false);
+            panelActionButtons.ResumeLayout(false);
             tableActionButtons.ResumeLayout(false);
             panelButtonArea.ResumeLayout(false);
             tableButtonArea.ResumeLayout(false);
@@ -1615,7 +1616,7 @@ namespace CryptoTool.Win
         private System.Windows.Forms.Button btnImportPublicKey;
         private System.Windows.Forms.Button btnSavePublicKey;
         private System.Windows.Forms.Button btnClearPublicKey;
-        private System.Windows.Forms.GroupBox groupActionButtons;
+        private System.Windows.Forms.Panel panelActionButtons;
         private System.Windows.Forms.TableLayoutPanel tableActionButtons;
         private System.Windows.Forms.Panel panelButtonArea;
         private System.Windows.Forms.TableLayoutPanel tableButtonArea;
