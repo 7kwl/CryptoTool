@@ -35,6 +35,7 @@ namespace CryptoTool.Win
         private ComboBox comboEcdhCurve = null!;
         private ComboBox comboEcdhMode = null!;
         private Button btnGenerateEcdhKeys = null!;
+        private Button btnGenerateSharedSecret = null!;
         private TextBox textEcdhAlicePrivate = null!;
         private TextBox textEcdhAlicePublic = null!;
         private TextBox textEcdhBobPrivate = null!;
@@ -404,18 +405,19 @@ namespace CryptoTool.Win
                 {
                     Dock = DockStyle.Fill,
                     ColumnCount = 1,
-                    RowCount = 6,
+                    RowCount = 7,
                     Margin = new Padding(0),
                     Padding = new Padding(0, 4, 0, 4)
                 };
-                for (int i = 0; i < 6; i++)
-                    btnPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 16.6667F));
+                for (int i = 0; i < 7; i++)
+                    btnPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 14.2857F));
 
                 btnEcdhEncrypt = new Button { Text = "加密", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
                 btnEcdhDecrypt = new Button { Text = "解密", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
                 btnEcdhCopyResult = new Button { Text = "复制结果", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
                 btnEcdhPasteInput = new Button { Text = "粘贴输入", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
                 btnEcdhClear = new Button { Text = "清空", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
+                btnGenerateSharedSecret = new Button { Text = "生成共享密钥", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
                 lblEcdhIV = new Label { Text = "IV (Base64):", AutoSize = true, Margin = new Padding(0, 0, 4, 4) };
                 textEcdhIV = new TextBox { Width = 440, ReadOnly = false, BackColor = SystemColors.Window };
 
@@ -424,13 +426,15 @@ namespace CryptoTool.Win
                 btnEcdhCopyResult.Click += BtnEcdhCopyResult_Click;
                 btnEcdhPasteInput.Click += BtnEcdhPasteInput_Click;
                 btnEcdhClear.Click += BtnEcdhClear_Click;
+                btnGenerateSharedSecret.Click += BtnGenerateSharedSecret_Click;
 
                 btnPanel.Controls.Add(btnGenerateEcdhKeys, 0, 0);
                 btnPanel.Controls.Add(btnEcdhEncrypt, 0, 1);
                 btnPanel.Controls.Add(btnEcdhDecrypt, 0, 2);
-                btnPanel.Controls.Add(btnEcdhCopyResult, 0, 3);
-                btnPanel.Controls.Add(btnEcdhPasteInput, 0, 4);
-                btnPanel.Controls.Add(btnEcdhClear, 0, 5);
+                btnPanel.Controls.Add(btnGenerateSharedSecret, 0, 3);
+                btnPanel.Controls.Add(btnEcdhCopyResult, 0, 4);
+                btnPanel.Controls.Add(btnEcdhPasteInput, 0, 5);
+                btnPanel.Controls.Add(btnEcdhClear, 0, 6);
                 operationsPanel.Controls.Add(btnPanel, 0, 0);
                 operationsPanel.SetRowSpan(btnPanel, 6); // 按钮列跨六行
 
@@ -510,7 +514,7 @@ namespace CryptoTool.Win
                 rightLayout.Controls.Add(textEcdhInput, 0, 1);
 
                 // 共享密钥
-                rightLayout.Controls.Add(new Label { Text = "共享密钥 (HEX, 可编辑):", Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft }, 0, 2);
+                rightLayout.Controls.Add(new Label { Text = "共享密钥 (Base64, 可编辑):", Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft }, 0, 2);
                 textEcdhSharedKey = new TextBox
                 {
                     Dock = DockStyle.Fill,
@@ -826,7 +830,7 @@ namespace CryptoTool.Win
                 textEcdhBobPublic.Text = EcdsaKeyHelper.ExportPublicKeyPem(bobPub);
 
                 byte[] shared = EcdhAlgorithm.DeriveSharedSecret(alicePriv, bobPub);
-                textEcdhSharedKey.Text = Convert.ToHexString(shared).ToLowerInvariant();
+                textEcdhSharedKey.Text = Convert.ToBase64String(shared);
 
                 // 生成新密钥对后，旧密文/IV/输入与新的密钥不再匹配，清空避免误用
                 textEcdhInput.Clear();
@@ -841,6 +845,27 @@ namespace CryptoTool.Win
             {
                 AppendValidationResult($"❌ 生成 ECDH 密钥对失败: {ex.Message}", Color.Red);
                 SetStatus("生成 ECDH 密钥对失败");
+            }
+        }
+
+        private void BtnGenerateSharedSecret_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(textEcdhAlicePrivate.Text) || string.IsNullOrWhiteSpace(textEcdhBobPublic.Text))
+                { MessageBox.Show("请输入 Alice 私钥和 Bob 公钥", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+
+                var alicePriv = EcdsaKeyHelper.ImportPrivateKeyPem(textEcdhAlicePrivate.Text.Trim());
+                var bobPub = EcdsaKeyHelper.ImportPublicKeyPem(textEcdhBobPublic.Text.Trim());
+                byte[] shared = EcdhAlgorithm.DeriveSharedSecret(alicePriv, bobPub);
+                textEcdhSharedKey.Text = Convert.ToBase64String(shared);
+                AppendValidationResult($"✅ 共享密钥已生成\n长度: {shared.Length} 字节", Color.Green);
+                SetStatus("共享密钥生成完成");
+            }
+            catch (Exception ex)
+            {
+                AppendValidationResult($"❌ 生成共享密钥失败: {ex.Message}", Color.Red);
+                SetStatus("生成共享密钥失败");
             }
         }
 
@@ -859,7 +884,7 @@ namespace CryptoTool.Win
 
                 byte[] shared = EcdhAlgorithm.DeriveSharedSecret(alicePriv, bobPub);
                 byte[] key = EcdhAlgorithm.DeriveAesKey(shared, mode);
-                textEcdhSharedKey.Text = Convert.ToHexString(shared).ToLowerInvariant();
+                textEcdhSharedKey.Text = Convert.ToBase64String(shared);
                 byte[] iv = EcdhAlgorithm.GenerateNonce(EcdhAlgorithm.GetNonceLength(mode));
                 _ecdhLastIV = iv;
 
@@ -889,7 +914,7 @@ namespace CryptoTool.Win
 
                 var mode = GetEcdhMode();
 
-                bool sharedFromTextbox = TryParseHex(textEcdhSharedKey.Text, out byte[] shared);
+                bool sharedFromTextbox = TryParseBase64(textEcdhSharedKey.Text, out byte[] shared);
                 if (!sharedFromTextbox)
                 {
                     if (string.IsNullOrWhiteSpace(textEcdhBobPrivate.Text) || string.IsNullOrWhiteSpace(textEcdhAlicePublic.Text))
@@ -897,7 +922,7 @@ namespace CryptoTool.Win
                     var bobPriv = EcdsaKeyHelper.ImportPrivateKeyPem(textEcdhBobPrivate.Text.Trim());
                     var alicePub = EcdsaKeyHelper.ImportPublicKeyPem(textEcdhAlicePublic.Text.Trim());
                     shared = EcdhAlgorithm.DeriveSharedSecret(bobPriv, alicePub);
-                    textEcdhSharedKey.Text = Convert.ToHexString(shared).ToLowerInvariant();
+                    textEcdhSharedKey.Text = Convert.ToBase64String(shared);
                 }
 
                 byte[] key = EcdhAlgorithm.DeriveAesKey(shared, mode);
@@ -970,6 +995,22 @@ namespace CryptoTool.Win
             try
             {
                 bytes = Convert.FromHexString(input.Trim().Replace("0x", "").Replace("0X", "").Replace(" ", ""));
+                return bytes.Length > 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static bool TryParseBase64(string? input, out byte[] bytes)
+        {
+            bytes = [];
+            if (string.IsNullOrWhiteSpace(input))
+                return false;
+            try
+            {
+                bytes = Convert.FromBase64String(input.Trim());
                 return bytes.Length > 0;
             }
             catch
