@@ -865,10 +865,10 @@ namespace CryptoTool.Win
             // panelViewBar
             // 
             mainTableLayout.SetColumnSpan(panelViewBar, 2);
+            panelViewBar.Controls.Add(btnViewEcdh);
             panelViewBar.Controls.Add(btnViewSign);
             panelViewBar.Controls.Add(btnViewEncrypt);
             panelViewBar.Controls.Add(btnViewFile);
-            panelViewBar.Controls.Add(btnViewEcdh);
             panelViewBar.Dock = DockStyle.Fill;
             panelViewBar.Location = new Point(11, 704);
             panelViewBar.Name = "panelViewBar";
@@ -876,58 +876,58 @@ namespace CryptoTool.Win
             panelViewBar.Size = new Size(3265, 54);
             panelViewBar.TabIndex = 10;
             panelViewBar.WrapContents = false;
-            // 
-            // btnViewSign
-            // 
-            btnViewSign.AutoSize = true;
-            btnViewSign.FlatStyle = FlatStyle.Flat;
-            btnViewSign.Location = new Point(6, 6);
-            btnViewSign.Margin = new Padding(2, 2, 8, 2);
-            btnViewSign.Name = "btnViewSign";
-            btnViewSign.Padding = new Padding(12, 4, 12, 4);
-            btnViewSign.Size = new Size(126, 44);
-            btnViewSign.TabIndex = 0;
-            btnViewSign.Text = "签名/验签";
-            btnViewSign.UseVisualStyleBackColor = true;
-            // 
-            // btnViewEncrypt
-            // 
-            btnViewEncrypt.AutoSize = true;
-            btnViewEncrypt.FlatStyle = FlatStyle.Flat;
-            btnViewEncrypt.Location = new Point(142, 6);
-            btnViewEncrypt.Margin = new Padding(2, 2, 8, 2);
-            btnViewEncrypt.Name = "btnViewEncrypt";
-            btnViewEncrypt.Padding = new Padding(12, 4, 12, 4);
-            btnViewEncrypt.Size = new Size(136, 44);
-            btnViewEncrypt.TabIndex = 1;
-            btnViewEncrypt.Text = "加密与解密";
-            btnViewEncrypt.UseVisualStyleBackColor = true;
-            // 
-            // btnViewFile
-            // 
-            btnViewFile.AutoSize = true;
-            btnViewFile.FlatStyle = FlatStyle.Flat;
-            btnViewFile.Location = new Point(288, 6);
-            btnViewFile.Margin = new Padding(2, 2, 8, 2);
-            btnViewFile.Name = "btnViewFile";
-            btnViewFile.Padding = new Padding(12, 4, 12, 4);
-            btnViewFile.Size = new Size(162, 44);
-            btnViewFile.TabIndex = 2;
-            btnViewFile.Text = "文件签名/验签";
-            btnViewFile.UseVisualStyleBackColor = true;
-            // 
+            //
             // btnViewEcdh
-            // 
+            //
             btnViewEcdh.AutoSize = true;
             btnViewEcdh.FlatStyle = FlatStyle.Flat;
-            btnViewEcdh.Location = new Point(460, 6);
+            btnViewEcdh.Location = new Point(6, 6);
             btnViewEcdh.Margin = new Padding(2, 2, 8, 2);
             btnViewEcdh.Name = "btnViewEcdh";
             btnViewEcdh.Padding = new Padding(12, 4, 12, 4);
             btnViewEcdh.Size = new Size(191, 44);
-            btnViewEcdh.TabIndex = 3;
+            btnViewEcdh.TabIndex = 0;
             btnViewEcdh.Text = "ECDH 协商加解密";
             btnViewEcdh.UseVisualStyleBackColor = true;
+            //
+            // btnViewSign
+            //
+            btnViewSign.AutoSize = true;
+            btnViewSign.FlatStyle = FlatStyle.Flat;
+            btnViewSign.Location = new Point(207, 6);
+            btnViewSign.Margin = new Padding(2, 2, 8, 2);
+            btnViewSign.Name = "btnViewSign";
+            btnViewSign.Padding = new Padding(12, 4, 12, 4);
+            btnViewSign.Size = new Size(126, 44);
+            btnViewSign.TabIndex = 1;
+            btnViewSign.Text = "签名/验签";
+            btnViewSign.UseVisualStyleBackColor = true;
+            //
+            // btnViewEncrypt
+            //
+            btnViewEncrypt.AutoSize = true;
+            btnViewEncrypt.FlatStyle = FlatStyle.Flat;
+            btnViewEncrypt.Location = new Point(343, 6);
+            btnViewEncrypt.Margin = new Padding(2, 2, 8, 2);
+            btnViewEncrypt.Name = "btnViewEncrypt";
+            btnViewEncrypt.Padding = new Padding(12, 4, 12, 4);
+            btnViewEncrypt.Size = new Size(136, 44);
+            btnViewEncrypt.TabIndex = 2;
+            btnViewEncrypt.Text = "加密与解密";
+            btnViewEncrypt.UseVisualStyleBackColor = true;
+            //
+            // btnViewFile
+            //
+            btnViewFile.AutoSize = true;
+            btnViewFile.FlatStyle = FlatStyle.Flat;
+            btnViewFile.Location = new Point(489, 6);
+            btnViewFile.Margin = new Padding(2, 2, 8, 2);
+            btnViewFile.Name = "btnViewFile";
+            btnViewFile.Padding = new Padding(12, 4, 12, 4);
+            btnViewFile.Size = new Size(162, 44);
+            btnViewFile.TabIndex = 3;
+            btnViewFile.Text = "文件签名/验签";
+            btnViewFile.UseVisualStyleBackColor = true;
             // 
             // panelViewContent
             // 

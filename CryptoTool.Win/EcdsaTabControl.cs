@@ -233,10 +233,10 @@ namespace CryptoTool.Win
             // Designer.cs 已设置 panelViewBar/panelViewContent 布局，此处只需绑定事件和初始状态
 
             // 按钮点击事件
-            btnViewSign.Click += (_, _) => SwitchView(0);
-            btnViewEncrypt.Click += (_, _) => SwitchView(1);
-            btnViewFile.Click += (_, _) => SwitchView(2);
-            btnViewEcdh.Click += (_, _) => SwitchView(3);
+            btnViewEcdh.Click += (_, _) => SwitchView(0);
+            btnViewSign.Click += (_, _) => SwitchView(1);
+            btnViewEncrypt.Click += (_, _) => SwitchView(2);
+            btnViewFile.Click += (_, _) => SwitchView(3);
 
             _currentViewIndex = -1;
             SwitchView(0);
@@ -247,8 +247,8 @@ namespace CryptoTool.Win
             if (_currentViewIndex == index) return;
             _currentViewIndex = index;
 
-            var buttons = new[] { btnViewSign, btnViewEncrypt, btnViewFile, btnViewEcdh };
-            var groups = new Control[] { groupSign, groupEncrypt, groupFile, groupEcdh };
+            var buttons = new[] { btnViewEcdh, btnViewSign, btnViewEncrypt, btnViewFile };
+            var groups = new Control[] { groupEcdh, groupSign, groupEncrypt, groupFile };
 
             for (int i = 0; i < buttons.Length; i++)
             {
