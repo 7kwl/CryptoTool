@@ -43,7 +43,6 @@ namespace CryptoTool.Win
         private TextBox textEcdhInput = null!;
         private TextBox textEcdhOutput = null!;
         private TextBox textEcdhSharedKey = null!;
-        private TextBox textEcdhStaticShared = null!;
         private TextBox textEcdhIV = null!;
         private Label lblEcdhIV = null!;
         private Button btnEcdhEncrypt = null!;
@@ -281,48 +280,25 @@ namespace CryptoTool.Win
                 main.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));          // Alice 密钥对
                 main.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));          // Bob 密钥对
 
-                // 0. 左侧总容器：静态共享密钥 + Alice/Bob 密钥对
+                // 0. 左侧总容器：Alice/Bob 密钥对
                 var leftPanel = new TableLayoutPanel
                 {
                     Dock = DockStyle.Fill,
                     ColumnCount = 1,
-                    RowCount = 3,
+                    RowCount = 2,
                     Margin = new Padding(0),
                     Padding = new Padding(4)
                 };
-                leftPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 80F));   // 静态共享密钥
                 leftPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));    // Alice 密钥对
                 leftPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));    // Bob 密钥对
 
-                var staticSharedBox = new GroupBox
-                {
-                    Text = "共同的秘密（Alice = Bob）",
-                    Dock = DockStyle.Fill,
-                    BackColor = Color.FromArgb(76, 175, 80),
-                    ForeColor = Color.White,
-                    Padding = new Padding(6)
-                };
-                textEcdhStaticShared = new TextBox
-                {
-                    Dock = DockStyle.Fill,
-                    Multiline = true,
-                    ScrollBars = ScrollBars.Vertical,
-                    ReadOnly = true,
-                    BackColor = Color.FromArgb(200, 230, 201),
-                    ForeColor = Color.Black,
-                    Font = new Font("Consolas", 9F),
-                    BorderStyle = BorderStyle.None
-                };
-                staticSharedBox.Controls.Add(textEcdhStaticShared);
-                leftPanel.Controls.Add(staticSharedBox, 0, 0);
-
                 // 1. Alice 密钥对
                 var aliceBox = CreateKeyPairBox("爱丽丝的钥匙 (Alice)", out textEcdhAlicePrivate, out textEcdhAlicePublic);
-                leftPanel.Controls.Add(aliceBox, 0, 1);
+                leftPanel.Controls.Add(aliceBox, 0, 0);
 
                 // 2. Bob 密钥对
                 var bobBox = CreateKeyPairBox("鲍勃的钥匙 (Bob)", out textEcdhBobPrivate, out textEcdhBobPublic);
-                leftPanel.Controls.Add(bobBox, 0, 2);
+                leftPanel.Controls.Add(bobBox, 0, 1);
 
                 main.Controls.Add(leftPanel, 0, 0);
                 main.SetRowSpan(leftPanel, 2);
@@ -840,7 +816,6 @@ namespace CryptoTool.Win
 
                 byte[] shared = EcdhAlgorithm.DeriveSharedSecret(alicePriv, bobPub);
                 textEcdhSharedKey.Text = Convert.ToBase64String(shared);
-                textEcdhStaticShared.Text = textEcdhSharedKey.Text;
 
                 // 生成新密钥对后，旧密文/IV/输入与新的密钥不再匹配，清空避免误用
                 textEcdhInput.Clear();
@@ -1047,7 +1022,6 @@ namespace CryptoTool.Win
             textEcdhInput.Clear();
             textEcdhOutput.Clear();
             textEcdhSharedKey.Clear();
-            textEcdhStaticShared.Clear();
             textEcdhIV.Clear();
             _ecdhLastIV = null;
             SetStatus("ECDH 输入/输出已清空");
