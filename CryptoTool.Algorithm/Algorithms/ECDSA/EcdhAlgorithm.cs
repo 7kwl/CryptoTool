@@ -13,7 +13,7 @@ using Org.BouncyCastle.Security;
 namespace CryptoTool.Algorithm.Algorithms.ECDSA
 {
     /// <summary>
-    /// ECDH 兼容模式
+    /// ECDH / ECIES 密钥派生模式
     /// </summary>
     public enum EcdhMode
     {
@@ -22,9 +22,25 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
         /// </summary>
         CryptoTool,
         /// <summary>
-        /// 8gwifi.org 兼容模式：SHA-256 KDF + 16 字节 IV(Hex)
+        /// 8gwifi.org 兼容模式：原始共享密钥截断 + 16 字节 IV(Hex)
         /// </summary>
-        GwifiOrg
+        GwifiOrg,
+        /// <summary>
+        /// ANSI X9.63：X9.63-KDF(SHA-256) + 12 字节 IV(Base64)，ECIES 临时密钥
+        /// </summary>
+        AnsiX963,
+        /// <summary>
+        /// IEEE 1363a：KDF2(SHA-256) + 12 字节 IV(Base64)，ECIES 临时密钥
+        /// </summary>
+        Ieee1363a,
+        /// <summary>
+        /// ISO/IEC 18033-2：KDF2(SHA-256) + 12 字节 IV(Base64)，ECIES 临时密钥
+        /// </summary>
+        Iso180332,
+        /// <summary>
+        /// SECG SEC 1 v2.0：X9.63-KDF(SHA-256) + 12 字节 IV(Base64)，ECIES 临时密钥
+        /// </summary>
+        SecgSec1
     }
 
     /// <summary>
@@ -87,19 +103,64 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
             return mode switch
             {
                 EcdhMode.CryptoTool => DeriveAesKey(sharedSecret, null, System.Text.Encoding.UTF8.GetBytes("ECDH-AES-GCM")),
-                EcdhMode.GwifiOrg => Sha256Kdf(sharedSecret, 32),
+                // 8gwifi.org 直接使用原始 ECDH 共享密钥（X 坐标）作为 AES 密钥，
+                // 长度超过 32 字节时取前 32 字节（兼容 P-384 / P-521）
+                EcdhMode.GwifiOrg => TruncateToAesKey(sharedSecret, 32),
+                // ECIES 标准模式：ANSI X9.63 / IEEE 1363a / ISO/IEC 18033-2 / SECG SEC 1
+                // 均使用 ANSI X9.63-KDF (SHA-256, SharedInfo 为空)
+                EcdhMode.AnsiX963 => X963Kdf(sharedSecret, 32),
+                EcdhMode.Ieee1363a => X963Kdf(sharedSecret, 32),
+                EcdhMode.Iso180332 => X963Kdf(sharedSecret, 32),
+                EcdhMode.SecgSec1 => X963Kdf(sharedSecret, 32),
                 _ => DeriveAesKey(sharedSecret, null, System.Text.Encoding.UTF8.GetBytes("ECDH-AES-GCM"))
             };
         }
 
-        private static byte[] Sha256Kdf(byte[] sharedSecret, int length)
+        /// <summary>
+        /// ANSI X9.63 KDF (等同 IEEE 1363a KDF2 / ISO/IEC 18033-2 KDF2 / SECG SEC 1)
+        /// K = Hash(counter || Z || SharedInfo)
+        /// counter 为 4 字节大端序，从 1 开始递增
+        /// </summary>
+        private static byte[] X963Kdf(byte[] sharedSecret, int keyLengthInBytes)
         {
             var digest = new Sha256Digest();
-            byte[] hash = new byte[digest.GetDigestSize()];
-            digest.BlockUpdate(sharedSecret, 0, sharedSecret.Length);
-            digest.DoFinal(hash, 0);
+            int hashLen = digest.GetDigestSize(); // 32
+            byte[] result = new byte[keyLengthInBytes];
+            int offset = 0;
+            uint counter = 1;
+
+            while (offset < keyLengthInBytes)
+            {
+                digest.Reset();
+                // counter (4 bytes, big-endian)
+                byte[] counterBytes = new byte[4];
+                counterBytes[0] = (byte)(counter >> 24);
+                counterBytes[1] = (byte)(counter >> 16);
+                counterBytes[2] = (byte)(counter >> 8);
+                counterBytes[3] = (byte)(counter);
+                digest.BlockUpdate(counterBytes, 0, 4);
+                // Z (shared secret)
+                digest.BlockUpdate(sharedSecret, 0, sharedSecret.Length);
+                // SharedInfo (empty per ECIES defaults)
+                byte[] hash = new byte[hashLen];
+                digest.DoFinal(hash, 0);
+
+                int copyLen = Math.Min(hashLen, keyLengthInBytes - offset);
+                Buffer.BlockCopy(hash, 0, result, offset, copyLen);
+                offset += copyLen;
+                counter++;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 8gwifi.org 兼容：直接取共享密钥前 32 字节作为 AES-256 密钥
+        /// </summary>
+        private static byte[] TruncateToAesKey(byte[] sharedSecret, int length)
+        {
             byte[] result = new byte[length];
-            Buffer.BlockCopy(hash, 0, result, 0, Math.Min(length, hash.Length));
+            int copyLength = Math.Min(length, sharedSecret.Length);
+            Buffer.BlockCopy(sharedSecret, 0, result, 0, copyLength);
             return result;
         }
 
@@ -110,9 +171,8 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
         {
             return mode switch
             {
-                EcdhMode.CryptoTool => 12,
-                EcdhMode.GwifiOrg => 16,
-                _ => 12
+                EcdhMode.GwifiOrg => 16,  // 8gwifi.org 使用 16 字节 IV
+                _ => 12                    // CryptoTool 及所有 ECIES 标准模式使用 12 字节 IV
             };
         }
 
@@ -123,9 +183,8 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
         {
             return mode switch
             {
-                EcdhMode.CryptoTool => Convert.ToBase64String(iv),
-                EcdhMode.GwifiOrg => ToHexString(iv),
-                _ => Convert.ToBase64String(iv)
+                EcdhMode.GwifiOrg => ToHexString(iv),     // 8gwifi.org 使用 Hex 编码
+                _ => Convert.ToBase64String(iv)            // 其余模式使用 Base64
             };
         }
 
@@ -136,7 +195,6 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
         {
             return mode switch
             {
-                EcdhMode.CryptoTool => Convert.FromBase64String(ivText.Trim()),
                 EcdhMode.GwifiOrg => FromHexString(ivText.Trim()),
                 _ => Convert.FromBase64String(ivText.Trim())
             };
@@ -180,7 +238,149 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
         }
 
         /// <summary>
-        /// 按模式将 IV 与密文打包成字符串（CryptoTool 只返回密文，8gwifi.org 返回 IV + 密文）
+        /// 获取指定曲线的临时公钥编码长度（未压缩格式：0x04 || X || Y）
+        /// </summary>
+        public static int GetEphemeralPubKeyLength(string curveName)
+        {
+            X9ECParameters curveParams = ECNamedCurveTable.GetByName(curveName)
+                ?? throw new ArgumentException($"不支持的曲线: {curveName}");
+            int fieldSize = (curveParams.Curve.FieldSize + 7) / 8;
+            return 1 + 2 * fieldSize; // 0x04 || X || Y
+        }
+
+        /// <summary>
+        /// ECIES 加密：生成临时密钥对，用接收方公钥加密
+        /// 输出格式：ephemeral_pub(未压缩) || IV || cipher+tag
+        /// </summary>
+        public static byte[] EciesEncrypt(
+            byte[] plain,
+            ECPublicKeyParameters recipientPub,
+            string curveName,
+            EcdhMode mode,
+            out byte[] sharedSecret,
+            out byte[] iv)
+        {
+            // 1. 生成临时 EC 密钥对
+            var ephemeralKp = GenerateKeyPair(curveName);
+            var ephemeralPriv = (ECPrivateKeyParameters)ephemeralKp.Private;
+            var ephemeralPub = (ECPublicKeyParameters)ephemeralKp.Public;
+
+            // 2. 将临时公钥编码为未压缩格式（0x04 || X || Y）
+            byte[] ephemeralPubEncoded = ephemeralPub.Q.GetEncoded(false);
+
+            // 3. 计算共享密钥：临时私钥 × 接收方公钥
+            sharedSecret = DeriveSharedSecret(ephemeralPriv, recipientPub);
+
+            // 4. 派生 AES 密钥
+            byte[] key = DeriveAesKey(sharedSecret, mode);
+
+            // 5. 生成随机 IV
+            iv = GenerateNonce(GetNonceLength(mode));
+
+            // 6. AES-GCM 加密
+            byte[] cipher = EncryptAesGcm(plain, key, iv);
+
+            // 7. 拼接：ephemeral_pub_encoded || IV || cipher+tag
+            byte[] combined = new byte[ephemeralPubEncoded.Length + iv.Length + cipher.Length];
+            Buffer.BlockCopy(ephemeralPubEncoded, 0, combined, 0, ephemeralPubEncoded.Length);
+            Buffer.BlockCopy(iv, 0, combined, ephemeralPubEncoded.Length, iv.Length);
+            Buffer.BlockCopy(cipher, 0, combined, ephemeralPubEncoded.Length + iv.Length, cipher.Length);
+
+            return combined;
+        }
+
+        /// <summary>
+        /// ECIES 解密：从密文中提取临时公钥，用接收方私钥解密
+        /// </summary>
+        /// <param name="combined">ephemeral_pub_encoded || IV || cipher+tag</param>
+        public static byte[] EciesDecrypt(
+            byte[] combined,
+            ECPrivateKeyParameters recipientPriv,
+            string curveName,
+            EcdhMode mode,
+            out byte[] sharedSecret,
+            out byte[] iv)
+        {
+            X9ECParameters curveParams = ECNamedCurveTable.GetByName(curveName)
+                ?? throw new ArgumentException($"不支持的曲线: {curveName}");
+
+            // 1. 计算临时公钥长度（未压缩格式：1 + 2*fieldSize）
+            int fieldSize = (curveParams.Curve.FieldSize + 7) / 8;
+            int pubKeyLength = 1 + 2 * fieldSize;
+
+            int ivLength = GetNonceLength(mode);
+            int minLen = pubKeyLength + ivLength + 16; // pub + IV + 至少 16 字节 Tag
+            if (combined.Length < minLen)
+                throw new FormatException($"ECIES 密文过短，需要至少 {minLen} 字节（含临时公钥 {pubKeyLength}B + IV {ivLength}B + Tag 16B）");
+
+            // 2. 提取临时公钥
+            byte[] ephemeralPubEncoded = new byte[pubKeyLength];
+            Buffer.BlockCopy(combined, 0, ephemeralPubEncoded, 0, pubKeyLength);
+
+            // 3. 解码临时公钥点
+            var ephemeralPoint = curveParams.Curve.DecodePoint(ephemeralPubEncoded);
+            var domain = new ECDomainParameters(curveParams.Curve, curveParams.G, curveParams.N, curveParams.H, curveParams.GetSeed());
+            var ephemeralPub = new ECPublicKeyParameters("ECDH", ephemeralPoint, domain);
+
+            // 4. 提取 IV
+            iv = new byte[ivLength];
+            Buffer.BlockCopy(combined, pubKeyLength, iv, 0, ivLength);
+
+            // 5. 提取密文
+            byte[] cipher = new byte[combined.Length - pubKeyLength - ivLength];
+            Buffer.BlockCopy(combined, pubKeyLength + ivLength, cipher, 0, cipher.Length);
+
+            // 6. 计算共享密钥：接收方私钥 × 临时公钥
+            sharedSecret = DeriveSharedSecret(recipientPriv, ephemeralPub);
+
+            // 7. 派生 AES 密钥
+            byte[] key = DeriveAesKey(sharedSecret, mode);
+
+            // 8. AES-GCM 解密
+            return DecryptAesGcm(cipher, key, iv);
+        }
+
+        /// <summary>
+        /// 静态 ECDH 加密（8gwifi.org 兼容模式）：使用 Alice 私钥 + Bob 公钥计算共享密钥
+        /// 输出格式：Base64(IV + cipher+tag)，与 8gwifi.org 的解密流程兼容
+        /// </summary>
+        public static string StaticEcdhEncrypt(
+            byte[] plain,
+            ECPrivateKeyParameters alicePriv,
+            ECPublicKeyParameters bobPub,
+            EcdhMode mode,
+            out byte[] sharedSecret,
+            out byte[] iv)
+        {
+            sharedSecret = DeriveSharedSecret(alicePriv, bobPub);
+            byte[] key = DeriveAesKey(sharedSecret, mode);
+            iv = GenerateNonce(GetNonceLength(mode));
+            byte[] cipher = EncryptAesGcm(plain, key, iv);
+            return FormatCipher(iv, cipher, mode);
+        }
+
+        /// <summary>
+        /// 静态 ECDH 解密（8gwifi.org 兼容模式）：使用 Bob 私钥 + Alice 公钥计算共享密钥
+        /// 输入格式：Base64(IV + cipher+tag)
+        /// </summary>
+        public static byte[] StaticEcdhDecrypt(
+            string cipherBase64,
+            ECPrivateKeyParameters bobPriv,
+            ECPublicKeyParameters alicePub,
+            EcdhMode mode,
+            out byte[] sharedSecret,
+            out byte[] iv)
+        {
+            sharedSecret = DeriveSharedSecret(bobPriv, alicePub);
+            byte[] key = DeriveAesKey(sharedSecret, mode);
+            var ivCipher = ParseCipher(cipherBase64, mode);
+            iv = ivCipher.iv;
+            byte[] cipher = ivCipher.cipher;
+            return DecryptAesGcm(cipher, key, iv);
+        }
+
+        /// <summary>
+        /// 按模式将 IV 与密文打包成字符串（8gwifi.org 模式返回 Base64(IV + cipher+tag)）
         /// </summary>
         public static string FormatCipher(byte[] iv, byte[] cipher, EcdhMode mode)
         {
