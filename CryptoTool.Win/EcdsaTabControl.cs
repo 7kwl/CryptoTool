@@ -61,7 +61,6 @@ namespace CryptoTool.Win
             InitializeDefaults();
             InitializeResizeTimer();
             EnableDoubleBuffering();
-            InitializeResultHeaders();
 
             // ✅ 初始加载时保持拆分容器为50%
             this.Load += (_, __) => ApplySplitterRatios();
@@ -105,57 +104,7 @@ namespace CryptoTool.Win
             SetControlDoubleBuffered(mainTableLayout);
         }
 
-        private void InitializeResultHeaders()
-        {
-            // 清空 GroupBox 标题，用左右两列的标题代替，避免重复显示
-            groupRunResult.Text = string.Empty;
 
-            // 为运行结果区域的左右两列增加标题
-            var labelRunResult = new Label
-            {
-                Name = "labelRunResultHeader",
-                Text = "运行结果",
-                Dock = DockStyle.Fill,
-                TextAlign = ContentAlignment.MiddleLeft,
-                AutoSize = false,
-                Font = new Font(this.Font, FontStyle.Bold)
-            };
-            var labelCalcResult = new Label
-            {
-                Name = "labelCalcResultHeader",
-                Text = "计算结果",
-                Dock = DockStyle.Fill,
-                TextAlign = ContentAlignment.MiddleLeft,
-                AutoSize = false,
-                Font = new Font(this.Font, FontStyle.Bold)
-            };
-
-            tableRunResult.SuspendLayout();
-            try
-            {
-                // 改为 2 列 2 行：左列计算结果，右列运行结果
-                tableRunResult.Controls.Remove(labelValidationResult);
-                tableRunResult.Controls.Remove(textKeyResult);
-                tableRunResult.ColumnStyles.Clear();
-                tableRunResult.RowStyles.Clear();
-                tableRunResult.ColumnCount = 2;
-                tableRunResult.RowCount = 2;
-
-                tableRunResult.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-                tableRunResult.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-                tableRunResult.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
-                tableRunResult.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-
-                tableRunResult.Controls.Add(labelCalcResult, 0, 0);
-                tableRunResult.Controls.Add(labelRunResult, 1, 0);
-                tableRunResult.Controls.Add(textKeyResult, 0, 1);
-                tableRunResult.Controls.Add(labelValidationResult, 1, 1);
-            }
-            finally
-            {
-                tableRunResult.ResumeLayout(true);
-            }
-        }
 
         private void InitializeEncryptLayout()
         {

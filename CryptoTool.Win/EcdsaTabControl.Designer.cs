@@ -40,6 +40,8 @@ namespace CryptoTool.Win
             btnClearPublicKey = new Button();
             panelActionButtons = new Panel();
             tableActionButtons = new TableLayoutPanel();
+            groupKeyActions = new GroupBox();
+            tableKeyActions = new TableLayoutPanel();
             panelButtonArea = new Panel();
             tableButtonArea = new TableLayoutPanel();
             panelRightScroll = new Panel();
@@ -66,10 +68,10 @@ namespace CryptoTool.Win
             panelFormatRow = new FlowLayoutPanel();
             labelOutputFormat = new Label();
             comboOutputFormat = new ComboBox();
-            groupRunResult = new GroupBox();
-            tableRunResult = new TableLayoutPanel();
-            labelValidationResult = new RichTextBox();
+            groupComputeResult = new GroupBox();
             textKeyResult = new RichTextBox();
+            groupRunResult = new GroupBox();
+            labelValidationResult = new RichTextBox();
             panelViewBar = new FlowLayoutPanel();
             btnViewEcdh = new Button();
             btnViewSign = new Button();
@@ -133,6 +135,8 @@ namespace CryptoTool.Win
             panelPublicKeyActions.SuspendLayout();
             panelActionButtons.SuspendLayout();
             tableActionButtons.SuspendLayout();
+            groupKeyActions.SuspendLayout();
+            tableKeyActions.SuspendLayout();
             panelButtonArea.SuspendLayout();
             tableButtonArea.SuspendLayout();
             panelRightScroll.SuspendLayout();
@@ -144,8 +148,8 @@ namespace CryptoTool.Win
             panelCurveContainer.SuspendLayout();
             panelCurveRow.SuspendLayout();
             panelFormatRow.SuspendLayout();
+            groupComputeResult.SuspendLayout();
             groupRunResult.SuspendLayout();
-            tableRunResult.SuspendLayout();
             panelViewBar.SuspendLayout();
             panelViewContent.SuspendLayout();
             groupSign.SuspendLayout();
@@ -484,11 +488,10 @@ namespace CryptoTool.Win
             // 
             panelActionButtons.Controls.Add(tableActionButtons);
             panelActionButtons.Dock = DockStyle.Fill;
-            panelActionButtons.Location = new Point(1646, 11);
+            panelActionButtons.Location = new Point(1643, 8);
             panelActionButtons.Margin = new Padding(0);
             panelActionButtons.Name = "panelActionButtons";
-            panelActionButtons.Padding = new Padding(0);
-            panelActionButtons.Size = new Size(1630, 687);
+            panelActionButtons.Size = new Size(1636, 693);
             panelActionButtons.TabIndex = 1;
             // 
             // tableActionButtons
@@ -496,22 +499,49 @@ namespace CryptoTool.Win
             tableActionButtons.ColumnCount = 2;
             tableActionButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableActionButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableActionButtons.Controls.Add(panelButtonArea, 0, 0);
-            tableActionButtons.Controls.Add(groupRunResult, 0, 1);
-            tableActionButtons.SetColumnSpan(groupRunResult, 2);
+            tableActionButtons.Controls.Add(groupKeyActions, 0, 0);
             tableActionButtons.Dock = DockStyle.Fill;
             tableActionButtons.Location = new Point(0, 0);
             tableActionButtons.Margin = new Padding(0);
             tableActionButtons.Name = "tableActionButtons";
-            tableActionButtons.RowCount = 2;
-            tableActionButtons.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableActionButtons.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableActionButtons.Size = new Size(1630, 687);
+            tableActionButtons.RowCount = 1;
+            tableActionButtons.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableActionButtons.Size = new Size(1636, 693);
             tableActionButtons.TabIndex = 0;
+            // 
+            // groupKeyActions
+            // 
+            tableActionButtons.SetColumnSpan(groupKeyActions, 2);
+            groupKeyActions.Controls.Add(tableKeyActions);
+            groupKeyActions.Dock = DockStyle.Fill;
+            groupKeyActions.Location = new Point(3, 3);
+            groupKeyActions.Name = "groupKeyActions";
+            groupKeyActions.Padding = new Padding(8);
+            groupKeyActions.Size = new Size(1630, 687);
+            groupKeyActions.TabIndex = 1;
+            groupKeyActions.TabStop = false;
+            groupKeyActions.Text = "密钥操作";
+            // 
+            // tableKeyActions
+            // 
+            tableKeyActions.ColumnCount = 2;
+            tableKeyActions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableKeyActions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableKeyActions.Controls.Add(panelButtonArea, 0, 0);
+            tableKeyActions.Controls.Add(groupComputeResult, 0, 1);
+            tableKeyActions.Controls.Add(groupRunResult, 1, 1);
+            tableKeyActions.Dock = DockStyle.Fill;
+            tableKeyActions.Location = new Point(8, 31);
+            tableKeyActions.Name = "tableKeyActions";
+            tableKeyActions.RowCount = 2;
+            tableKeyActions.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableKeyActions.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableKeyActions.Size = new Size(1614, 648);
+            tableKeyActions.TabIndex = 0;
             // 
             // panelButtonArea
             // 
-            tableActionButtons.SetColumnSpan(panelButtonArea, 2);
+            tableKeyActions.SetColumnSpan(panelButtonArea, 2);
             panelButtonArea.Controls.Add(tableButtonArea);
             panelButtonArea.Dock = DockStyle.Fill;
             panelButtonArea.Location = new Point(3, 3);
@@ -534,7 +564,6 @@ namespace CryptoTool.Win
             // 
             // panelRightScroll
             // 
-            panelRightScroll.AutoScroll = true;
             panelRightScroll.Controls.Add(tableRightActions);
             panelRightScroll.Dock = DockStyle.Fill;
             panelRightScroll.Location = new Point(3, 3);
@@ -805,34 +834,43 @@ namespace CryptoTool.Win
             comboOutputFormat.TabIndex = 3;
             comboOutputFormat.SelectedIndexChanged += ComboOutputFormat_SelectedIndexChanged;
             // 
+            // groupComputeResult
+            // 
+            groupComputeResult.Controls.Add(textKeyResult);
+            groupComputeResult.Dock = DockStyle.Fill;
+            groupComputeResult.Location = new Point(3, 327);
+            groupComputeResult.Name = "groupComputeResult";
+            groupComputeResult.Padding = new Padding(8);
+            groupComputeResult.Size = new Size(801, 318);
+            groupComputeResult.TabIndex = 0;
+            groupComputeResult.TabStop = false;
+            groupComputeResult.Text = "计算结果";
+            // 
+            // textKeyResult
+            // 
+            textKeyResult.BackColor = Color.White;
+            textKeyResult.BorderStyle = BorderStyle.None;
+            textKeyResult.Dock = DockStyle.Fill;
+            textKeyResult.Font = new Font("Segoe UI", 9F);
+            textKeyResult.Location = new Point(8, 31);
+            textKeyResult.Name = "textKeyResult";
+            textKeyResult.ReadOnly = true;
+            textKeyResult.ScrollBars = RichTextBoxScrollBars.Vertical;
+            textKeyResult.Size = new Size(785, 279);
+            textKeyResult.TabIndex = 1;
+            textKeyResult.Text = "从私钥提取/曲线检测：\n等待操作...";
+            // 
             // groupRunResult
             // 
-            tableActionButtons.SetColumnSpan(groupRunResult, 2);
-            groupRunResult.Controls.Add(tableRunResult);
+            groupRunResult.Controls.Add(labelValidationResult);
             groupRunResult.Dock = DockStyle.Fill;
-            groupRunResult.Location = new Point(3, 327);
+            groupRunResult.Location = new Point(810, 327);
             groupRunResult.Name = "groupRunResult";
             groupRunResult.Padding = new Padding(8);
-            groupRunResult.Size = new Size(1608, 318);
-            groupRunResult.TabIndex = 0;
+            groupRunResult.Size = new Size(801, 318);
+            groupRunResult.TabIndex = 1;
             groupRunResult.TabStop = false;
             groupRunResult.Text = "运行结果";
-            // 
-            // tableRunResult
-            // 
-            tableRunResult.ColumnCount = 2;
-            tableRunResult.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableRunResult.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableRunResult.Controls.Add(labelValidationResult, 0, 0);
-            tableRunResult.Controls.Add(textKeyResult, 1, 0);
-            tableRunResult.Dock = DockStyle.Fill;
-            tableRunResult.Location = new Point(8, 31);
-            tableRunResult.Name = "tableRunResult";
-            tableRunResult.RowCount = 2;
-            tableRunResult.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
-            tableRunResult.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableRunResult.Size = new Size(1592, 279);
-            tableRunResult.TabIndex = 0;
             // 
             // labelValidationResult
             // 
@@ -841,27 +879,13 @@ namespace CryptoTool.Win
             labelValidationResult.Dock = DockStyle.Fill;
             labelValidationResult.Font = new Font("Segoe UI", 9F);
             labelValidationResult.ForeColor = Color.Gray;
-            labelValidationResult.Location = new Point(3, 3);
+            labelValidationResult.Location = new Point(8, 31);
             labelValidationResult.Name = "labelValidationResult";
             labelValidationResult.ReadOnly = true;
             labelValidationResult.ScrollBars = RichTextBoxScrollBars.Vertical;
-            labelValidationResult.Size = new Size(790, 22);
+            labelValidationResult.Size = new Size(785, 279);
             labelValidationResult.TabIndex = 0;
             labelValidationResult.Text = "验证结果: 未验证";
-            // 
-            // textKeyResult
-            // 
-            textKeyResult.BackColor = Color.White;
-            textKeyResult.BorderStyle = BorderStyle.None;
-            textKeyResult.Dock = DockStyle.Fill;
-            textKeyResult.Font = new Font("Segoe UI", 9F);
-            textKeyResult.Location = new Point(799, 3);
-            textKeyResult.Name = "textKeyResult";
-            textKeyResult.ReadOnly = true;
-            textKeyResult.ScrollBars = RichTextBoxScrollBars.Vertical;
-            textKeyResult.Size = new Size(790, 22);
-            textKeyResult.TabIndex = 1;
-            textKeyResult.Text = "从私钥提取/曲线检测：\n等待操作...";
             // 
             // panelViewBar
             // 
@@ -1546,6 +1570,8 @@ namespace CryptoTool.Win
             panelPublicKeyActions.PerformLayout();
             panelActionButtons.ResumeLayout(false);
             tableActionButtons.ResumeLayout(false);
+            groupKeyActions.ResumeLayout(false);
+            tableKeyActions.ResumeLayout(false);
             panelButtonArea.ResumeLayout(false);
             tableButtonArea.ResumeLayout(false);
             panelRightScroll.ResumeLayout(false);
@@ -1560,8 +1586,8 @@ namespace CryptoTool.Win
             panelCurveContainer.ResumeLayout(false);
             panelCurveRow.ResumeLayout(false);
             panelFormatRow.ResumeLayout(false);
+            groupComputeResult.ResumeLayout(false);
             groupRunResult.ResumeLayout(false);
-            tableRunResult.ResumeLayout(false);
             panelViewBar.ResumeLayout(false);
             panelViewBar.PerformLayout();
             panelViewContent.ResumeLayout(false);
@@ -1692,7 +1718,9 @@ namespace CryptoTool.Win
         private System.Windows.Forms.Button btnSignFile;
         private System.Windows.Forms.Button btnVerifyFile;
         private System.Windows.Forms.GroupBox groupRunResult;
-        private System.Windows.Forms.TableLayoutPanel tableRunResult;
+        private System.Windows.Forms.GroupBox groupKeyActions;
+        private System.Windows.Forms.GroupBox groupComputeResult;
+        private System.Windows.Forms.TableLayoutPanel tableKeyActions;
         private System.Windows.Forms.RichTextBox textKeyResult;
         private System.Windows.Forms.RichTextBox labelValidationResult;
         private System.Windows.Forms.FlowLayoutPanel panelViewBar;
