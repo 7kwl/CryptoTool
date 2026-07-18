@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace CryptoTool.Win.Helpers
 {
@@ -13,7 +12,7 @@ namespace CryptoTool.Win.Helpers
         private static readonly IReadOnlyList<string> _allCurves = new[]
         {
             // NIST / SECG prime 曲线
-            "prime256v1", "secp384r1", "secp521r1",
+            "prime256v1", "secp256r1", "secp384r1", "secp521r1",
             "secp112r1", "secp112r2", "secp128r1", "secp128r2",
             "secp160k1", "secp160r1", "secp160r2",
             "secp192k1", "secp192r1", "secp224k1", "secp224r1",
@@ -92,9 +91,9 @@ namespace CryptoTool.Win.Helpers
             var friendlyNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
                 { "prime256v1", "prime256v1 (NIST P-256)" },
-                { "secp256r1", "secp256r1 (NIST P-256)" },
-                { "secp384r1", "secp384r1 (NIST P-384)" },
-                { "secp521r1", "secp521r1 (NIST P-521)" },
+                { "secp256r1", "P-256 (secp256r1) - 128 位安全" },
+                { "secp384r1", "P-384 (secp384r1) - 192 位安全" },
+                { "secp521r1", "P-521 (secp521r1) - 256 位安全" },
                 { "secp112r1", "secp112r1 (SECG 112-bit)" },
                 { "secp112r2", "secp112r2 (SECG 112-bit)" },
                 { "secp128r1", "secp128r1 (SECG 128-bit)" },
@@ -170,125 +169,131 @@ namespace CryptoTool.Win.Helpers
         /// </summary>
         public static Dictionary<string, (string Icon, List<KeyValuePair<string, string>> Curves)> GetAllCurvesByCategory()
         {
-            var result = new Dictionary<string, (string, List<KeyValuePair<string, string>>)>();
-
-            // 1. NIST Prime 曲线
-            result["prime"] = ("⭐", new List<KeyValuePair<string, string>>
+            var result = new Dictionary<string, (string, List<KeyValuePair<string, string>>)>
             {
-                KVP("prime256v1", "prime256v1 (NIST P-256)"),
-                KVP("secp256r1", "secp256r1 (NIST P-256)"),
-                KVP("secp384r1", "secp384r1 (NIST P-384)"),
-                KVP("secp521r1", "secp521r1 (NIST P-521)"),
-                KVP("secp192r1", "secp192r1 (NIST P-192)"),
-                KVP("secp224r1", "secp224r1 (NIST P-224)"),
-                KVP("prime192v1", "prime192v1 (NIST P-192)"),
-                KVP("prime192v2", "prime192v2"),
-                KVP("prime192v3", "prime192v3"),
-                KVP("prime239v1", "prime239v1"),
-                KVP("prime239v2", "prime239v2"),
-                KVP("prime239v3", "prime239v3"),
-            });
+                // 1. NIST 推荐曲线（置顶，与参考网站一致）
+                ["NIST Curves (Recommended)"] = ("🏆", new List<KeyValuePair<string, string>>
+                {
+                    KVP("secp256r1", "P-256 (secp256r1) - 128 位安全"),
+                    KVP("secp384r1", "P-384 (secp384r1) - 192 位安全"),
+                    KVP("secp521r1", "P-521 (secp521r1) - 256 位安全"),
+                }),
 
-            // 2. SECG Koblitz 曲线
-            result["secp"] = ("🔹", new List<KeyValuePair<string, string>>
-            {
-                KVP("secp112r1", "secp112r1 (SECG 112-bit)"),
-                KVP("secp112r2", "secp112r2 (SECG 112-bit)"),
-                KVP("secp128r1", "secp128r1 (SECG 128-bit)"),
-                KVP("secp128r2", "secp128r2 (SECG 128-bit)"),
-                KVP("secp160k1", "secp160k1 (Koblitz 160)"),
-                KVP("secp160r1", "secp160r1 (SECG 160-bit)"),
-                KVP("secp160r2", "secp160r2 (SECG 160-bit)"),
-                KVP("secp192k1", "secp192k1 (Koblitz 192)"),
-                KVP("secp224k1", "secp224k1 (Koblitz 224)"),
-                KVP("secp256k1", "secp256k1 (Bitcoin)"),
-            });
+                // 2. NIST Prime 曲线
+                ["prime"] = ("⭐", new List<KeyValuePair<string, string>>
+                {
+                    KVP("prime256v1", "prime256v1 (NIST P-256)"),
+                    KVP("secp192r1", "secp192r1 (NIST P-192)"),
+                    KVP("secp224r1", "secp224r1 (NIST P-224)"),
+                    KVP("prime192v1", "prime192v1 (NIST P-192)"),
+                    KVP("prime192v2", "prime192v2"),
+                    KVP("prime192v3", "prime192v3"),
+                    KVP("prime239v1", "prime239v1"),
+                    KVP("prime239v2", "prime239v2"),
+                    KVP("prime239v3", "prime239v3"),
+                }),
 
-            // 3. NIST B 二进制曲线
-            result["nist-b"] = ("🔸", new List<KeyValuePair<string, string>>
-            {
-                KVP("B-163", "B-163 (NIST Binary 163)"),
-                KVP("B-233", "B-233 (NIST Binary 233)"),
-                KVP("B-283", "B-283 (NIST Binary 283)"),
-                KVP("B-409", "B-409 (NIST Binary 409)"),
-                KVP("B-571", "B-571 (NIST Binary 571)"),
-            });
+                // 3. SECG Koblitz 曲线
+                ["secp"] = ("🔹", new List<KeyValuePair<string, string>>
+                {
+                    KVP("secp112r1", "secp112r1 (SECG 112-bit)"),
+                    KVP("secp112r2", "secp112r2 (SECG 112-bit)"),
+                    KVP("secp128r1", "secp128r1 (SECG 128-bit)"),
+                    KVP("secp128r2", "secp128r2 (SECG 128-bit)"),
+                    KVP("secp160k1", "secp160k1 (Koblitz 160)"),
+                    KVP("secp160r1", "secp160r1 (SECG 160-bit)"),
+                    KVP("secp160r2", "secp160r2 (SECG 160-bit)"),
+                    KVP("secp192k1", "secp192k1 (Koblitz 192)"),
+                    KVP("secp224k1", "secp224k1 (Koblitz 224)"),
+                    KVP("secp256k1", "secp256k1 (Bitcoin)"),
+                }),
 
-            // 4. Brainpool 曲线
-            result["brainpool"] = ("🧠", new List<KeyValuePair<string, string>>
-            {
-                KVP("brainpoolP160r1", "brainpoolP160r1"),
-                KVP("brainpoolP192r1", "brainpoolP192r1"),
-                KVP("brainpoolP224r1", "brainpoolP224r1"),
-                KVP("brainpoolP256r1", "brainpoolP256r1"),
-                KVP("brainpoolP320r1", "brainpoolP320r1"),
-                KVP("brainpoolP384r1", "brainpoolP384r1"),
-                KVP("brainpoolP512r1", "brainpoolP512r1"),
-            });
+                // 4. NIST B 二进制曲线
+                ["nist-b"] = ("🔸", new List<KeyValuePair<string, string>>
+                {
+                    KVP("B-163", "B-163 (NIST Binary 163)"),
+                    KVP("B-233", "B-233 (NIST Binary 233)"),
+                    KVP("B-283", "B-283 (NIST Binary 283)"),
+                    KVP("B-409", "B-409 (NIST Binary 409)"),
+                    KVP("B-571", "B-571 (NIST Binary 571)"),
+                }),
 
-            // 5. GOST 曲线
-            result["gost"] = ("🇷🇺", new List<KeyValuePair<string, string>>
-            {
-                KVP("GostR3410-2001-CryptoPro-A", "GOST CP-A"),
-                KVP("GostR3410-2001-CryptoPro-B", "GOST CP-B"),
-                KVP("GostR3410-2001-CryptoPro-C", "GOST CP-C"),
-                KVP("GostR3410-2001-CryptoPro-D", "GOST CP-D"),
-            });
+                // 5. Brainpool 曲线
+                ["brainpool"] = ("🧠", new List<KeyValuePair<string, string>>
+                {
+                    KVP("brainpoolP160r1", "brainpoolP160r1"),
+                    KVP("brainpoolP192r1", "brainpoolP192r1"),
+                    KVP("brainpoolP224r1", "brainpoolP224r1"),
+                    KVP("brainpoolP256r1", "brainpoolP256r1"),
+                    KVP("brainpoolP320r1", "brainpoolP320r1"),
+                    KVP("brainpoolP384r1", "brainpoolP384r1"),
+                    KVP("brainpoolP512r1", "brainpoolP512r1"),
+                }),
 
-            // 6. X9.62 c2pnb 曲线
-            result["c2pnb"] = ("📶", new List<KeyValuePair<string, string>>
-            {
-                KVP("c2pnb163v1", "c2pnb163v1"),
-                KVP("c2pnb163v2", "c2pnb163v2"),
-                KVP("c2pnb163v3", "c2pnb163v3"),
-                KVP("c2pnb176v1", "c2pnb176v1"),
-                KVP("c2pnb208w1", "c2pnb208w1"),
-                KVP("c2pnb272w1", "c2pnb272w1"),
-                KVP("c2pnb304w1", "c2pnb304w1"),
-                KVP("c2pnb368w1", "c2pnb368w1"),
-            });
+                // 6. GOST 曲线
+                ["gost"] = ("🇷🇺", new List<KeyValuePair<string, string>>
+                {
+                    KVP("GostR3410-2001-CryptoPro-A", "GOST CP-A"),
+                    KVP("GostR3410-2001-CryptoPro-B", "GOST CP-B"),
+                    KVP("GostR3410-2001-CryptoPro-C", "GOST CP-C"),
+                    KVP("GostR3410-2001-CryptoPro-D", "GOST CP-D"),
+                }),
 
-            // 7. X9.62 c2tnb 曲线
-            result["c2tnb"] = ("📡", new List<KeyValuePair<string, string>>
-            {
-                KVP("c2tnb191v1", "c2tnb191v1"),
-                KVP("c2tnb191v2", "c2tnb191v2"),
-                KVP("c2tnb191v3", "c2tnb191v3"),
-                KVP("c2tnb239v1", "c2tnb239v1"),
-                KVP("c2tnb239v2", "c2tnb239v2"),
-                KVP("c2tnb239v3", "c2tnb239v3"),
-                KVP("c2tnb431r1", "c2tnb431r1"),
-            });
+                // 7. X9.62 c2pnb 曲线
+                ["c2pnb"] = ("📶", new List<KeyValuePair<string, string>>
+                {
+                    KVP("c2pnb163v1", "c2pnb163v1"),
+                    KVP("c2pnb163v2", "c2pnb163v2"),
+                    KVP("c2pnb163v3", "c2pnb163v3"),
+                    KVP("c2pnb176v1", "c2pnb176v1"),
+                    KVP("c2pnb208w1", "c2pnb208w1"),
+                    KVP("c2pnb272w1", "c2pnb272w1"),
+                    KVP("c2pnb304w1", "c2pnb304w1"),
+                    KVP("c2pnb368w1", "c2pnb368w1"),
+                }),
 
-            // 8. WTLS 曲线
-            result["wtls"] = ("📱", new List<KeyValuePair<string, string>>
-            {
-                KVP("wtls1", "WTLS-1"),
-                KVP("wtls3", "WTLS-3"),
-                KVP("wtls4", "WTLS-4"),
-                KVP("wtls5", "WTLS-5"),
-                KVP("wtls6", "WTLS-6"),
-                KVP("wtls7", "WTLS-7"),
-                KVP("wtls8", "WTLS-8"),
-                KVP("wtls9", "WTLS-9"),
-                KVP("wtls10", "WTLS-10"),
-            });
+                // 8. X9.62 c2tnb 曲线
+                ["c2tnb"] = ("📡", new List<KeyValuePair<string, string>>
+                {
+                    KVP("c2tnb191v1", "c2tnb191v1"),
+                    KVP("c2tnb191v2", "c2tnb191v2"),
+                    KVP("c2tnb191v3", "c2tnb191v3"),
+                    KVP("c2tnb239v1", "c2tnb239v1"),
+                    KVP("c2tnb239v2", "c2tnb239v2"),
+                    KVP("c2tnb239v3", "c2tnb239v3"),
+                    KVP("c2tnb431r1", "c2tnb431r1"),
+                }),
 
-            // 9. SM2 国密
-            result["sm2"] = ("🇨🇳", new List<KeyValuePair<string, string>>
-            {
-                KVP("sm2p256v1", "sm2p256v1 (国密 SM2)"),
-            });
+                // 9. WTLS 曲线
+                ["wtls"] = ("📱", new List<KeyValuePair<string, string>>
+                {
+                    KVP("wtls1", "WTLS-1"),
+                    KVP("wtls3", "WTLS-3"),
+                    KVP("wtls4", "WTLS-4"),
+                    KVP("wtls5", "WTLS-5"),
+                    KVP("wtls6", "WTLS-6"),
+                    KVP("wtls7", "WTLS-7"),
+                    KVP("wtls8", "WTLS-8"),
+                    KVP("wtls9", "WTLS-9"),
+                    KVP("wtls10", "WTLS-10"),
+                }),
 
-            // 10. NIST P 别名
-            result["nist-p"] = ("🇺🇸", new List<KeyValuePair<string, string>>
-            {
-                KVP("P-192", "P-192 (NIST)"),
-                KVP("P-224", "P-224 (NIST)"),
-                KVP("P-256", "P-256 (NIST)"),
-                KVP("P-384", "P-384 (NIST)"),
-                KVP("P-521", "P-521 (NIST)"),
-            });
+                // 10. SM2 国密
+                ["sm2"] = ("🇨🇳", new List<KeyValuePair<string, string>>
+                {
+                    KVP("sm2p256v1", "sm2p256v1 (国密 SM2)"),
+                }),
+
+                // 11. NIST P 别名
+                ["nist-p"] = ("🇺🇸", new List<KeyValuePair<string, string>>
+                {
+                    KVP("P-192", "P-192 (NIST)"),
+                    KVP("P-224", "P-224 (NIST)"),
+                    KVP("P-256", "P-256 (NIST)"),
+                    KVP("P-384", "P-384 (NIST)"),
+                    KVP("P-521", "P-521 (NIST)"),
+                }),
+            };
 
             return result;
         }

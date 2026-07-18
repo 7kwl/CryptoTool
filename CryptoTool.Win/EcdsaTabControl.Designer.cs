@@ -1,6 +1,3 @@
-using System.Drawing;
-using System.Windows.Forms;
-
 namespace CryptoTool.Win
 {
     partial class EcdsaTabControl
@@ -21,19 +18,21 @@ namespace CryptoTool.Win
             mainTableLayout = new TableLayoutPanel();
             groupKey = new GroupBox();
             tableLayoutKey = new TableLayoutPanel();
+            panelPrivateKeyBox = new Panel();
             labelPrivateKey = new Label();
-            labelPrivateActionsTitle = new Label();
             textPrivateKey = new TextBox();
             panelPrivateKeyActions = new TableLayoutPanel();
+            labelPrivateActionsTitle = new Label();
             btnCopyPrivateKey = new Button();
             btnPastePrivateKey = new Button();
             btnImportPrivateKey = new Button();
             btnSavePrivateKey = new Button();
             btnClearPrivateKey = new Button();
+            panelPublicKeyBox = new Panel();
             labelPublicKey = new Label();
-            labelPublicActionsTitle = new Label();
             textPublicKey = new TextBox();
             panelPublicKeyActions = new TableLayoutPanel();
+            labelPublicActionsTitle = new Label();
             btnCopyPublicKey = new Button();
             btnPastePublicKey = new Button();
             btnImportPublicKey = new Button();
@@ -52,9 +51,6 @@ namespace CryptoTool.Win
             btnGetPublicKeyFromPrivate = new Button();
             btnGetCurveType = new Button();
             btnClearAll = new Button();
-            panelFormatRow = new FlowLayoutPanel();
-            labelOutputFormat = new Label();
-            comboOutputFormat = new ComboBox();
             panelKeyTypeRow = new FlowLayoutPanel();
             labelKeyType = new Label();
             radioPanel = new FlowLayoutPanel();
@@ -67,7 +63,19 @@ namespace CryptoTool.Win
             comboCategory = new ComboBox();
             lblArrow = new Label();
             comboCurve = new ComboBox();
-            splitSignEncrypt = new SplitContainer();
+            panelFormatRow = new FlowLayoutPanel();
+            labelOutputFormat = new Label();
+            comboOutputFormat = new ComboBox();
+            groupRunResult = new GroupBox();
+            tableRunResult = new TableLayoutPanel();
+            labelValidationResult = new RichTextBox();
+            textKeyResult = new RichTextBox();
+            panelViewBar = new FlowLayoutPanel();
+            btnViewSign = new Button();
+            btnViewEncrypt = new Button();
+            btnViewFile = new Button();
+            btnViewEcdh = new Button();
+            panelViewContent = new Panel();
             groupSign = new GroupBox();
             tableLayoutSign = new TableLayoutPanel();
             labelPlainData = new Label();
@@ -103,25 +111,25 @@ namespace CryptoTool.Win
             btnEncClear = new Button();
             btnEncCopy = new Button();
             btnEncPaste = new Button();
-            groupEncFile = new GroupBox();
-            panelEncFileBtns = new FlowLayoutPanel();
-            btnEncryptFile = new Button();
-            btnDecryptFile = new Button();
-            labelEncResult = new TextBox();
             labelEncOutputLabel = new Label();
-            splitFileResult = new SplitContainer();
             groupFile = new GroupBox();
             panelFileControls = new FlowLayoutPanel();
             btnSignFile = new Button();
             btnVerifyFile = new Button();
-            groupRunResult = new GroupBox();
-            tableRunResult = new TableLayoutPanel();
-            labelValidationResult = new RichTextBox();
-            textKeyResult = new RichTextBox();
+            groupEcdh = new Panel();
+            labelEncResult = new TextBox();
+            splitSignEncrypt = new SplitContainer();
+            groupEncFile = new GroupBox();
+            panelEncFileBtns = new FlowLayoutPanel();
+            btnEncryptFile = new Button();
+            btnDecryptFile = new Button();
+            splitFileResult = new SplitContainer();
             mainTableLayout.SuspendLayout();
             groupKey.SuspendLayout();
             tableLayoutKey.SuspendLayout();
+            panelPrivateKeyBox.SuspendLayout();
             panelPrivateKeyActions.SuspendLayout();
+            panelPublicKeyBox.SuspendLayout();
             panelPublicKeyActions.SuspendLayout();
             groupActionButtons.SuspendLayout();
             tableActionButtons.SuspendLayout();
@@ -131,31 +139,29 @@ namespace CryptoTool.Win
             tableRightActions.SuspendLayout();
             panelKeyControlsContainer.SuspendLayout();
             panelKeyControls.SuspendLayout();
-            panelFormatRow.SuspendLayout();
             panelKeyTypeRow.SuspendLayout();
             radioPanel.SuspendLayout();
             panelCurveContainer.SuspendLayout();
             panelCurveRow.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)splitSignEncrypt).BeginInit();
-            splitSignEncrypt.Panel1.SuspendLayout();
-            splitSignEncrypt.Panel2.SuspendLayout();
-            splitSignEncrypt.SuspendLayout();
+            panelFormatRow.SuspendLayout();
+            groupRunResult.SuspendLayout();
+            tableRunResult.SuspendLayout();
+            panelViewBar.SuspendLayout();
+            panelViewContent.SuspendLayout();
             groupSign.SuspendLayout();
             tableLayoutSign.SuspendLayout();
             panelSignActions.SuspendLayout();
             groupEncrypt.SuspendLayout();
             tableLayoutEncrypt.SuspendLayout();
             panelEncBtns.SuspendLayout();
+            groupFile.SuspendLayout();
+            panelFileControls.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)splitSignEncrypt).BeginInit();
+            splitSignEncrypt.SuspendLayout();
             groupEncFile.SuspendLayout();
             panelEncFileBtns.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitFileResult).BeginInit();
-            splitFileResult.Panel1.SuspendLayout();
-            splitFileResult.Panel2.SuspendLayout();
             splitFileResult.SuspendLayout();
-            groupFile.SuspendLayout();
-            panelFileControls.SuspendLayout();
-            groupRunResult.SuspendLayout();
-            tableRunResult.SuspendLayout();
             SuspendLayout();
             // 
             // mainTableLayout
@@ -165,16 +171,16 @@ namespace CryptoTool.Win
             mainTableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             mainTableLayout.Controls.Add(groupKey, 0, 0);
             mainTableLayout.Controls.Add(groupActionButtons, 1, 0);
-            mainTableLayout.Controls.Add(splitSignEncrypt, 0, 1);
-            mainTableLayout.Controls.Add(splitFileResult, 0, 2);
+            mainTableLayout.Controls.Add(panelViewBar, 0, 1);
+            mainTableLayout.Controls.Add(panelViewContent, 0, 2);
             mainTableLayout.Dock = DockStyle.Fill;
             mainTableLayout.Location = new Point(0, 0);
             mainTableLayout.Name = "mainTableLayout";
             mainTableLayout.Padding = new Padding(8);
             mainTableLayout.RowCount = 3;
             mainTableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 45F));
-            mainTableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 30F));
-            mainTableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 28F));
+            mainTableLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 60F));
+            mainTableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 55F));
             mainTableLayout.Size = new Size(3287, 1616);
             mainTableLayout.TabIndex = 0;
             // 
@@ -185,7 +191,7 @@ namespace CryptoTool.Win
             groupKey.Location = new Point(11, 11);
             groupKey.Name = "groupKey";
             groupKey.Padding = new Padding(8);
-            groupKey.Size = new Size(1629, 693);
+            groupKey.Size = new Size(1629, 687);
             groupKey.TabIndex = 0;
             groupKey.TabStop = false;
             groupKey.Text = "密钥生成";
@@ -195,262 +201,284 @@ namespace CryptoTool.Win
             tableLayoutKey.ColumnCount = 2;
             tableLayoutKey.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tableLayoutKey.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 200F));
-            tableLayoutKey.Controls.Add(labelPrivateKey, 0, 0);
-            tableLayoutKey.Controls.Add(labelPrivateActionsTitle, 1, 0);
-            tableLayoutKey.Controls.Add(textPrivateKey, 0, 1);
-            tableLayoutKey.Controls.Add(panelPrivateKeyActions, 1, 1);
-            tableLayoutKey.Controls.Add(labelPublicKey, 0, 2);
-            tableLayoutKey.Controls.Add(labelPublicActionsTitle, 1, 2);
-            tableLayoutKey.Controls.Add(textPublicKey, 0, 3);
-            tableLayoutKey.Controls.Add(panelPublicKeyActions, 1, 3);
+            tableLayoutKey.Controls.Add(panelPrivateKeyBox, 0, 0);
+            tableLayoutKey.Controls.Add(panelPrivateKeyActions, 1, 0);
+            tableLayoutKey.Controls.Add(panelPublicKeyBox, 0, 2);
+            tableLayoutKey.Controls.Add(panelPublicKeyActions, 1, 2);
             tableLayoutKey.Dock = DockStyle.Fill;
             tableLayoutKey.Location = new Point(8, 31);
             tableLayoutKey.Name = "tableLayoutKey";
             tableLayoutKey.Padding = new Padding(6);
             tableLayoutKey.RowCount = 4;
-            tableLayoutKey.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
-            tableLayoutKey.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-            tableLayoutKey.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
-            tableLayoutKey.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-            tableLayoutKey.Size = new Size(1613, 654);
+            tableLayoutKey.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutKey.RowStyles.Add(new RowStyle(SizeType.Percent, 0F));
+            tableLayoutKey.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutKey.RowStyles.Add(new RowStyle(SizeType.Percent, 0F));
+            tableLayoutKey.Size = new Size(1613, 648);
             tableLayoutKey.TabIndex = 0;
+            // 
+            // panelPrivateKeyBox
+            // 
+            panelPrivateKeyBox.Controls.Add(labelPrivateKey);
+            panelPrivateKeyBox.Controls.Add(textPrivateKey);
+            panelPrivateKeyBox.Dock = DockStyle.Fill;
+            panelPrivateKeyBox.Location = new Point(9, 9);
+            panelPrivateKeyBox.Name = "panelPrivateKeyBox";
+            tableLayoutKey.SetRowSpan(panelPrivateKeyBox, 2);
+            panelPrivateKeyBox.Size = new Size(1395, 312);
+            panelPrivateKeyBox.TabIndex = 6;
             // 
             // labelPrivateKey
             // 
-            labelPrivateKey.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            labelPrivateKey.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             labelPrivateKey.AutoSize = true;
-            labelPrivateKey.Location = new Point(10, 10);
+            labelPrivateKey.BackColor = Color.Transparent;
+            labelPrivateKey.Location = new Point(1263, 4);
             labelPrivateKey.Margin = new Padding(4, 4, 4, 2);
             labelPrivateKey.Name = "labelPrivateKey";
             labelPrivateKey.Padding = new Padding(4, 0, 4, 0);
-            labelPrivateKey.Size = new Size(128, 22);
+            labelPrivateKey.Size = new Size(128, 24);
             labelPrivateKey.TabIndex = 0;
             labelPrivateKey.Text = "私钥 (PEM)：";
-            // 
-            // labelPrivateActionsTitle
-            // 
-            labelPrivateActionsTitle.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            labelPrivateActionsTitle.AutoSize = true;
-            labelPrivateActionsTitle.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            labelPrivateActionsTitle.ForeColor = Color.FromArgb(192, 0, 0);
-            labelPrivateActionsTitle.Location = new Point(1411, 10);
-            labelPrivateActionsTitle.Margin = new Padding(4, 4, 4, 2);
-            labelPrivateActionsTitle.Name = "labelPrivateActionsTitle";
-            labelPrivateActionsTitle.Padding = new Padding(4, 0, 4, 0);
-            labelPrivateActionsTitle.Size = new Size(131, 22);
-            labelPrivateActionsTitle.TabIndex = 0;
-            labelPrivateActionsTitle.Text = "🔑 私钥操作";
             // 
             // textPrivateKey
             // 
             textPrivateKey.Dock = DockStyle.Fill;
-            textPrivateKey.Location = new Point(9, 37);
+            textPrivateKey.Location = new Point(0, 0);
             textPrivateKey.Multiline = true;
             textPrivateKey.Name = "textPrivateKey";
             textPrivateKey.ScrollBars = ScrollBars.Vertical;
-            textPrivateKey.Size = new Size(1395, 287);
+            textPrivateKey.Size = new Size(1395, 312);
             textPrivateKey.TabIndex = 1;
-            textPrivateKey.TextChanged += textPrivateKey_TextChanged;
+            textPrivateKey.TextChanged += TextPrivateKey_TextChanged;
             // 
             // panelPrivateKeyActions
             // 
             panelPrivateKeyActions.ColumnCount = 1;
             panelPrivateKeyActions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            panelPrivateKeyActions.Controls.Add(btnCopyPrivateKey, 0, 0);
-            panelPrivateKeyActions.Controls.Add(btnPastePrivateKey, 0, 1);
-            panelPrivateKeyActions.Controls.Add(btnImportPrivateKey, 0, 2);
-            panelPrivateKeyActions.Controls.Add(btnSavePrivateKey, 0, 3);
-            panelPrivateKeyActions.Controls.Add(btnClearPrivateKey, 0, 4);
+            panelPrivateKeyActions.Controls.Add(labelPrivateActionsTitle, 0, 0);
+            panelPrivateKeyActions.Controls.Add(btnCopyPrivateKey, 0, 1);
+            panelPrivateKeyActions.Controls.Add(btnPastePrivateKey, 0, 2);
+            panelPrivateKeyActions.Controls.Add(btnImportPrivateKey, 0, 3);
+            panelPrivateKeyActions.Controls.Add(btnSavePrivateKey, 0, 4);
+            panelPrivateKeyActions.Controls.Add(btnClearPrivateKey, 0, 5);
             panelPrivateKeyActions.Dock = DockStyle.Fill;
-            panelPrivateKeyActions.Location = new Point(1410, 37);
+            panelPrivateKeyActions.Location = new Point(1410, 9);
             panelPrivateKeyActions.Name = "panelPrivateKeyActions";
             panelPrivateKeyActions.Padding = new Padding(8, 4, 8, 4);
-            panelPrivateKeyActions.RowCount = 5;
+            panelPrivateKeyActions.RowCount = 6;
+            tableLayoutKey.SetRowSpan(panelPrivateKeyActions, 2);
+            panelPrivateKeyActions.RowStyles.Add(new RowStyle(SizeType.Absolute, 26F));
             panelPrivateKeyActions.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             panelPrivateKeyActions.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             panelPrivateKeyActions.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             panelPrivateKeyActions.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             panelPrivateKeyActions.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-            panelPrivateKeyActions.Size = new Size(194, 287);
+            panelPrivateKeyActions.Size = new Size(194, 312);
             panelPrivateKeyActions.TabIndex = 4;
+            // 
+            // labelPrivateActionsTitle
+            // 
+            labelPrivateActionsTitle.AutoSize = true;
+            labelPrivateActionsTitle.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            labelPrivateActionsTitle.ForeColor = Color.FromArgb(192, 0, 0);
+            labelPrivateActionsTitle.Location = new Point(8, 4);
+            labelPrivateActionsTitle.Margin = new Padding(0);
+            labelPrivateActionsTitle.Name = "labelPrivateActionsTitle";
+            labelPrivateActionsTitle.Size = new Size(123, 25);
+            labelPrivateActionsTitle.TabIndex = 0;
+            labelPrivateActionsTitle.Text = "🔑 私钥操作";
             // 
             // btnCopyPrivateKey
             // 
             btnCopyPrivateKey.Dock = DockStyle.Fill;
-            btnCopyPrivateKey.Location = new Point(10, 6);
+            btnCopyPrivateKey.Location = new Point(10, 32);
             btnCopyPrivateKey.Margin = new Padding(2);
             btnCopyPrivateKey.MinimumSize = new Size(120, 30);
             btnCopyPrivateKey.Name = "btnCopyPrivateKey";
             btnCopyPrivateKey.Size = new Size(174, 51);
             btnCopyPrivateKey.TabIndex = 0;
             btnCopyPrivateKey.Text = "复制私钥";
-            btnCopyPrivateKey.Click += btnCopyPrivateKey_Click;
+            btnCopyPrivateKey.Click += BtnCopyPrivateKey_Click;
             // 
             // btnPastePrivateKey
             // 
             btnPastePrivateKey.Dock = DockStyle.Fill;
-            btnPastePrivateKey.Location = new Point(10, 61);
+            btnPastePrivateKey.Location = new Point(10, 87);
             btnPastePrivateKey.Margin = new Padding(2);
             btnPastePrivateKey.MinimumSize = new Size(120, 30);
             btnPastePrivateKey.Name = "btnPastePrivateKey";
             btnPastePrivateKey.Size = new Size(174, 51);
             btnPastePrivateKey.TabIndex = 1;
             btnPastePrivateKey.Text = "粘贴私钥";
-            btnPastePrivateKey.Click += btnPastePrivateKey_Click;
+            btnPastePrivateKey.Click += BtnPastePrivateKey_Click;
             // 
             // btnImportPrivateKey
             // 
             btnImportPrivateKey.Dock = DockStyle.Fill;
-            btnImportPrivateKey.Location = new Point(10, 116);
+            btnImportPrivateKey.Location = new Point(10, 142);
             btnImportPrivateKey.Margin = new Padding(2);
             btnImportPrivateKey.MinimumSize = new Size(120, 30);
             btnImportPrivateKey.Name = "btnImportPrivateKey";
             btnImportPrivateKey.Size = new Size(174, 51);
             btnImportPrivateKey.TabIndex = 2;
             btnImportPrivateKey.Text = "导入私钥";
-            btnImportPrivateKey.Click += btnImportPrivateKey_Click;
+            btnImportPrivateKey.Click += BtnImportPrivateKey_Click;
             // 
             // btnSavePrivateKey
             // 
             btnSavePrivateKey.Dock = DockStyle.Fill;
-            btnSavePrivateKey.Location = new Point(10, 171);
+            btnSavePrivateKey.Location = new Point(10, 197);
             btnSavePrivateKey.Margin = new Padding(2);
             btnSavePrivateKey.MinimumSize = new Size(120, 30);
             btnSavePrivateKey.Name = "btnSavePrivateKey";
             btnSavePrivateKey.Size = new Size(174, 51);
             btnSavePrivateKey.TabIndex = 3;
             btnSavePrivateKey.Text = "保存私钥";
-            btnSavePrivateKey.Click += btnSavePrivateKey_Click;
+            btnSavePrivateKey.Click += BtnSavePrivateKey_Click;
             // 
             // btnClearPrivateKey
             // 
             btnClearPrivateKey.Dock = DockStyle.Fill;
-            btnClearPrivateKey.Location = new Point(10, 226);
+            btnClearPrivateKey.Location = new Point(10, 252);
             btnClearPrivateKey.Margin = new Padding(2);
             btnClearPrivateKey.MinimumSize = new Size(120, 30);
             btnClearPrivateKey.Name = "btnClearPrivateKey";
-            btnClearPrivateKey.Size = new Size(174, 55);
+            btnClearPrivateKey.Size = new Size(174, 54);
             btnClearPrivateKey.TabIndex = 4;
             btnClearPrivateKey.Text = "清空私钥";
-            btnClearPrivateKey.Click += btnClearPrivateKey_Click;
+            btnClearPrivateKey.Click += BtnClearPrivateKey_Click;
+            // 
+            // panelPublicKeyBox
+            // 
+            panelPublicKeyBox.Controls.Add(labelPublicKey);
+            panelPublicKeyBox.Controls.Add(textPublicKey);
+            panelPublicKeyBox.Dock = DockStyle.Fill;
+            panelPublicKeyBox.Location = new Point(9, 327);
+            panelPublicKeyBox.Name = "panelPublicKeyBox";
+            tableLayoutKey.SetRowSpan(panelPublicKeyBox, 2);
+            panelPublicKeyBox.Size = new Size(1395, 312);
+            panelPublicKeyBox.TabIndex = 7;
             // 
             // labelPublicKey
             // 
-            labelPublicKey.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            labelPublicKey.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             labelPublicKey.AutoSize = true;
-            labelPublicKey.Location = new Point(10, 331);
+            labelPublicKey.BackColor = Color.Transparent;
+            labelPublicKey.Location = new Point(1263, 4);
             labelPublicKey.Margin = new Padding(4, 4, 4, 2);
             labelPublicKey.Name = "labelPublicKey";
             labelPublicKey.Padding = new Padding(4, 0, 4, 0);
-            labelPublicKey.Size = new Size(128, 22);
+            labelPublicKey.Size = new Size(128, 24);
             labelPublicKey.TabIndex = 2;
             labelPublicKey.Text = "公钥 (PEM)：";
-            // 
-            // labelPublicActionsTitle
-            // 
-            labelPublicActionsTitle.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            labelPublicActionsTitle.AutoSize = true;
-            labelPublicActionsTitle.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            labelPublicActionsTitle.ForeColor = Color.FromArgb(0, 100, 180);
-            labelPublicActionsTitle.Location = new Point(1411, 331);
-            labelPublicActionsTitle.Margin = new Padding(4, 4, 4, 2);
-            labelPublicActionsTitle.Name = "labelPublicActionsTitle";
-            labelPublicActionsTitle.Padding = new Padding(4, 0, 4, 0);
-            labelPublicActionsTitle.Size = new Size(131, 22);
-            labelPublicActionsTitle.TabIndex = 0;
-            labelPublicActionsTitle.Text = "🔓 公钥操作";
             // 
             // textPublicKey
             // 
             textPublicKey.Dock = DockStyle.Fill;
-            textPublicKey.Location = new Point(9, 358);
+            textPublicKey.Location = new Point(0, 0);
             textPublicKey.Multiline = true;
             textPublicKey.Name = "textPublicKey";
             textPublicKey.ScrollBars = ScrollBars.Vertical;
-            textPublicKey.Size = new Size(1395, 287);
+            textPublicKey.Size = new Size(1395, 312);
             textPublicKey.TabIndex = 3;
             // 
             // panelPublicKeyActions
             // 
             panelPublicKeyActions.ColumnCount = 1;
             panelPublicKeyActions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            panelPublicKeyActions.Controls.Add(btnCopyPublicKey, 0, 0);
-            panelPublicKeyActions.Controls.Add(btnPastePublicKey, 0, 1);
-            panelPublicKeyActions.Controls.Add(btnImportPublicKey, 0, 2);
-            panelPublicKeyActions.Controls.Add(btnSavePublicKey, 0, 3);
-            panelPublicKeyActions.Controls.Add(btnClearPublicKey, 0, 4);
+            panelPublicKeyActions.Controls.Add(labelPublicActionsTitle, 0, 0);
+            panelPublicKeyActions.Controls.Add(btnCopyPublicKey, 0, 1);
+            panelPublicKeyActions.Controls.Add(btnPastePublicKey, 0, 2);
+            panelPublicKeyActions.Controls.Add(btnImportPublicKey, 0, 3);
+            panelPublicKeyActions.Controls.Add(btnSavePublicKey, 0, 4);
+            panelPublicKeyActions.Controls.Add(btnClearPublicKey, 0, 5);
             panelPublicKeyActions.Dock = DockStyle.Fill;
-            panelPublicKeyActions.Location = new Point(1410, 358);
+            panelPublicKeyActions.Location = new Point(1410, 327);
             panelPublicKeyActions.Name = "panelPublicKeyActions";
             panelPublicKeyActions.Padding = new Padding(8, 4, 8, 4);
-            panelPublicKeyActions.RowCount = 5;
+            panelPublicKeyActions.RowCount = 6;
+            tableLayoutKey.SetRowSpan(panelPublicKeyActions, 2);
+            panelPublicKeyActions.RowStyles.Add(new RowStyle(SizeType.Absolute, 26F));
             panelPublicKeyActions.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             panelPublicKeyActions.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             panelPublicKeyActions.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             panelPublicKeyActions.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             panelPublicKeyActions.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-            panelPublicKeyActions.Size = new Size(194, 287);
+            panelPublicKeyActions.Size = new Size(194, 312);
             panelPublicKeyActions.TabIndex = 5;
+            // 
+            // labelPublicActionsTitle
+            // 
+            labelPublicActionsTitle.AutoSize = true;
+            labelPublicActionsTitle.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            labelPublicActionsTitle.ForeColor = Color.FromArgb(0, 100, 180);
+            labelPublicActionsTitle.Location = new Point(8, 4);
+            labelPublicActionsTitle.Margin = new Padding(0);
+            labelPublicActionsTitle.Name = "labelPublicActionsTitle";
+            labelPublicActionsTitle.Size = new Size(123, 25);
+            labelPublicActionsTitle.TabIndex = 0;
+            labelPublicActionsTitle.Text = "🔓 公钥操作";
             // 
             // btnCopyPublicKey
             // 
             btnCopyPublicKey.Dock = DockStyle.Fill;
-            btnCopyPublicKey.Location = new Point(10, 6);
+            btnCopyPublicKey.Location = new Point(10, 32);
             btnCopyPublicKey.Margin = new Padding(2);
             btnCopyPublicKey.MinimumSize = new Size(120, 30);
             btnCopyPublicKey.Name = "btnCopyPublicKey";
             btnCopyPublicKey.Size = new Size(174, 51);
             btnCopyPublicKey.TabIndex = 0;
             btnCopyPublicKey.Text = "复制公钥";
-            btnCopyPublicKey.Click += btnCopyPublicKey_Click;
+            btnCopyPublicKey.Click += BtnCopyPublicKey_Click;
             // 
             // btnPastePublicKey
             // 
             btnPastePublicKey.Dock = DockStyle.Fill;
-            btnPastePublicKey.Location = new Point(10, 61);
+            btnPastePublicKey.Location = new Point(10, 87);
             btnPastePublicKey.Margin = new Padding(2);
             btnPastePublicKey.MinimumSize = new Size(120, 30);
             btnPastePublicKey.Name = "btnPastePublicKey";
             btnPastePublicKey.Size = new Size(174, 51);
             btnPastePublicKey.TabIndex = 1;
             btnPastePublicKey.Text = "粘贴公钥";
-            btnPastePublicKey.Click += btnPastePublicKey_Click;
+            btnPastePublicKey.Click += BtnPastePublicKey_Click;
             // 
             // btnImportPublicKey
             // 
             btnImportPublicKey.Dock = DockStyle.Fill;
-            btnImportPublicKey.Location = new Point(10, 116);
+            btnImportPublicKey.Location = new Point(10, 142);
             btnImportPublicKey.Margin = new Padding(2);
             btnImportPublicKey.MinimumSize = new Size(120, 30);
             btnImportPublicKey.Name = "btnImportPublicKey";
             btnImportPublicKey.Size = new Size(174, 51);
             btnImportPublicKey.TabIndex = 2;
             btnImportPublicKey.Text = "导入公钥";
-            btnImportPublicKey.Click += btnImportPublicKey_Click;
+            btnImportPublicKey.Click += BtnImportPublicKey_Click;
             // 
             // btnSavePublicKey
             // 
             btnSavePublicKey.Dock = DockStyle.Fill;
-            btnSavePublicKey.Location = new Point(10, 171);
+            btnSavePublicKey.Location = new Point(10, 197);
             btnSavePublicKey.Margin = new Padding(2);
             btnSavePublicKey.MinimumSize = new Size(120, 30);
             btnSavePublicKey.Name = "btnSavePublicKey";
             btnSavePublicKey.Size = new Size(174, 51);
             btnSavePublicKey.TabIndex = 3;
             btnSavePublicKey.Text = "保存公钥";
-            btnSavePublicKey.Click += btnSavePublicKey_Click;
+            btnSavePublicKey.Click += BtnSavePublicKey_Click;
             // 
             // btnClearPublicKey
             // 
             btnClearPublicKey.Dock = DockStyle.Fill;
-            btnClearPublicKey.Location = new Point(10, 226);
+            btnClearPublicKey.Location = new Point(10, 252);
             btnClearPublicKey.Margin = new Padding(2);
             btnClearPublicKey.MinimumSize = new Size(120, 30);
             btnClearPublicKey.Name = "btnClearPublicKey";
-            btnClearPublicKey.Size = new Size(174, 55);
+            btnClearPublicKey.Size = new Size(174, 54);
             btnClearPublicKey.TabIndex = 4;
             btnClearPublicKey.Text = "清空公钥";
-            btnClearPublicKey.Click += btnClearPublicKey_Click;
+            btnClearPublicKey.Click += BtnClearPublicKey_Click;
             // 
             // groupActionButtons
             // 
@@ -459,30 +487,35 @@ namespace CryptoTool.Win
             groupActionButtons.Location = new Point(1646, 11);
             groupActionButtons.Name = "groupActionButtons";
             groupActionButtons.Padding = new Padding(8);
-            groupActionButtons.Size = new Size(1630, 693);
+            groupActionButtons.Size = new Size(1630, 687);
             groupActionButtons.TabIndex = 1;
             groupActionButtons.TabStop = false;
             groupActionButtons.Text = "操作按钮";
             // 
             // tableActionButtons
             // 
-            tableActionButtons.ColumnCount = 1;
-            tableActionButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableActionButtons.ColumnCount = 2;
+            tableActionButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableActionButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableActionButtons.Controls.Add(panelButtonArea, 0, 0);
+            tableActionButtons.Controls.Add(groupRunResult, 0, 1);
+            tableActionButtons.Dock = DockStyle.Fill;
             tableActionButtons.Location = new Point(8, 31);
             tableActionButtons.Name = "tableActionButtons";
-            tableActionButtons.RowCount = 1;
-            tableActionButtons.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableActionButtons.Size = new Size(1288, 654);
+            tableActionButtons.RowCount = 2;
+            tableActionButtons.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableActionButtons.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableActionButtons.Size = new Size(1614, 648);
             tableActionButtons.TabIndex = 0;
             // 
             // panelButtonArea
             // 
+            tableActionButtons.SetColumnSpan(panelButtonArea, 2);
             panelButtonArea.Controls.Add(tableButtonArea);
             panelButtonArea.Dock = DockStyle.Fill;
             panelButtonArea.Location = new Point(3, 3);
             panelButtonArea.Name = "panelButtonArea";
-            panelButtonArea.Size = new Size(1282, 648);
+            panelButtonArea.Size = new Size(1608, 318);
             panelButtonArea.TabIndex = 1;
             // 
             // tableButtonArea
@@ -495,7 +528,7 @@ namespace CryptoTool.Win
             tableButtonArea.Name = "tableButtonArea";
             tableButtonArea.RowCount = 1;
             tableButtonArea.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableButtonArea.Size = new Size(1282, 648);
+            tableButtonArea.Size = new Size(1608, 318);
             tableButtonArea.TabIndex = 0;
             // 
             // panelRightScroll
@@ -506,7 +539,7 @@ namespace CryptoTool.Win
             panelRightScroll.Location = new Point(3, 3);
             panelRightScroll.Name = "panelRightScroll";
             panelRightScroll.Padding = new Padding(6);
-            panelRightScroll.Size = new Size(1276, 642);
+            panelRightScroll.Size = new Size(1602, 312);
             panelRightScroll.TabIndex = 1;
             // 
             // tableRightActions
@@ -515,9 +548,9 @@ namespace CryptoTool.Win
             tableRightActions.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 180F));
             tableRightActions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tableRightActions.Controls.Add(panelKeyControlsContainer, 0, 0);
-            tableRightActions.Controls.Add(panelFormatRow, 1, 0);
             tableRightActions.Controls.Add(panelKeyTypeRow, 1, 1);
             tableRightActions.Controls.Add(panelCurveContainer, 1, 2);
+            tableRightActions.Controls.Add(panelFormatRow, 1, 0);
             tableRightActions.Dock = DockStyle.Top;
             tableRightActions.Location = new Point(6, 6);
             tableRightActions.Name = "tableRightActions";
@@ -525,7 +558,7 @@ namespace CryptoTool.Win
             tableRightActions.RowStyles.Add(new RowStyle(SizeType.Absolute, 58F));
             tableRightActions.RowStyles.Add(new RowStyle(SizeType.Absolute, 58F));
             tableRightActions.RowStyles.Add(new RowStyle(SizeType.Absolute, 73F));
-            tableRightActions.Size = new Size(1264, 633);
+            tableRightActions.Size = new Size(1564, 633);
             tableRightActions.TabIndex = 0;
             // 
             // panelKeyControlsContainer
@@ -563,7 +596,7 @@ namespace CryptoTool.Win
             btnGenerateKeyPair.Size = new Size(150, 40);
             btnGenerateKeyPair.TabIndex = 0;
             btnGenerateKeyPair.Text = "生成密钥对";
-            btnGenerateKeyPair.Click += btnGenerateKeyPair_Click;
+            btnGenerateKeyPair.Click += BtnGenerateKeyPair_Click;
             // 
             // btnValidateKeyPair
             // 
@@ -573,7 +606,7 @@ namespace CryptoTool.Win
             btnValidateKeyPair.Size = new Size(150, 40);
             btnValidateKeyPair.TabIndex = 1;
             btnValidateKeyPair.Text = "验证密钥对";
-            btnValidateKeyPair.Click += btnValidateKeyPair_Click;
+            btnValidateKeyPair.Click += BtnValidateKeyPair_Click;
             // 
             // btnGetPublicKeyFromPrivate
             // 
@@ -583,7 +616,7 @@ namespace CryptoTool.Win
             btnGetPublicKeyFromPrivate.Size = new Size(150, 40);
             btnGetPublicKeyFromPrivate.TabIndex = 2;
             btnGetPublicKeyFromPrivate.Text = "从私钥提取公钥";
-            btnGetPublicKeyFromPrivate.Click += btnGetPublicKeyFromPrivate_Click;
+            btnGetPublicKeyFromPrivate.Click += BtnGetPublicKeyFromPrivate_Click;
             // 
             // btnGetCurveType
             // 
@@ -593,7 +626,7 @@ namespace CryptoTool.Win
             btnGetCurveType.Size = new Size(150, 40);
             btnGetCurveType.TabIndex = 3;
             btnGetCurveType.Text = "获取私钥曲线类型";
-            btnGetCurveType.Click += btnGetCurveType_Click;
+            btnGetCurveType.Click += BtnGetCurveType_Click;
             // 
             // btnClearAll
             // 
@@ -603,40 +636,7 @@ namespace CryptoTool.Win
             btnClearAll.Size = new Size(150, 40);
             btnClearAll.TabIndex = 4;
             btnClearAll.Text = "清空全部";
-            btnClearAll.Click += btnClearAll_Click;
-            // 
-            // panelFormatRow
-            // 
-            panelFormatRow.AutoSize = true;
-            panelFormatRow.Controls.Add(labelOutputFormat);
-            panelFormatRow.Controls.Add(comboOutputFormat);
-            panelFormatRow.Location = new Point(183, 3);
-            panelFormatRow.Name = "panelFormatRow";
-            panelFormatRow.Padding = new Padding(6, 6, 6, 8);
-            panelFormatRow.Size = new Size(273, 52);
-            panelFormatRow.TabIndex = 0;
-            // 
-            // labelOutputFormat
-            // 
-            labelOutputFormat.AutoSize = true;
-            labelOutputFormat.Location = new Point(10, 10);
-            labelOutputFormat.Margin = new Padding(4, 4, 2, 4);
-            labelOutputFormat.Name = "labelOutputFormat";
-            labelOutputFormat.Size = new Size(100, 24);
-            labelOutputFormat.TabIndex = 2;
-            labelOutputFormat.Text = "输出格式：";
-            // 
-            // comboOutputFormat
-            // 
-            comboOutputFormat.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboOutputFormat.FormattingEnabled = true;
-            comboOutputFormat.Items.AddRange(new object[] { "PEM", "Base64", "Hex大写", "Hex小写" });
-            comboOutputFormat.Location = new Point(112, 9);
-            comboOutputFormat.Margin = new Padding(0, 3, 8, 3);
-            comboOutputFormat.Name = "comboOutputFormat";
-            comboOutputFormat.Size = new Size(147, 32);
-            comboOutputFormat.TabIndex = 3;
-            comboOutputFormat.SelectedIndexChanged += comboOutputFormat_SelectedIndexChanged;
+            btnClearAll.Click += BtnClearAll_Click;
             // 
             // panelKeyTypeRow
             // 
@@ -647,25 +647,25 @@ namespace CryptoTool.Win
             panelKeyTypeRow.Location = new Point(183, 61);
             panelKeyTypeRow.Name = "panelKeyTypeRow";
             panelKeyTypeRow.Padding = new Padding(6, 6, 6, 8);
-            panelKeyTypeRow.Size = new Size(383, 52);
+            panelKeyTypeRow.Size = new Size(409, 52);
             panelKeyTypeRow.TabIndex = 1;
             // 
             // labelKeyType
             // 
-            labelKeyType.AutoSize = true;
-            labelKeyType.Location = new Point(14, 10);
-            labelKeyType.Margin = new Padding(8, 4, 2, 4);
+            labelKeyType.Location = new Point(40, 9);
+            labelKeyType.Margin = new Padding(34, 3, 2, 3);
             labelKeyType.Name = "labelKeyType";
-            labelKeyType.Size = new Size(100, 24);
+            labelKeyType.Size = new Size(100, 34);
             labelKeyType.TabIndex = 4;
             labelKeyType.Text = "密钥类型：";
+            labelKeyType.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // radioPanel
             // 
             radioPanel.AutoSize = true;
             radioPanel.Controls.Add(radioPrivateKey);
             radioPanel.Controls.Add(radioPublicKey);
-            radioPanel.Location = new Point(116, 9);
+            radioPanel.Location = new Point(142, 9);
             radioPanel.Margin = new Padding(0, 3, 8, 3);
             radioPanel.Name = "radioPanel";
             radioPanel.Size = new Size(157, 34);
@@ -695,23 +695,22 @@ namespace CryptoTool.Win
             // btnConvertKey
             // 
             btnConvertKey.AutoSize = true;
-            btnConvertKey.Location = new Point(293, 9);
+            btnConvertKey.Location = new Point(319, 9);
             btnConvertKey.Margin = new Padding(12, 3, 4, 3);
             btnConvertKey.MinimumSize = new Size(80, 26);
             btnConvertKey.Name = "btnConvertKey";
             btnConvertKey.Size = new Size(80, 34);
             btnConvertKey.TabIndex = 6;
             btnConvertKey.Text = "转换";
-            btnConvertKey.Click += btnConvertKey_Click;
+            btnConvertKey.Click += BtnConvertKey_Click;
             // 
             // panelCurveContainer
             // 
-            panelCurveContainer.AutoSize = true;
             panelCurveContainer.Controls.Add(panelCurveRow);
             panelCurveContainer.Location = new Point(183, 119);
             panelCurveContainer.Name = "panelCurveContainer";
             panelCurveContainer.Padding = new Padding(6, 4, 6, 8);
-            panelCurveContainer.Size = new Size(615, 79);
+            panelCurveContainer.Size = new Size(920, 56);
             panelCurveContainer.TabIndex = 2;
             // 
             // panelCurveRow
@@ -720,29 +719,29 @@ namespace CryptoTool.Win
             panelCurveRow.Controls.Add(comboCategory);
             panelCurveRow.Controls.Add(lblArrow);
             panelCurveRow.Controls.Add(comboCurve);
-            panelCurveRow.Location = new Point(6, 30);
+            panelCurveRow.Location = new Point(9, 7);
             panelCurveRow.Name = "panelCurveRow";
             panelCurveRow.Padding = new Padding(0, 2, 0, 2);
-            panelCurveRow.Size = new Size(600, 38);
+            panelCurveRow.Size = new Size(900, 38);
             panelCurveRow.TabIndex = 1;
             panelCurveRow.WrapContents = false;
             // 
             // labelCurve
             // 
-            labelCurve.AutoSize = true;
-            labelCurve.Location = new Point(4, 6);
-            labelCurve.Margin = new Padding(4, 4, 2, 4);
+            labelCurve.Location = new Point(34, 5);
+            labelCurve.Margin = new Padding(34, 3, 2, 3);
             labelCurve.Name = "labelCurve";
-            labelCurve.Size = new Size(100, 24);
+            labelCurve.Size = new Size(100, 32);
             labelCurve.TabIndex = 0;
             labelCurve.Text = "椭圆曲线：";
-            labelCurve.Click += labelCurve_Click;
+            labelCurve.TextAlign = ContentAlignment.MiddleLeft;
+            labelCurve.Click += LabelCurve_Click;
             // 
             // comboCategory
             // 
             comboCategory.DropDownStyle = ComboBoxStyle.DropDownList;
             comboCategory.FormattingEnabled = true;
-            comboCategory.Location = new Point(106, 5);
+            comboCategory.Location = new Point(136, 5);
             comboCategory.Margin = new Padding(0, 3, 4, 3);
             comboCategory.Name = "comboCategory";
             comboCategory.Size = new Size(183, 32);
@@ -751,44 +750,197 @@ namespace CryptoTool.Win
             // 
             // lblArrow
             // 
-            lblArrow.AutoSize = true;
-            lblArrow.Location = new Point(297, 6);
-            lblArrow.Margin = new Padding(4, 4, 4, 0);
+            lblArrow.Location = new Point(327, 5);
+            lblArrow.Margin = new Padding(4, 3, 4, 3);
             lblArrow.Name = "lblArrow";
-            lblArrow.Padding = new Padding(4, 6, 4, 0);
-            lblArrow.Size = new Size(36, 30);
+            lblArrow.Padding = new Padding(4, 0, 4, 0);
+            lblArrow.Size = new Size(36, 32);
             lblArrow.TabIndex = 2;
             lblArrow.Text = "→";
+            lblArrow.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // comboCurve
             // 
             comboCurve.DisplayMember = "Value";
             comboCurve.DropDownStyle = ComboBoxStyle.DropDownList;
             comboCurve.FormattingEnabled = true;
-            comboCurve.Location = new Point(337, 5);
+            comboCurve.Location = new Point(367, 5);
             comboCurve.Margin = new Padding(0, 3, 4, 3);
             comboCurve.Name = "comboCurve";
-            comboCurve.Size = new Size(240, 32);
+            comboCurve.Size = new Size(520, 32);
             comboCurve.TabIndex = 3;
             comboCurve.ValueMember = "Key";
             // 
-            // splitSignEncrypt
+            // panelFormatRow
             // 
-            mainTableLayout.SetColumnSpan(splitSignEncrypt, 2);
-            splitSignEncrypt.Dock = DockStyle.Fill;
-            splitSignEncrypt.Location = new Point(11, 710);
-            splitSignEncrypt.Name = "splitSignEncrypt";
+            panelFormatRow.AutoSize = true;
+            panelFormatRow.Controls.Add(labelOutputFormat);
+            panelFormatRow.Controls.Add(comboOutputFormat);
+            panelFormatRow.Location = new Point(183, 3);
+            panelFormatRow.Name = "panelFormatRow";
+            panelFormatRow.Padding = new Padding(6, 6, 6, 8);
+            panelFormatRow.Size = new Size(303, 52);
+            panelFormatRow.TabIndex = 0;
             // 
-            // splitSignEncrypt.Panel1
+            // labelOutputFormat
             // 
-            splitSignEncrypt.Panel1.Controls.Add(groupSign);
+            labelOutputFormat.Location = new Point(40, 9);
+            labelOutputFormat.Margin = new Padding(34, 3, 2, 3);
+            labelOutputFormat.Name = "labelOutputFormat";
+            labelOutputFormat.Size = new Size(100, 32);
+            labelOutputFormat.TabIndex = 2;
+            labelOutputFormat.Text = "输出格式：";
+            labelOutputFormat.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // splitSignEncrypt.Panel2
+            // comboOutputFormat
             // 
-            splitSignEncrypt.Panel2.Controls.Add(groupEncrypt);
-            splitSignEncrypt.Size = new Size(3265, 460);
-            splitSignEncrypt.SplitterDistance = 1766;
-            splitSignEncrypt.TabIndex = 2;
+            comboOutputFormat.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboOutputFormat.FormattingEnabled = true;
+            comboOutputFormat.Items.AddRange(new object[] { "PEM", "Base64", "Hex大写", "Hex小写" });
+            comboOutputFormat.Location = new Point(142, 9);
+            comboOutputFormat.Margin = new Padding(0, 3, 8, 3);
+            comboOutputFormat.Name = "comboOutputFormat";
+            comboOutputFormat.Size = new Size(147, 32);
+            comboOutputFormat.TabIndex = 3;
+            comboOutputFormat.SelectedIndexChanged += ComboOutputFormat_SelectedIndexChanged;
+            // 
+            // groupRunResult
+            // 
+            tableActionButtons.SetColumnSpan(groupRunResult, 2);
+            groupRunResult.Controls.Add(tableRunResult);
+            groupRunResult.Dock = DockStyle.Fill;
+            groupRunResult.Location = new Point(3, 327);
+            groupRunResult.Name = "groupRunResult";
+            groupRunResult.Padding = new Padding(8);
+            groupRunResult.Size = new Size(1608, 318);
+            groupRunResult.TabIndex = 0;
+            groupRunResult.TabStop = false;
+            groupRunResult.Text = "运行结果";
+            // 
+            // tableRunResult
+            // 
+            tableRunResult.ColumnCount = 2;
+            tableRunResult.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableRunResult.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableRunResult.Controls.Add(labelValidationResult, 0, 0);
+            tableRunResult.Controls.Add(textKeyResult, 1, 0);
+            tableRunResult.Dock = DockStyle.Fill;
+            tableRunResult.Location = new Point(8, 31);
+            tableRunResult.Name = "tableRunResult";
+            tableRunResult.RowCount = 2;
+            tableRunResult.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
+            tableRunResult.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableRunResult.Size = new Size(1592, 279);
+            tableRunResult.TabIndex = 0;
+            // 
+            // labelValidationResult
+            // 
+            labelValidationResult.BackColor = Color.White;
+            labelValidationResult.BorderStyle = BorderStyle.None;
+            labelValidationResult.Dock = DockStyle.Fill;
+            labelValidationResult.Font = new Font("Segoe UI", 9F);
+            labelValidationResult.ForeColor = Color.Gray;
+            labelValidationResult.Location = new Point(3, 3);
+            labelValidationResult.Name = "labelValidationResult";
+            labelValidationResult.ReadOnly = true;
+            labelValidationResult.ScrollBars = RichTextBoxScrollBars.Vertical;
+            labelValidationResult.Size = new Size(790, 22);
+            labelValidationResult.TabIndex = 0;
+            labelValidationResult.Text = "验证结果: 未验证";
+            // 
+            // textKeyResult
+            // 
+            textKeyResult.BackColor = Color.White;
+            textKeyResult.BorderStyle = BorderStyle.None;
+            textKeyResult.Dock = DockStyle.Fill;
+            textKeyResult.Font = new Font("Segoe UI", 9F);
+            textKeyResult.Location = new Point(799, 3);
+            textKeyResult.Name = "textKeyResult";
+            textKeyResult.ReadOnly = true;
+            textKeyResult.ScrollBars = RichTextBoxScrollBars.Vertical;
+            textKeyResult.Size = new Size(790, 22);
+            textKeyResult.TabIndex = 1;
+            textKeyResult.Text = "从私钥提取/曲线检测：\n等待操作...";
+            // 
+            // panelViewBar
+            // 
+            mainTableLayout.SetColumnSpan(panelViewBar, 2);
+            panelViewBar.Controls.Add(btnViewSign);
+            panelViewBar.Controls.Add(btnViewEncrypt);
+            panelViewBar.Controls.Add(btnViewFile);
+            panelViewBar.Controls.Add(btnViewEcdh);
+            panelViewBar.Dock = DockStyle.Fill;
+            panelViewBar.Location = new Point(11, 704);
+            panelViewBar.Name = "panelViewBar";
+            panelViewBar.Padding = new Padding(4);
+            panelViewBar.Size = new Size(3265, 54);
+            panelViewBar.TabIndex = 10;
+            panelViewBar.WrapContents = false;
+            // 
+            // btnViewSign
+            // 
+            btnViewSign.AutoSize = true;
+            btnViewSign.FlatStyle = FlatStyle.Flat;
+            btnViewSign.Location = new Point(6, 6);
+            btnViewSign.Margin = new Padding(2, 2, 8, 2);
+            btnViewSign.Name = "btnViewSign";
+            btnViewSign.Padding = new Padding(12, 4, 12, 4);
+            btnViewSign.Size = new Size(126, 44);
+            btnViewSign.TabIndex = 0;
+            btnViewSign.Text = "签名/验签";
+            btnViewSign.UseVisualStyleBackColor = true;
+            // 
+            // btnViewEncrypt
+            // 
+            btnViewEncrypt.AutoSize = true;
+            btnViewEncrypt.FlatStyle = FlatStyle.Flat;
+            btnViewEncrypt.Location = new Point(142, 6);
+            btnViewEncrypt.Margin = new Padding(2, 2, 8, 2);
+            btnViewEncrypt.Name = "btnViewEncrypt";
+            btnViewEncrypt.Padding = new Padding(12, 4, 12, 4);
+            btnViewEncrypt.Size = new Size(136, 44);
+            btnViewEncrypt.TabIndex = 1;
+            btnViewEncrypt.Text = "加密与解密";
+            btnViewEncrypt.UseVisualStyleBackColor = true;
+            // 
+            // btnViewFile
+            // 
+            btnViewFile.AutoSize = true;
+            btnViewFile.FlatStyle = FlatStyle.Flat;
+            btnViewFile.Location = new Point(288, 6);
+            btnViewFile.Margin = new Padding(2, 2, 8, 2);
+            btnViewFile.Name = "btnViewFile";
+            btnViewFile.Padding = new Padding(12, 4, 12, 4);
+            btnViewFile.Size = new Size(162, 44);
+            btnViewFile.TabIndex = 2;
+            btnViewFile.Text = "文件签名/验签";
+            btnViewFile.UseVisualStyleBackColor = true;
+            // 
+            // btnViewEcdh
+            // 
+            btnViewEcdh.AutoSize = true;
+            btnViewEcdh.FlatStyle = FlatStyle.Flat;
+            btnViewEcdh.Location = new Point(460, 6);
+            btnViewEcdh.Margin = new Padding(2, 2, 8, 2);
+            btnViewEcdh.Name = "btnViewEcdh";
+            btnViewEcdh.Padding = new Padding(12, 4, 12, 4);
+            btnViewEcdh.Size = new Size(191, 44);
+            btnViewEcdh.TabIndex = 3;
+            btnViewEcdh.Text = "ECDH 协商加解密";
+            btnViewEcdh.UseVisualStyleBackColor = true;
+            // 
+            // panelViewContent
+            // 
+            mainTableLayout.SetColumnSpan(panelViewContent, 2);
+            panelViewContent.Controls.Add(groupSign);
+            panelViewContent.Controls.Add(groupEncrypt);
+            panelViewContent.Controls.Add(groupFile);
+            panelViewContent.Controls.Add(groupEcdh);
+            panelViewContent.Dock = DockStyle.Fill;
+            panelViewContent.Location = new Point(11, 764);
+            panelViewContent.Name = "panelViewContent";
+            panelViewContent.Size = new Size(3265, 841);
+            panelViewContent.TabIndex = 11;
             // 
             // groupSign
             // 
@@ -797,10 +949,9 @@ namespace CryptoTool.Win
             groupSign.Location = new Point(0, 0);
             groupSign.Name = "groupSign";
             groupSign.Padding = new Padding(8);
-            groupSign.Size = new Size(1766, 460);
+            groupSign.Size = new Size(3265, 841);
             groupSign.TabIndex = 0;
             groupSign.TabStop = false;
-            groupSign.Text = "签名与验签";
             // 
             // tableLayoutSign
             // 
@@ -820,7 +971,7 @@ namespace CryptoTool.Win
             tableLayoutSign.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             tableLayoutSign.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
             tableLayoutSign.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutSign.Size = new Size(1750, 421);
+            tableLayoutSign.Size = new Size(3249, 802);
             tableLayoutSign.TabIndex = 0;
             // 
             // labelPlainData
@@ -846,11 +997,11 @@ namespace CryptoTool.Win
             panelSignActions.Controls.Add(btnCopySignature);
             panelSignActions.Dock = DockStyle.Fill;
             panelSignActions.FlowDirection = FlowDirection.TopDown;
-            panelSignActions.Location = new Point(1553, 3);
+            panelSignActions.Location = new Point(3052, 3);
             panelSignActions.Name = "panelSignActions";
             panelSignActions.Padding = new Padding(8, 4, 8, 4);
             tableLayoutSign.SetRowSpan(panelSignActions, 4);
-            panelSignActions.Size = new Size(194, 415);
+            panelSignActions.Size = new Size(194, 796);
             panelSignActions.TabIndex = 1;
             panelSignActions.WrapContents = false;
             // 
@@ -911,7 +1062,7 @@ namespace CryptoTool.Win
             btnSign.Size = new Size(120, 40);
             btnSign.TabIndex = 4;
             btnSign.Text = "签名";
-            btnSign.Click += btnSign_Click;
+            btnSign.Click += BtnSign_Click;
             // 
             // btnVerify
             // 
@@ -924,7 +1075,7 @@ namespace CryptoTool.Win
             btnVerify.Size = new Size(120, 40);
             btnVerify.TabIndex = 5;
             btnVerify.Text = "验签";
-            btnVerify.Click += btnVerify_Click;
+            btnVerify.Click += BtnVerify_Click;
             // 
             // btnCopySignature
             // 
@@ -937,7 +1088,7 @@ namespace CryptoTool.Win
             btnCopySignature.Size = new Size(120, 40);
             btnCopySignature.TabIndex = 6;
             btnCopySignature.Text = "复制签名";
-            btnCopySignature.Click += btnCopySignature_Click;
+            btnCopySignature.Click += BtnCopySignature_Click;
             // 
             // textPlainData
             // 
@@ -946,14 +1097,14 @@ namespace CryptoTool.Win
             textPlainData.Multiline = true;
             textPlainData.Name = "textPlainData";
             textPlainData.ScrollBars = ScrollBars.Vertical;
-            textPlainData.Size = new Size(1544, 176);
+            textPlainData.Size = new Size(3043, 367);
             textPlainData.TabIndex = 2;
             // 
             // labelSignature
             // 
             labelSignature.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             labelSignature.AutoSize = true;
-            labelSignature.Location = new Point(4, 214);
+            labelSignature.Location = new Point(4, 405);
             labelSignature.Margin = new Padding(4, 4, 4, 2);
             labelSignature.Name = "labelSignature";
             labelSignature.Padding = new Padding(4, 0, 4, 0);
@@ -964,11 +1115,11 @@ namespace CryptoTool.Win
             // textSignature
             // 
             textSignature.Dock = DockStyle.Fill;
-            textSignature.Location = new Point(3, 241);
+            textSignature.Location = new Point(3, 432);
             textSignature.Multiline = true;
             textSignature.Name = "textSignature";
             textSignature.ScrollBars = ScrollBars.Vertical;
-            textSignature.Size = new Size(1544, 177);
+            textSignature.Size = new Size(3043, 367);
             textSignature.TabIndex = 4;
             // 
             // groupEncrypt
@@ -978,16 +1129,14 @@ namespace CryptoTool.Win
             groupEncrypt.Location = new Point(0, 0);
             groupEncrypt.Name = "groupEncrypt";
             groupEncrypt.Padding = new Padding(8);
-            groupEncrypt.Size = new Size(1495, 460);
+            groupEncrypt.Size = new Size(3265, 841);
             groupEncrypt.TabIndex = 0;
             groupEncrypt.TabStop = false;
-            groupEncrypt.Text = "加密与解密";
             // 
             // tableLayoutEncrypt
             // 
-            tableLayoutEncrypt.ColumnCount = 2;
-            tableLayoutEncrypt.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 75F));
-            tableLayoutEncrypt.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tableLayoutEncrypt.ColumnCount = 1;
+            tableLayoutEncrypt.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tableLayoutEncrypt.Controls.Add(labelEncMode, 0, 0);
             tableLayoutEncrypt.Controls.Add(comboEncMode, 0, 0);
             tableLayoutEncrypt.Controls.Add(labelEncInputFormat, 0, 1);
@@ -1002,13 +1151,11 @@ namespace CryptoTool.Win
             tableLayoutEncrypt.Controls.Add(textEncInput, 0, 5);
             tableLayoutEncrypt.Controls.Add(textEncOutput, 0, 7);
             tableLayoutEncrypt.Controls.Add(panelEncBtns, 0, 8);
-            tableLayoutEncrypt.Controls.Add(groupEncFile, 0, 9);
-            tableLayoutEncrypt.Controls.Add(labelEncResult, 1, 0);
             tableLayoutEncrypt.Controls.Add(labelEncOutputLabel, 0, 6);
             tableLayoutEncrypt.Dock = DockStyle.Fill;
             tableLayoutEncrypt.Location = new Point(8, 31);
             tableLayoutEncrypt.Name = "tableLayoutEncrypt";
-            tableLayoutEncrypt.RowCount = 10;
+            tableLayoutEncrypt.RowCount = 9;
             tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
             tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
             tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
@@ -1018,17 +1165,19 @@ namespace CryptoTool.Win
             tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 22F));
             tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Percent, 35F));
             tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 44F));
-            tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 50F));
             tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutEncrypt.Size = new Size(1479, 421);
+            tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutEncrypt.Size = new Size(3249, 802);
             tableLayoutEncrypt.TabIndex = 0;
             // 
             // labelEncMode
             // 
             labelEncMode.AutoSize = true;
-            labelEncMode.Location = new Point(1113, 4);
+            labelEncMode.Location = new Point(4, 40);
             labelEncMode.Margin = new Padding(4, 4, 2, 4);
             labelEncMode.Name = "labelEncMode";
             labelEncMode.Size = new Size(100, 24);
@@ -1049,7 +1198,7 @@ namespace CryptoTool.Win
             // labelEncInputFormat
             // 
             labelEncInputFormat.AutoSize = true;
-            labelEncInputFormat.Location = new Point(1113, 148);
+            labelEncInputFormat.Location = new Point(4, 148);
             labelEncInputFormat.Margin = new Padding(4, 4, 2, 4);
             labelEncInputFormat.Name = "labelEncInputFormat";
             labelEncInputFormat.Size = new Size(100, 14);
@@ -1061,7 +1210,7 @@ namespace CryptoTool.Win
             comboEncInputFormat.DropDownStyle = ComboBoxStyle.DropDownList;
             comboEncInputFormat.FormattingEnabled = true;
             comboEncInputFormat.Items.AddRange(new object[] { "UTF-8文本", "Base64", "Hex" });
-            comboEncInputFormat.Location = new Point(1109, 111);
+            comboEncInputFormat.Location = new Point(0, 169);
             comboEncInputFormat.Margin = new Padding(0, 3, 4, 3);
             comboEncInputFormat.Name = "comboEncInputFormat";
             comboEncInputFormat.Size = new Size(120, 32);
@@ -1070,7 +1219,7 @@ namespace CryptoTool.Win
             // labelEncOutputFormat
             // 
             labelEncOutputFormat.AutoSize = true;
-            labelEncOutputFormat.Location = new Point(1117, 76);
+            labelEncOutputFormat.Location = new Point(8, 76);
             labelEncOutputFormat.Margin = new Padding(8, 4, 2, 4);
             labelEncOutputFormat.Name = "labelEncOutputFormat";
             labelEncOutputFormat.Size = new Size(100, 24);
@@ -1082,7 +1231,7 @@ namespace CryptoTool.Win
             comboEncOutputFormat.DropDownStyle = ComboBoxStyle.DropDownList;
             comboEncOutputFormat.FormattingEnabled = true;
             comboEncOutputFormat.Items.AddRange(new object[] { "Base64", "Hex" });
-            comboEncOutputFormat.Location = new Point(1109, 39);
+            comboEncOutputFormat.Location = new Point(0, 111);
             comboEncOutputFormat.Margin = new Padding(0, 3, 4, 3);
             comboEncOutputFormat.Name = "comboEncOutputFormat";
             comboEncOutputFormat.Size = new Size(120, 32);
@@ -1091,7 +1240,7 @@ namespace CryptoTool.Win
             // labelEncKey
             // 
             labelEncKey.AutoSize = true;
-            labelEncKey.Location = new Point(1113, 170);
+            labelEncKey.Location = new Point(4, 417);
             labelEncKey.Margin = new Padding(4, 4, 2, 4);
             labelEncKey.Name = "labelEncKey";
             labelEncKey.Size = new Size(279, 24);
@@ -1102,20 +1251,20 @@ namespace CryptoTool.Win
             // 
             textEncKey.Dock = DockStyle.Fill;
             textEncKey.Font = new Font("Consolas", 9F);
-            textEncKey.Location = new Point(1113, 208);
+            textEncKey.Location = new Point(4, 394);
             textEncKey.Margin = new Padding(4, 3, 4, 3);
             textEncKey.Name = "textEncKey";
             textEncKey.PlaceholderText = "从ECDSA私钥自动派生（HKDF-SHA256）";
-            textEncKey.Size = new Size(362, 29);
+            textEncKey.Size = new Size(3241, 29);
             textEncKey.TabIndex = 8;
             // 
             // labelEncIV
             // 
             labelEncIV.AutoSize = true;
-            labelEncIV.Location = new Point(1113, 270);
+            labelEncIV.Location = new Point(4, 686);
             labelEncIV.Margin = new Padding(4, 4, 2, 4);
             labelEncIV.Name = "labelEncIV";
-            labelEncIV.Size = new Size(288, 24);
+            labelEncIV.Size = new Size(288, 12);
             labelEncIV.TabIndex = 9;
             labelEncIV.Text = "IV/Nonce (HEX，留空随机生成)：";
             // 
@@ -1123,20 +1272,20 @@ namespace CryptoTool.Win
             // 
             textEncIV.Dock = DockStyle.Fill;
             textEncIV.Font = new Font("Consolas", 9F);
-            textEncIV.Location = new Point(1113, 230);
+            textEncIV.Location = new Point(4, 641);
             textEncIV.Margin = new Padding(4, 3, 4, 3);
             textEncIV.Name = "textEncIV";
             textEncIV.PlaceholderText = "加密时自动生成，解密时需填写";
-            textEncIV.Size = new Size(362, 29);
+            textEncIV.Size = new Size(3241, 29);
             textEncIV.TabIndex = 10;
             // 
             // labelEncInput
             // 
             labelEncInput.AutoSize = true;
-            labelEncInput.Location = new Point(1113, 314);
+            labelEncInput.Location = new Point(4, 706);
             labelEncInput.Margin = new Padding(4, 4, 2, 4);
             labelEncInput.Name = "labelEncInput";
-            labelEncInput.Size = new Size(154, 24);
+            labelEncInput.Size = new Size(154, 12);
             labelEncInput.TabIndex = 11;
             labelEncInput.Text = "明文 / 密文输入：";
             // 
@@ -1144,25 +1293,25 @@ namespace CryptoTool.Win
             // 
             textEncInput.Dock = DockStyle.Fill;
             textEncInput.Font = new Font("Consolas", 9F);
-            textEncInput.Location = new Point(1113, 363);
+            textEncInput.Location = new Point(4, 725);
             textEncInput.Margin = new Padding(4, 3, 4, 3);
             textEncInput.Multiline = true;
             textEncInput.Name = "textEncInput";
             textEncInput.ScrollBars = ScrollBars.Vertical;
-            textEncInput.Size = new Size(362, 14);
+            textEncInput.Size = new Size(3241, 14);
             textEncInput.TabIndex = 12;
             // 
             // textEncOutput
             // 
             textEncOutput.Dock = DockStyle.Fill;
             textEncOutput.Font = new Font("Consolas", 9F);
-            textEncOutput.Location = new Point(1113, 383);
+            textEncOutput.Location = new Point(4, 765);
             textEncOutput.Margin = new Padding(4, 3, 4, 3);
             textEncOutput.Multiline = true;
             textEncOutput.Name = "textEncOutput";
             textEncOutput.ReadOnly = true;
             textEncOutput.ScrollBars = ScrollBars.Vertical;
-            textEncOutput.Size = new Size(362, 14);
+            textEncOutput.Size = new Size(3241, 14);
             textEncOutput.TabIndex = 14;
             // 
             // panelEncBtns
@@ -1173,10 +1322,10 @@ namespace CryptoTool.Win
             panelEncBtns.Controls.Add(btnEncCopy);
             panelEncBtns.Controls.Add(btnEncPaste);
             panelEncBtns.Dock = DockStyle.Fill;
-            panelEncBtns.Location = new Point(3, 403);
+            panelEncBtns.Location = new Point(3, 785);
             panelEncBtns.Name = "panelEncBtns";
             panelEncBtns.Padding = new Padding(0, 4, 0, 0);
-            panelEncBtns.Size = new Size(1103, 15);
+            panelEncBtns.Size = new Size(3243, 14);
             panelEncBtns.TabIndex = 15;
             panelEncBtns.WrapContents = false;
             // 
@@ -1189,7 +1338,7 @@ namespace CryptoTool.Win
             btnEncrypt.Size = new Size(75, 34);
             btnEncrypt.TabIndex = 0;
             btnEncrypt.Text = "加密";
-            btnEncrypt.Click += btnEncrypt_Click;
+            btnEncrypt.Click += BtnEncrypt_Click;
             // 
             // btnDecrypt
             // 
@@ -1200,7 +1349,7 @@ namespace CryptoTool.Win
             btnDecrypt.Size = new Size(75, 34);
             btnDecrypt.TabIndex = 1;
             btnDecrypt.Text = "解密";
-            btnDecrypt.Click += btnDecrypt_Click;
+            btnDecrypt.Click += BtnDecrypt_Click;
             // 
             // btnEncClear
             // 
@@ -1211,7 +1360,7 @@ namespace CryptoTool.Win
             btnEncClear.Size = new Size(75, 34);
             btnEncClear.TabIndex = 2;
             btnEncClear.Text = "清空";
-            btnEncClear.Click += btnEncClear_Click;
+            btnEncClear.Click += BtnEncClear_Click;
             // 
             // btnEncCopy
             // 
@@ -1222,7 +1371,7 @@ namespace CryptoTool.Win
             btnEncCopy.Size = new Size(92, 34);
             btnEncCopy.TabIndex = 3;
             btnEncCopy.Text = "复制结果";
-            btnEncCopy.Click += btnEncCopy_Click;
+            btnEncCopy.Click += BtnEncCopy_Click;
             // 
             // btnEncPaste
             // 
@@ -1233,7 +1382,95 @@ namespace CryptoTool.Win
             btnEncPaste.Size = new Size(92, 34);
             btnEncPaste.TabIndex = 4;
             btnEncPaste.Text = "粘贴输入";
-            btnEncPaste.Click += btnEncPaste_Click;
+            btnEncPaste.Click += BtnEncPaste_Click;
+            // 
+            // labelEncOutputLabel
+            // 
+            labelEncOutputLabel.AutoSize = true;
+            labelEncOutputLabel.Location = new Point(4, 746);
+            labelEncOutputLabel.Margin = new Padding(4, 4, 2, 4);
+            labelEncOutputLabel.Name = "labelEncOutputLabel";
+            labelEncOutputLabel.Size = new Size(144, 12);
+            labelEncOutputLabel.TabIndex = 13;
+            labelEncOutputLabel.Text = "加密/解密结果：";
+            // 
+            // groupFile
+            // 
+            groupFile.Controls.Add(panelFileControls);
+            groupFile.Dock = DockStyle.Fill;
+            groupFile.Location = new Point(0, 0);
+            groupFile.Name = "groupFile";
+            groupFile.Padding = new Padding(8);
+            groupFile.Size = new Size(3265, 841);
+            groupFile.TabIndex = 0;
+            groupFile.TabStop = false;
+            // 
+            // panelFileControls
+            // 
+            panelFileControls.Controls.Add(btnSignFile);
+            panelFileControls.Controls.Add(btnVerifyFile);
+            panelFileControls.Dock = DockStyle.Fill;
+            panelFileControls.Location = new Point(8, 31);
+            panelFileControls.Name = "panelFileControls";
+            panelFileControls.Padding = new Padding(4, 2, 4, 2);
+            panelFileControls.Size = new Size(3249, 802);
+            panelFileControls.TabIndex = 0;
+            panelFileControls.WrapContents = false;
+            // 
+            // btnSignFile
+            // 
+            btnSignFile.AutoSize = true;
+            btnSignFile.Location = new Point(8, 5);
+            btnSignFile.Margin = new Padding(4, 3, 4, 3);
+            btnSignFile.Name = "btnSignFile";
+            btnSignFile.Size = new Size(92, 34);
+            btnSignFile.TabIndex = 0;
+            btnSignFile.Text = "签名文件";
+            btnSignFile.Click += BtnSignFile_Click;
+            // 
+            // btnVerifyFile
+            // 
+            btnVerifyFile.AutoSize = true;
+            btnVerifyFile.Location = new Point(110, 5);
+            btnVerifyFile.Margin = new Padding(6, 3, 4, 3);
+            btnVerifyFile.Name = "btnVerifyFile";
+            btnVerifyFile.Size = new Size(92, 34);
+            btnVerifyFile.TabIndex = 1;
+            btnVerifyFile.Text = "验签文件";
+            btnVerifyFile.Click += BtnVerifyFile_Click;
+            // 
+            // groupEcdh
+            // 
+            groupEcdh.Dock = DockStyle.Fill;
+            groupEcdh.Location = new Point(0, 0);
+            groupEcdh.Name = "groupEcdh";
+            groupEcdh.Padding = new Padding(8);
+            groupEcdh.Size = new Size(3265, 841);
+            groupEcdh.TabIndex = 0;
+            // 
+            // labelEncResult
+            // 
+            labelEncResult.BackColor = Color.White;
+            labelEncResult.BorderStyle = BorderStyle.None;
+            labelEncResult.Font = new Font("Segoe UI", 9F);
+            labelEncResult.ForeColor = Color.Gray;
+            labelEncResult.Location = new Point(3, 39);
+            labelEncResult.Multiline = true;
+            labelEncResult.Name = "labelEncResult";
+            labelEncResult.ReadOnly = true;
+            labelEncResult.ScrollBars = ScrollBars.Vertical;
+            labelEncResult.Size = new Size(364, 338);
+            labelEncResult.TabIndex = 0;
+            labelEncResult.Text = "加密结果:\r\n等待操作...";
+            // 
+            // splitSignEncrypt
+            // 
+            splitSignEncrypt.Dock = DockStyle.Fill;
+            splitSignEncrypt.Location = new Point(11, 710);
+            splitSignEncrypt.Name = "splitSignEncrypt";
+            splitSignEncrypt.Size = new Size(3265, 460);
+            splitSignEncrypt.SplitterDistance = 1766;
+            splitSignEncrypt.TabIndex = 2;
             // 
             // groupEncFile
             // 
@@ -1267,7 +1504,7 @@ namespace CryptoTool.Win
             btnEncryptFile.Size = new Size(92, 34);
             btnEncryptFile.TabIndex = 0;
             btnEncryptFile.Text = "加密文件";
-            btnEncryptFile.Click += btnEncryptFile_Click;
+            btnEncryptFile.Click += BtnEncryptFile_Click;
             // 
             // btnDecryptFile
             // 
@@ -1278,153 +1515,16 @@ namespace CryptoTool.Win
             btnDecryptFile.Size = new Size(92, 34);
             btnDecryptFile.TabIndex = 1;
             btnDecryptFile.Text = "解密文件";
-            btnDecryptFile.Click += btnDecryptFile_Click;
-            // 
-            // labelEncResult
-            // 
-            labelEncResult.BackColor = Color.White;
-            labelEncResult.BorderStyle = BorderStyle.None;
-            labelEncResult.Font = new Font("Segoe UI", 9F);
-            labelEncResult.ForeColor = Color.Gray;
-            labelEncResult.Location = new Point(3, 39);
-            labelEncResult.Multiline = true;
-            labelEncResult.Name = "labelEncResult";
-            labelEncResult.ReadOnly = true;
-            tableLayoutEncrypt.SetRowSpan(labelEncResult, 10);
-            labelEncResult.ScrollBars = ScrollBars.Vertical;
-            labelEncResult.Size = new Size(364, 338);
-            labelEncResult.TabIndex = 0;
-            labelEncResult.Text = "加密结果:\r\n等待操作...";
-            // 
-            // labelEncOutputLabel
-            // 
-            labelEncOutputLabel.AutoSize = true;
-            labelEncOutputLabel.Location = new Point(4, 384);
-            labelEncOutputLabel.Margin = new Padding(4, 4, 2, 4);
-            labelEncOutputLabel.Name = "labelEncOutputLabel";
-            labelEncOutputLabel.Size = new Size(144, 12);
-            labelEncOutputLabel.TabIndex = 13;
-            labelEncOutputLabel.Text = "加密/解密结果：";
+            btnDecryptFile.Click += BtnDecryptFile_Click;
             // 
             // splitFileResult
             // 
-            mainTableLayout.SetColumnSpan(splitFileResult, 2);
             splitFileResult.Dock = DockStyle.Fill;
             splitFileResult.Location = new Point(11, 1176);
             splitFileResult.Name = "splitFileResult";
-            // 
-            // splitFileResult.Panel1
-            // 
-            splitFileResult.Panel1.Controls.Add(groupFile);
-            // 
-            // splitFileResult.Panel2
-            // 
-            splitFileResult.Panel2.Controls.Add(groupRunResult);
             splitFileResult.Size = new Size(3265, 429);
             splitFileResult.SplitterDistance = 2633;
             splitFileResult.TabIndex = 3;
-            // 
-            // groupFile
-            // 
-            groupFile.Controls.Add(panelFileControls);
-            groupFile.Dock = DockStyle.Fill;
-            groupFile.Location = new Point(0, 0);
-            groupFile.Name = "groupFile";
-            groupFile.Padding = new Padding(8);
-            groupFile.Size = new Size(2633, 429);
-            groupFile.TabIndex = 0;
-            groupFile.TabStop = false;
-            groupFile.Text = "文件操作";
-            // 
-            // panelFileControls
-            // 
-            panelFileControls.Controls.Add(btnSignFile);
-            panelFileControls.Controls.Add(btnVerifyFile);
-            panelFileControls.Dock = DockStyle.Fill;
-            panelFileControls.Location = new Point(8, 31);
-            panelFileControls.Name = "panelFileControls";
-            panelFileControls.Padding = new Padding(4, 2, 4, 2);
-            panelFileControls.Size = new Size(2617, 390);
-            panelFileControls.TabIndex = 0;
-            panelFileControls.WrapContents = false;
-            // 
-            // btnSignFile
-            // 
-            btnSignFile.AutoSize = true;
-            btnSignFile.Location = new Point(8, 5);
-            btnSignFile.Margin = new Padding(4, 3, 4, 3);
-            btnSignFile.Name = "btnSignFile";
-            btnSignFile.Size = new Size(92, 34);
-            btnSignFile.TabIndex = 0;
-            btnSignFile.Text = "签名文件";
-            btnSignFile.Click += btnSignFile_Click;
-            // 
-            // btnVerifyFile
-            // 
-            btnVerifyFile.AutoSize = true;
-            btnVerifyFile.Location = new Point(110, 5);
-            btnVerifyFile.Margin = new Padding(6, 3, 4, 3);
-            btnVerifyFile.Name = "btnVerifyFile";
-            btnVerifyFile.Size = new Size(92, 34);
-            btnVerifyFile.TabIndex = 1;
-            btnVerifyFile.Text = "验签文件";
-            btnVerifyFile.Click += btnVerifyFile_Click;
-            // 
-            // groupRunResult
-            // 
-            groupRunResult.Controls.Add(tableRunResult);
-            groupRunResult.Dock = DockStyle.Fill;
-            groupRunResult.Location = new Point(0, 0);
-            groupRunResult.Name = "groupRunResult";
-            groupRunResult.Padding = new Padding(8);
-            groupRunResult.Size = new Size(628, 429);
-            groupRunResult.TabIndex = 0;
-            groupRunResult.TabStop = false;
-            groupRunResult.Text = "运行结果";
-            // 
-            // tableRunResult
-            // 
-            tableRunResult.ColumnCount = 2;
-            tableRunResult.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableRunResult.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableRunResult.Controls.Add(labelValidationResult, 0, 0);
-            tableRunResult.Controls.Add(textKeyResult, 1, 0);
-            tableRunResult.Dock = DockStyle.Fill;
-            tableRunResult.Location = new Point(8, 31);
-            tableRunResult.Name = "tableRunResult";
-            tableRunResult.RowCount = 1;
-            tableRunResult.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableRunResult.Size = new Size(612, 390);
-            tableRunResult.TabIndex = 0;
-            // 
-            // labelValidationResult
-            // 
-            labelValidationResult.BackColor = Color.White;
-            labelValidationResult.BorderStyle = BorderStyle.None;
-            labelValidationResult.Dock = DockStyle.Fill;
-            labelValidationResult.Font = new Font("Segoe UI", 9F);
-            labelValidationResult.ForeColor = Color.Gray;
-            labelValidationResult.Location = new Point(3, 3);
-            labelValidationResult.Name = "labelValidationResult";
-            labelValidationResult.ReadOnly = true;
-            labelValidationResult.ScrollBars = RichTextBoxScrollBars.Vertical;
-            labelValidationResult.Size = new Size(300, 384);
-            labelValidationResult.TabIndex = 0;
-            labelValidationResult.Text = "验证结果: 未验证";
-            // 
-            // textKeyResult
-            // 
-            textKeyResult.BackColor = Color.White;
-            textKeyResult.BorderStyle = BorderStyle.None;
-            textKeyResult.Dock = DockStyle.Fill;
-            textKeyResult.Font = new Font("Segoe UI", 9F);
-            textKeyResult.Location = new Point(309, 3);
-            textKeyResult.Name = "textKeyResult";
-            textKeyResult.ReadOnly = true;
-            textKeyResult.ScrollBars = RichTextBoxScrollBars.Vertical;
-            textKeyResult.Size = new Size(300, 384);
-            textKeyResult.TabIndex = 1;
-            textKeyResult.Text = "从私钥提取/曲线检测：\n等待操作...";
             // 
             // EcdsaTabControl
             // 
@@ -1435,9 +1535,14 @@ namespace CryptoTool.Win
             mainTableLayout.ResumeLayout(false);
             groupKey.ResumeLayout(false);
             tableLayoutKey.ResumeLayout(false);
-            tableLayoutKey.PerformLayout();
+            panelPrivateKeyBox.ResumeLayout(false);
+            panelPrivateKeyBox.PerformLayout();
             panelPrivateKeyActions.ResumeLayout(false);
+            panelPrivateKeyActions.PerformLayout();
+            panelPublicKeyBox.ResumeLayout(false);
+            panelPublicKeyBox.PerformLayout();
             panelPublicKeyActions.ResumeLayout(false);
+            panelPublicKeyActions.PerformLayout();
             groupActionButtons.ResumeLayout(false);
             tableActionButtons.ResumeLayout(false);
             panelButtonArea.ResumeLayout(false);
@@ -1447,19 +1552,18 @@ namespace CryptoTool.Win
             tableRightActions.PerformLayout();
             panelKeyControlsContainer.ResumeLayout(false);
             panelKeyControls.ResumeLayout(false);
-            panelFormatRow.ResumeLayout(false);
-            panelFormatRow.PerformLayout();
             panelKeyTypeRow.ResumeLayout(false);
             panelKeyTypeRow.PerformLayout();
             radioPanel.ResumeLayout(false);
             radioPanel.PerformLayout();
             panelCurveContainer.ResumeLayout(false);
             panelCurveRow.ResumeLayout(false);
-            panelCurveRow.PerformLayout();
-            splitSignEncrypt.Panel1.ResumeLayout(false);
-            splitSignEncrypt.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)splitSignEncrypt).EndInit();
-            splitSignEncrypt.ResumeLayout(false);
+            panelFormatRow.ResumeLayout(false);
+            groupRunResult.ResumeLayout(false);
+            tableRunResult.ResumeLayout(false);
+            panelViewBar.ResumeLayout(false);
+            panelViewBar.PerformLayout();
+            panelViewContent.ResumeLayout(false);
             groupSign.ResumeLayout(false);
             tableLayoutSign.ResumeLayout(false);
             tableLayoutSign.PerformLayout();
@@ -1470,18 +1574,16 @@ namespace CryptoTool.Win
             tableLayoutEncrypt.PerformLayout();
             panelEncBtns.ResumeLayout(false);
             panelEncBtns.PerformLayout();
-            groupEncFile.ResumeLayout(false);
-            panelEncFileBtns.ResumeLayout(false);
-            panelEncFileBtns.PerformLayout();
-            splitFileResult.Panel1.ResumeLayout(false);
-            splitFileResult.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)splitFileResult).EndInit();
-            splitFileResult.ResumeLayout(false);
             groupFile.ResumeLayout(false);
             panelFileControls.ResumeLayout(false);
             panelFileControls.PerformLayout();
-            groupRunResult.ResumeLayout(false);
-            tableRunResult.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)splitSignEncrypt).EndInit();
+            splitSignEncrypt.ResumeLayout(false);
+            groupEncFile.ResumeLayout(false);
+            panelEncFileBtns.ResumeLayout(false);
+            panelEncFileBtns.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)splitFileResult).EndInit();
+            splitFileResult.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -1493,6 +1595,8 @@ namespace CryptoTool.Win
         private System.Windows.Forms.TableLayoutPanel mainTableLayout;
         private System.Windows.Forms.GroupBox groupKey;
         private System.Windows.Forms.TableLayoutPanel tableLayoutKey;
+        private System.Windows.Forms.Panel panelPrivateKeyBox;
+        private System.Windows.Forms.Panel panelPublicKeyBox;
         private System.Windows.Forms.Label labelPrivateKey;
         private System.Windows.Forms.Label labelPrivateActionsTitle;
         private System.Windows.Forms.TextBox textPrivateKey;
@@ -1590,5 +1694,12 @@ namespace CryptoTool.Win
         private System.Windows.Forms.TableLayoutPanel tableRunResult;
         private System.Windows.Forms.RichTextBox textKeyResult;
         private System.Windows.Forms.RichTextBox labelValidationResult;
+        private System.Windows.Forms.FlowLayoutPanel panelViewBar;
+        private System.Windows.Forms.Button btnViewSign;
+        private System.Windows.Forms.Button btnViewEncrypt;
+        private System.Windows.Forms.Button btnViewFile;
+        private System.Windows.Forms.Button btnViewEcdh;
+        private System.Windows.Forms.Panel panelViewContent;
+        private System.Windows.Forms.Panel groupEcdh;
     }
 }

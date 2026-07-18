@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using System.Windows.Forms;
 using CryptoTool.Algorithm.Algorithms.ECDSA;
 using CryptoTool.Win.Enums;
 using CryptoTool.Win.Helpers;
@@ -24,7 +19,7 @@ namespace CryptoTool.Win
         private string _publicKeyPem = string.Empty;
         private string _lastSignHashAlgorithm = string.Empty;
 
-        private Dictionary<string, (string Icon, List<KeyValuePair<string, string>> Curves)> _allCurveData = new();
+        private Dictionary<string, (string Icon, List<KeyValuePair<string, string>> Curves)> _allCurveData = [];
 
         private byte[]? _derivedEncKey = null;
         private byte[]? _lastEncIV = null;
@@ -32,10 +27,36 @@ namespace CryptoTool.Win
         private int _lastWidth = -1;
         private int _lastHeight = -1;
 
+        // 视图切换相关字段
+        private int _currentViewIndex = 0;
+
+        // ECDH 视图相关控件与状态
+        private ComboBox comboEcdhCategory = null!;
+        private ComboBox comboEcdhCurve = null!;
+        private ComboBox comboEcdhMode = null!;
+        private Button btnGenerateEcdhKeys = null!;
+        private TextBox textEcdhAlicePrivate = null!;
+        private TextBox textEcdhAlicePublic = null!;
+        private TextBox textEcdhBobPrivate = null!;
+        private TextBox textEcdhBobPublic = null!;
+        private TextBox textEcdhInput = null!;
+        private TextBox textEcdhOutput = null!;
+        private TextBox textEcdhSharedKey = null!;
+        private TextBox textEcdhIV = null!;
+        private Label lblEcdhIV = null!;
+        private Button btnEcdhEncrypt = null!;
+        private Button btnEcdhDecrypt = null!;
+        private Button btnEcdhCopyResult = null!;
+        private Button btnEcdhPasteInput = null!;
+        private Button btnEcdhClear = null!;
+        private byte[]? _ecdhLastIV = null;
+
         public EcdsaTabControl()
         {
             InitializeComponent();
             InitializeEncryptLayout();
+            InitializeViewSwitcher();
+            InitializeEcdhLayout();
             InitializeDefaults();
             InitializeResizeTimer();
             EnableDoubleBuffering();
@@ -61,9 +82,8 @@ namespace CryptoTool.Win
         {
             // 将 Timer 加入 components 容器，由设计器生成的 Dispose 统一释放
             components ??= new System.ComponentModel.Container();
-            _resizeTimer = new System.Windows.Forms.Timer(components);
+            _resizeTimer = new(components) { Interval = 150 };
             // 150ms 防抖，覆盖全屏/拖拽等连续尺寸变化，只在缩放稳定后重算一次
-            _resizeTimer.Interval = 150;
             _resizeTimer.Tick += (_, __) =>
             {
                 _resizeTimer.Stop();
@@ -81,8 +101,6 @@ namespace CryptoTool.Win
             this.UpdateStyles();
 
             // 对 SplitContainer 也开启双缓冲（DoubleBuffered 是 protected，使用反射）
-            SetControlDoubleBuffered(splitSignEncrypt);
-            SetControlDoubleBuffered(splitFileResult);
             SetControlDoubleBuffered(mainTableLayout);
         }
 
@@ -114,18 +132,23 @@ namespace CryptoTool.Win
             tableRunResult.SuspendLayout();
             try
             {
-                // 将原有控件从第一行移除，改为两行：标题 + 内容
+                // 改为 2 列 2 行：左列计算结果，右列运行结果
                 tableRunResult.Controls.Remove(labelValidationResult);
                 tableRunResult.Controls.Remove(textKeyResult);
+                tableRunResult.ColumnStyles.Clear();
                 tableRunResult.RowStyles.Clear();
+                tableRunResult.ColumnCount = 2;
                 tableRunResult.RowCount = 2;
+
+                tableRunResult.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+                tableRunResult.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
                 tableRunResult.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
                 tableRunResult.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
 
-                tableRunResult.Controls.Add(labelRunResult, 0, 0);
-                tableRunResult.Controls.Add(labelCalcResult, 1, 0);
-                tableRunResult.Controls.Add(labelValidationResult, 0, 1);
-                tableRunResult.Controls.Add(textKeyResult, 1, 1);
+                tableRunResult.Controls.Add(labelCalcResult, 0, 0);
+                tableRunResult.Controls.Add(labelRunResult, 1, 0);
+                tableRunResult.Controls.Add(textKeyResult, 0, 1);
+                tableRunResult.Controls.Add(labelValidationResult, 1, 1);
             }
             finally
             {
@@ -204,7 +227,788 @@ namespace CryptoTool.Win
             }
         }
 
-        private static Control CreateLabelControlRow(Label label, Control control)
+        private void InitializeViewSwitcher()
+        {
+            // Designer.cs 已设置 panelViewBar/panelViewContent 布局，此处只需绑定事件和初始状态
+
+            // 按钮点击事件
+            btnViewSign.Click += (_, _) => SwitchView(0);
+            btnViewEncrypt.Click += (_, _) => SwitchView(1);
+            btnViewFile.Click += (_, _) => SwitchView(2);
+            btnViewEcdh.Click += (_, _) => SwitchView(3);
+
+            _currentViewIndex = -1;
+            SwitchView(0);
+        }
+
+        private void SwitchView(int index)
+        {
+            if (_currentViewIndex == index) return;
+            _currentViewIndex = index;
+
+            var buttons = new[] { btnViewSign, btnViewEncrypt, btnViewFile, btnViewEcdh };
+            var groups = new Control[] { groupSign, groupEncrypt, groupFile, groupEcdh };
+
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                bool isActive = (i == index);
+                buttons[i].BackColor = isActive ? SystemColors.Highlight : SystemColors.Control;
+                buttons[i].ForeColor = isActive ? Color.White : SystemColors.ControlText;
+                groups[i].Visible = isActive;
+            }
+        }
+
+        #region ECDH 视图布局与逻辑
+        private void InitializeEcdhLayout()
+        {
+            groupEcdh.SuspendLayout();
+            try
+            {
+                var main = new TableLayoutPanel
+                {
+                    Name = "tableLayoutEcdh",
+                    Dock = DockStyle.Fill,
+                    ColumnCount = 1,
+                    RowCount = 5,
+                    Margin = new Padding(0),
+                    Padding = new Padding(4)
+                };
+                main.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+                main.RowStyles.Add(new RowStyle(SizeType.Absolute, 90F));   // 4 步骤流程图（高度缩减 25%）
+                main.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));    // Alice 密钥对 + 操作区
+                main.RowStyles.Add(new RowStyle(SizeType.Absolute, 8F));    // 间距
+                main.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));    // 加密/解密区域
+                main.RowStyles.Add(new RowStyle(SizeType.Absolute, 8F));    // 间距
+
+                // 0. 4 步骤 ECDH 流程图
+                var stepsPanel = CreateEcdhStepsPanel();
+                main.Controls.Add(stepsPanel, 0, 0);
+
+                // 1. Alice 密钥对（左列）+ 右侧操作区（曲线选择、生成按钮、加密/解密按钮、IV）
+                var keyPairsPanel = new TableLayoutPanel
+                {
+                    Dock = DockStyle.Fill,
+                    ColumnCount = 2,
+                    RowCount = 1,
+                    Margin = new Padding(0),
+                    Padding = new Padding(0, 4, 0, 4)
+                };
+                keyPairsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+                keyPairsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+                keyPairsPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+                keyPairsPanel.Controls.Add(CreateKeyPairBox("爱丽丝的钥匙 (Alice)", out textEcdhAlicePrivate, out textEcdhAlicePublic), 0, 0);
+
+                // 右侧操作区
+                var operationsPanel = new TableLayoutPanel
+                {
+                    Dock = DockStyle.Fill,
+                    ColumnCount = 2,
+                    RowCount = 6,
+                    Margin = new Padding(0),
+                    Padding = new Padding(6)
+                };
+                operationsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 170F));  // 按钮列：加宽以容纳"生成 EC 密钥对"单行文本
+                operationsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));   // 右侧区域：占剩余宽度
+                // 六行，与左侧按钮列一一对应并对齐
+                for (int i = 0; i < 6; i++)
+                    operationsPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 16.6667F));
+
+                // 曲线选择 + 生成按钮（生成按钮后续会并入按钮列）
+                const int ecdhBtnWidth = 150; // 加宽，避免"生成 EC 密钥对"文字换行
+                var curveRow = new FlowLayoutPanel
+                {
+                    Dock = DockStyle.Fill,
+                    Margin = new Padding(50, 0, 0, 0), // 增加与左侧按钮列的间距
+                    Padding = new Padding(0, 4, 0, 4),
+                    WrapContents = false
+                };
+                var lblCurve = new Label
+                {
+                    Text = "椭圆曲线：",
+                    AutoSize = false,
+                    Size = new Size(100, 32),
+                    TextAlign = ContentAlignment.MiddleLeft,
+                    Margin = new Padding(0, 3, 8, 3)
+                };
+                comboEcdhCategory = new ComboBox
+                {
+                    DropDownStyle = ComboBoxStyle.DropDownList,
+                    Size = new Size(183, 32),
+                    Margin = new Padding(0, 3, 4, 3)
+                };
+                var lblArrow = new Label
+                {
+                    Text = "→",
+                    AutoSize = false,
+                    Size = new Size(36, 32),
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Margin = new Padding(4, 3, 4, 3)
+                };
+                comboEcdhCurve = new ComboBox
+                {
+                    DropDownStyle = ComboBoxStyle.DropDownList,
+                    DisplayMember = "Value",
+                    ValueMember = "Key",
+                    Size = new Size(330, 32),
+                    Margin = new Padding(0, 3, 8, 3)
+                };
+                var lblMode = new Label
+                {
+                    Text = "密钥模型",
+                    AutoSize = false,
+                    Size = new Size(90, 32),
+                    TextAlign = ContentAlignment.MiddleLeft,
+                    Margin = new Padding(8, 3, 4, 3)
+                };
+                comboEcdhMode = new ComboBox
+                {
+                    DropDownStyle = ComboBoxStyle.DropDownList,
+                    Size = new Size(140, 32),
+                    Margin = new Padding(0, 3, 8, 3)
+                };
+                comboEcdhMode.Items.AddRange(["CryptoTool", "8gwifi.org"]);
+                comboEcdhMode.SelectedIndex = 0;
+                comboEcdhMode.SelectedIndexChanged += (s, e) =>
+                {
+                    lblEcdhIV.Text = GetEcdhMode() == EcdhMode.GwifiOrg ? "IV (Hex):" : "IV (Base64):";
+                };
+                btnGenerateEcdhKeys = new Button
+                {
+                    Text = "生成 EC 密钥对",
+                    Width = ecdhBtnWidth,
+                    Dock = DockStyle.Fill,
+                    Padding = new Padding(8, 2, 8, 2),
+                    Margin = new Padding(0, 2, 0, 2)
+                };
+                btnGenerateEcdhKeys.Click += BtnGenerateEcdhKeys_Click;
+                // 曲线行移到右侧（第二列），与按钮列上下错开
+                curveRow.Controls.Add(lblCurve);
+                curveRow.Controls.Add(comboEcdhCategory);
+                curveRow.Controls.Add(lblArrow);
+                curveRow.Controls.Add(comboEcdhCurve);
+
+                // 密钥模型行（位于曲线行下方）
+                var modeRow = new FlowLayoutPanel
+                {
+                    Dock = DockStyle.Fill,
+                    FlowDirection = FlowDirection.LeftToRight,
+                    Margin = new Padding(50, 0, 0, 0),
+                    Padding = new Padding(0, 4, 0, 4),
+                    WrapContents = false
+                };
+                modeRow.Controls.Add(lblMode);
+                modeRow.Controls.Add(comboEcdhMode);
+
+                // 加密/解密按钮（竖立一列，按百分比均分高度，生成按钮也纳入同一列）
+                var btnPanel = new TableLayoutPanel
+                {
+                    Dock = DockStyle.Fill,
+                    ColumnCount = 1,
+                    RowCount = 6,
+                    Margin = new Padding(0),
+                    Padding = new Padding(0, 4, 0, 4)
+                };
+                for (int i = 0; i < 6; i++)
+                    btnPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 16.6667F));
+
+                btnEcdhEncrypt = new Button { Text = "加密", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
+                btnEcdhDecrypt = new Button { Text = "解密", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
+                btnEcdhCopyResult = new Button { Text = "复制结果", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
+                btnEcdhPasteInput = new Button { Text = "粘贴输入", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
+                btnEcdhClear = new Button { Text = "清空", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
+                lblEcdhIV = new Label { Text = "IV (Base64):", AutoSize = true, Margin = new Padding(0, 0, 4, 4) };
+                textEcdhIV = new TextBox { Width = 440, ReadOnly = false, BackColor = SystemColors.Window };
+
+                btnEcdhEncrypt.Click += BtnEcdhEncrypt_Click;
+                btnEcdhDecrypt.Click += BtnEcdhDecrypt_Click;
+                btnEcdhCopyResult.Click += BtnEcdhCopyResult_Click;
+                btnEcdhPasteInput.Click += BtnEcdhPasteInput_Click;
+                btnEcdhClear.Click += BtnEcdhClear_Click;
+
+                btnPanel.Controls.Add(btnGenerateEcdhKeys, 0, 0);
+                btnPanel.Controls.Add(btnEcdhEncrypt, 0, 1);
+                btnPanel.Controls.Add(btnEcdhDecrypt, 0, 2);
+                btnPanel.Controls.Add(btnEcdhCopyResult, 0, 3);
+                btnPanel.Controls.Add(btnEcdhPasteInput, 0, 4);
+                btnPanel.Controls.Add(btnEcdhClear, 0, 5);
+                operationsPanel.Controls.Add(btnPanel, 0, 0);
+                operationsPanel.SetRowSpan(btnPanel, 6); // 按钮列跨六行
+
+                // 右上：曲线行
+                operationsPanel.Controls.Add(curveRow, 1, 0);
+
+                // 右中：密钥模型行
+                operationsPanel.Controls.Add(modeRow, 1, 1);
+
+                // 右下：IV 区域
+                var ivPanel = new FlowLayoutPanel
+                {
+                    Dock = DockStyle.Fill,
+                    FlowDirection = FlowDirection.LeftToRight,
+                    Margin = new Padding(50, 0, 0, 0), // 增加与左侧按钮列的间距
+                    Padding = new Padding(0, 6, 0, 4),
+                    WrapContents = false
+                };
+                lblEcdhIV.Margin = new Padding(0, 5, 4, 0);
+                ivPanel.Controls.Add(lblEcdhIV);
+                ivPanel.Controls.Add(textEcdhIV);
+                operationsPanel.Controls.Add(ivPanel, 1, 2);
+
+                keyPairsPanel.Controls.Add(operationsPanel, 1, 0);
+                main.Controls.Add(keyPairsPanel, 0, 1);
+
+                // 3. 加密区标题（已移除，标题直接放在底部 GroupBox 中）
+                // 4. 加密/解密区域
+                var encPanel = new TableLayoutPanel
+                {
+                    Dock = DockStyle.Fill,
+                    ColumnCount = 3,
+                    RowCount = 1,
+                    Margin = new Padding(0),
+                    Padding = new Padding(0)
+                };
+                encPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+                encPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+                encPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 0F));
+                encPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+
+                // 左列：Bob 密钥对（完整移下来）
+                var bobKeyBox = CreateKeyPairBox("鲍勃的钥匙 (Bob)", out textEcdhBobPrivate, out textEcdhBobPublic);
+                encPanel.Controls.Add(bobKeyBox, 0, 0);
+
+                // 右列：加密/解密（输入 + 共享密钥 + 输出）
+                var encryptDecryptBox = new GroupBox
+                {
+                    Text = "加密 / 解密（使用 Alice 私钥 + Bob 公钥计算共享密钥，再用 AES-GCM 加解密）",
+                    Dock = DockStyle.Fill,
+                    Padding = new Padding(6)
+                };
+                var rightLayout = new TableLayoutPanel
+                {
+                    Dock = DockStyle.Fill,
+                    ColumnCount = 1,
+                    RowCount = 6,
+                    Margin = new Padding(0),
+                    Padding = new Padding(0)
+                };
+                rightLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 22F));   // 信息标签
+                rightLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 33F));    // 信息输入
+                rightLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 22F));   // 共享密钥标签
+                rightLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 33F));    // 共享密钥
+                rightLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 22F));   // 输出标签
+                rightLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 34F));    // 信息输出
+
+                // 信息输入
+                rightLayout.Controls.Add(new Label { Text = "明文:", Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft }, 0, 0);
+                textEcdhInput = new TextBox
+                {
+                    Dock = DockStyle.Fill,
+                    Multiline = true,
+                    ScrollBars = ScrollBars.Vertical,
+                    Font = new Font("Consolas", 9F)
+                };
+                rightLayout.Controls.Add(textEcdhInput, 0, 1);
+
+                // 共享密钥
+                rightLayout.Controls.Add(new Label { Text = "共享密钥 (HEX, 可编辑):", Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft }, 0, 2);
+                textEcdhSharedKey = new TextBox
+                {
+                    Dock = DockStyle.Fill,
+                    Multiline = true,
+                    ScrollBars = ScrollBars.Vertical,
+                    ReadOnly = false,
+                    BackColor = SystemColors.Window,
+                    Font = new Font("Consolas", 9F)
+                };
+                rightLayout.Controls.Add(textEcdhSharedKey, 0, 3);
+
+                // 信息输出
+                rightLayout.Controls.Add(new Label { Text = "密文（可编辑）:", Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft, Height = 22 }, 0, 4);
+                textEcdhOutput = new TextBox
+                {
+                    Dock = DockStyle.Fill,
+                    Multiline = true,
+                    ScrollBars = ScrollBars.Vertical,
+                    ReadOnly = false,
+                    BackColor = SystemColors.Window,
+                    Font = new Font("Consolas", 9F)
+                };
+                rightLayout.Controls.Add(textEcdhOutput, 0, 5);
+
+                encryptDecryptBox.Controls.Add(rightLayout);
+                encPanel.Controls.Add(encryptDecryptBox, 1, 0);
+
+                main.Controls.Add(encPanel, 0, 3);
+
+                groupEcdh.Controls.Add(main);
+                InitializeEcdhCurveList();
+            }
+            finally
+            {
+                groupEcdh.ResumeLayout(true);
+            }
+        }
+
+        private static GroupBox CreateKeyPairBox(string title, out TextBox privateBox, out TextBox publicBox)
+        {
+            string prefix = title.Contains("Alice") || title.Contains("爱丽丝") ? "Alice" : "Bob";
+            var box = new GroupBox
+            {
+                Name = $"groupEcdh{prefix}Key",
+                Text = title,
+                Dock = DockStyle.Fill,
+                Padding = new Padding(6),
+                MinimumSize = new Size(0, 220)
+            };
+            var layout = new TableLayoutPanel
+            {
+                Name = $"tableLayoutEcdh{prefix}Key",
+                Dock = DockStyle.Fill,
+                ColumnCount = 2,
+                RowCount = 2,
+                Margin = new Padding(0),
+                Padding = new Padding(0)
+            };
+            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            layout.RowCount = 1;
+            layout.RowStyles.Clear();
+            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+
+            privateBox = new TextBox
+            {
+                Name = $"textEcdh{prefix}Private",
+                Dock = DockStyle.Fill,
+                Multiline = true,
+                ScrollBars = ScrollBars.Vertical,
+                Font = new Font("Consolas", 9F),
+                ReadOnly = false,
+                Enabled = true,
+                TabStop = true,
+                BackColor = SystemColors.Window,
+                MinimumSize = new Size(0, 60)
+            };
+            publicBox = new TextBox
+            {
+                Name = $"textEcdh{prefix}Public",
+                Dock = DockStyle.Fill,
+                Multiline = true,
+                ScrollBars = ScrollBars.Vertical,
+                Font = new Font("Consolas", 9F),
+                ReadOnly = false,
+                Enabled = true,
+                TabStop = true,
+                BackColor = SystemColors.Window,
+                MinimumSize = new Size(0, 60)
+            };
+
+            var privateTag = new Label
+            {
+                Name = $"labelEcdh{prefix}Private",
+                Text = "私钥 (PEM)：",
+                Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                AutoSize = true,
+                BackColor = Color.Transparent,
+                ForeColor = Color.Red,
+                Margin = new Padding(4, 4, 4, 2),
+                Padding = new Padding(4, 0, 4, 0)
+            };
+            var publicTag = new Label
+            {
+                Name = $"labelEcdh{prefix}Public",
+                Text = "公钥 (PEM)：",
+                Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                AutoSize = true,
+                BackColor = Color.Transparent,
+                ForeColor = Color.Red,
+                Margin = new Padding(4, 4, 4, 2),
+                Padding = new Padding(4, 0, 4, 0)
+            };
+
+            var privatePanel = new Panel
+            {
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0, 0, 4, 0)
+            };
+            privatePanel.Controls.Add(privateTag);
+            privatePanel.Controls.Add(privateBox);
+            privatePanel.Resize += (s, e) =>
+            {
+                privateTag.Location = new Point(privatePanel.ClientSize.Width - privateTag.Width - 6, 4);
+            };
+
+            var publicPanel = new Panel
+            {
+                Dock = DockStyle.Fill,
+                Margin = new Padding(4, 0, 0, 0)
+            };
+            publicPanel.Controls.Add(publicTag);
+            publicPanel.Controls.Add(publicBox);
+            publicPanel.Resize += (s, e) =>
+            {
+                publicTag.Location = new Point(publicPanel.ClientSize.Width - publicTag.Width - 6, 4);
+            };
+
+            layout.Controls.Add(privatePanel, 0, 0);
+            layout.Controls.Add(publicPanel, 1, 0);
+
+            box.Controls.Add(layout);
+            return box;
+        }
+
+        private static Panel CreateEcdhStepsPanel()
+        {
+            var steps = new (int number, string title, string desc, Color color)[]
+            {
+                (1, "密钥生成", "Alice 和 Bob 各自生成自己的 EC 密钥对（私钥 + 公钥）", Color.FromArgb(25, 118, 210)),
+                (2, "交换公钥", "Alice 将她的公钥发送给 Bob\nBob 将他的公钥发送给 Alice", Color.FromArgb(245, 124, 0)),
+                (3, "计算共享密钥", "每人使用自己的私钥加上对方的公钥\n来计算秘密密钥：S = priv × Pub", Color.FromArgb(56, 142, 60)),
+                (4, "加密 / 解密", "使用共享密钥作为 AES 密钥来\n加密和解密消息", Color.FromArgb(103, 58, 183))
+            };
+
+            var container = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 4,
+                RowCount = 1,
+                Margin = new Padding(0, 4, 0, 4),
+                Padding = new Padding(0)
+            };
+            for (int i = 0; i < 4; i++)
+                container.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            container.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+
+            for (int i = 0; i < steps.Length; i++)
+            {
+                var (number, title, desc, color) = steps[i];
+                var card = new Panel
+                {
+                    Dock = DockStyle.Fill,
+                    Margin = new Padding(i == 0 ? 0 : 6, 0, i == steps.Length - 1 ? 0 : 6, 0),
+                    Padding = new Padding(8),
+                    BackColor = Color.White,
+                    BorderStyle = BorderStyle.FixedSingle
+                };
+                var cardLayout = new TableLayoutPanel
+                {
+                    Dock = DockStyle.Fill,
+                    ColumnCount = 2,
+                    RowCount = 2,
+                    Margin = new Padding(0),
+                    Padding = new Padding(0)
+                };
+                cardLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 40F));
+                cardLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+                cardLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+                cardLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+
+                var circle = new Panel
+                {
+                    Size = new Size(32, 32),
+                    Margin = new Padding(0, 2, 8, 0),
+                    BackColor = color
+                };
+                string circleText = number.ToString();
+                circle.Paint += (s, e) =>
+                {
+                    var g = e.Graphics;
+                    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                    using var brush = new SolidBrush(circle.BackColor);
+                    g.FillEllipse(brush, 0, 0, circle.Width - 1, circle.Height - 1);
+                    using var pen = new Pen(Color.White, 1);
+                    g.DrawEllipse(pen, 0, 0, circle.Width - 1, circle.Height - 1);
+                    TextRenderer.DrawText(g, circleText, new Font("Segoe UI", 11F, FontStyle.Bold), new Rectangle(0, 0, circle.Width, circle.Height), Color.White, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+                };
+
+                var titleLabel = new Label
+                {
+                    Text = title,
+                    AutoSize = true,
+                    Font = new Font("Segoe UI", 9.5F, FontStyle.Bold),
+                    ForeColor = color,
+                    Dock = DockStyle.Fill,
+                    TextAlign = ContentAlignment.MiddleLeft
+                };
+
+                var descLabel = new Label
+                {
+                    Text = desc,
+                    AutoSize = true,
+                    Font = new Font("Segoe UI", 8F),
+                    ForeColor = Color.FromArgb(80, 80, 80),
+                    Dock = DockStyle.Fill,
+                    TextAlign = ContentAlignment.TopLeft
+                };
+
+                cardLayout.Controls.Add(circle, 0, 0);
+                cardLayout.SetRowSpan(circle, 2);
+                cardLayout.Controls.Add(titleLabel, 1, 0);
+                cardLayout.Controls.Add(descLabel, 1, 1);
+                card.Controls.Add(cardLayout);
+                container.Controls.Add(card, i, 0);
+            }
+
+            var panel = new Panel
+            {
+                Dock = DockStyle.Fill,
+                Padding = new Padding(4)
+            };
+            panel.Controls.Add(container);
+            return panel;
+        }
+
+        private void InitializeEcdhCurveList()
+        {
+            if (_allCurveData.Count == 0)
+                _allCurveData = EcdsaCurveNames.GetAllCurvesByCategory();
+
+            comboEcdhCategory.DisplayMember = "Text";
+            comboEcdhCategory.ValueMember = "Value";
+            foreach (var cat in _allCurveData)
+            {
+                comboEcdhCategory.Items.Add(new
+                {
+                    Text = $"{cat.Value.Icon} {cat.Key}",
+                    Value = cat.Key
+                });
+            }
+
+            comboEcdhCategory.SelectedIndexChanged += ComboEcdhCategory_SelectedIndexChanged;
+
+            if (comboEcdhCategory.Items.Count > 0)
+                comboEcdhCategory.SelectedIndex = 0;
+        }
+
+        private void ComboEcdhCategory_SelectedIndexChanged(object? sender, EventArgs e)
+        {
+            if (sender == null || comboEcdhCategory.SelectedItem == null)
+                return;
+
+            dynamic selectedItem = comboEcdhCategory.SelectedItem;
+            string categoryKey = selectedItem.Value;
+
+            if (!_allCurveData.TryGetValue(categoryKey, out var categoryData))
+                return;
+
+            comboEcdhCurve.Items.Clear();
+            foreach (var c in categoryData.Curves)
+                comboEcdhCurve.Items.Add(c);
+
+            if (comboEcdhCurve.Items.Count > 0)
+                comboEcdhCurve.SelectedIndex = 0;
+        }
+
+        private string GetEcdhSelectedCurve()
+        {
+            if (comboEcdhCurve.SelectedItem is KeyValuePair<string, string> sel && !string.IsNullOrEmpty(sel.Key))
+                return sel.Key;
+            return "prime256v1";
+        }
+
+        private void BtnGenerateEcdhKeys_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                string curve = GetEcdhSelectedCurve();
+                SetStatus($"正在生成 {EcdsaCurveNames.GetDisplayName(curve)} ECDH 密钥对...");
+
+                var alice = EcdhAlgorithm.GenerateKeyPair(curve);
+                var bob = EcdhAlgorithm.GenerateKeyPair(curve);
+
+                var alicePriv = (ECPrivateKeyParameters)alice.Private;
+                var alicePub = (ECPublicKeyParameters)alice.Public;
+                var bobPriv = (ECPrivateKeyParameters)bob.Private;
+                var bobPub = (ECPublicKeyParameters)bob.Public;
+
+                textEcdhAlicePrivate.Text = EcdsaKeyHelper.ExportPrivateKeyPem(alicePriv);
+                textEcdhAlicePublic.Text = EcdsaKeyHelper.ExportPublicKeyPem(alicePub);
+                textEcdhBobPrivate.Text = EcdsaKeyHelper.ExportPrivateKeyPem(bobPriv);
+                textEcdhBobPublic.Text = EcdsaKeyHelper.ExportPublicKeyPem(bobPub);
+
+                byte[] shared = EcdhAlgorithm.DeriveSharedSecret(alicePriv, bobPub);
+                textEcdhSharedKey.Text = Convert.ToHexString(shared).ToLowerInvariant();
+
+                // 生成新密钥对后，旧密文/IV/输入与新的密钥不再匹配，清空避免误用
+                textEcdhInput.Clear();
+                textEcdhOutput.Clear();
+                textEcdhIV.Clear();
+                _ecdhLastIV = null;
+
+                AppendValidationResult($"✅ ECDH 密钥对已生成\n曲线: {EcdsaCurveNames.GetDisplayName(curve)}\n共享密钥长度: {shared.Length} 字节", Color.Green);
+                SetStatus("ECDH 密钥对生成完成");
+            }
+            catch (Exception ex)
+            {
+                AppendValidationResult($"❌ 生成 ECDH 密钥对失败: {ex.Message}", Color.Red);
+                SetStatus("生成 ECDH 密钥对失败");
+            }
+        }
+
+        private void BtnEcdhEncrypt_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(textEcdhInput.Text))
+                { MessageBox.Show("请输入要加密的信息", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+                if (string.IsNullOrWhiteSpace(textEcdhAlicePrivate.Text) || string.IsNullOrWhiteSpace(textEcdhBobPublic.Text))
+                { MessageBox.Show("请输入 Alice 私钥和 Bob 公钥", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+
+                var mode = GetEcdhMode();
+                var alicePriv = EcdsaKeyHelper.ImportPrivateKeyPem(textEcdhAlicePrivate.Text.Trim());
+                var bobPub = EcdsaKeyHelper.ImportPublicKeyPem(textEcdhBobPublic.Text.Trim());
+
+                byte[] shared = EcdhAlgorithm.DeriveSharedSecret(alicePriv, bobPub);
+                byte[] key = EcdhAlgorithm.DeriveAesKey(shared, mode);
+                textEcdhSharedKey.Text = Convert.ToHexString(shared).ToLowerInvariant();
+                byte[] iv = EcdhAlgorithm.GenerateNonce(EcdhAlgorithm.GetNonceLength(mode));
+                _ecdhLastIV = iv;
+
+                byte[] plain = Encoding.UTF8.GetBytes(textEcdhInput.Text);
+                byte[] cipher = EcdhAlgorithm.EncryptAesGcm(plain, key, iv);
+
+                string cipherBase64 = EcdhAlgorithm.FormatCipher(iv, cipher, mode);
+                textEcdhOutput.Text = cipherBase64;
+                textEcdhIV.Text = EcdhAlgorithm.FormatIv(iv, mode);
+                AppendValidationResult($"✅ ECDH 加密成功\n模式: {comboEcdhMode.SelectedItem}\n明文长度: {plain.Length} 字节\n密文长度: {cipher.Length} 字节", Color.Green);
+                SetStatus("ECDH 加密完成");
+            }
+            catch (Exception ex)
+            {
+                AppendValidationResult($"❌ ECDH 加密失败: {ex.Message}", Color.Red);
+                SetStatus("ECDH 加密失败");
+            }
+        }
+
+        private void BtnEcdhDecrypt_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                string cipherSource = string.IsNullOrWhiteSpace(textEcdhOutput.Text) ? textEcdhInput.Text.Trim() : textEcdhOutput.Text.Trim();
+                if (string.IsNullOrWhiteSpace(cipherSource))
+                { MessageBox.Show("请输入或生成要解密的 Base64 密文", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+
+                var mode = GetEcdhMode();
+
+                bool sharedFromTextbox = TryParseHex(textEcdhSharedKey.Text, out byte[] shared);
+                if (!sharedFromTextbox)
+                {
+                    if (string.IsNullOrWhiteSpace(textEcdhBobPrivate.Text) || string.IsNullOrWhiteSpace(textEcdhAlicePublic.Text))
+                    { MessageBox.Show("请输入共享密钥，或提供 Bob 私钥和 Alice 公钥", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+                    var bobPriv = EcdsaKeyHelper.ImportPrivateKeyPem(textEcdhBobPrivate.Text.Trim());
+                    var alicePub = EcdsaKeyHelper.ImportPublicKeyPem(textEcdhAlicePublic.Text.Trim());
+                    shared = EcdhAlgorithm.DeriveSharedSecret(bobPriv, alicePub);
+                    textEcdhSharedKey.Text = Convert.ToHexString(shared).ToLowerInvariant();
+                }
+
+                byte[] key = EcdhAlgorithm.DeriveAesKey(shared, mode);
+
+                byte[] iv;
+                byte[] cipher;
+                if (mode == EcdhMode.GwifiOrg && string.IsNullOrWhiteSpace(textEcdhIV.Text))
+                {
+                    // 8gwifi.org 模式默认把 IV 拼在密文前面，未手动填写 IV 时自动拆分
+                    (iv, cipher) = EcdhAlgorithm.ParseCipher(cipherSource, mode);
+                    textEcdhIV.Text = EcdhAlgorithm.FormatIv(iv, mode);
+                }
+                else if (mode == EcdhMode.GwifiOrg)
+                {
+                    // 8gwifi.org 模式：密文框为 Base64(IV + cipher)，但 IV 已单独提供，需要去掉头部 IV
+                    iv = EcdhAlgorithm.ParseIv(textEcdhIV.Text.Trim(), mode);
+                    byte[] combined = Convert.FromBase64String(cipherSource);
+                    int ivLength = EcdhAlgorithm.GetNonceLength(mode);
+                    if (combined.Length < ivLength + 16)
+                        throw new FormatException($"8gwifi.org 模式密文过短，需要至少 IV({ivLength}) + Tag(16) 字节");
+                    cipher = new byte[combined.Length - ivLength];
+                    Buffer.BlockCopy(combined, ivLength, cipher, 0, cipher.Length);
+                }
+                else
+                {
+                    iv = string.IsNullOrWhiteSpace(textEcdhIV.Text)
+                        ? (_ecdhLastIV ?? throw new InvalidOperationException("缺少 IV，请先生成加密结果"))
+                        : EcdhAlgorithm.ParseIv(textEcdhIV.Text.Trim(), mode);
+                    cipher = Convert.FromBase64String(cipherSource);
+                }
+
+                byte[] plain;
+                try
+                {
+                    plain = EcdhAlgorithm.DecryptAesGcm(cipher, key, iv);
+                }
+                catch (InvalidCipherTextException) when (sharedFromTextbox && !string.IsNullOrWhiteSpace(textEcdhBobPrivate.Text) && !string.IsNullOrWhiteSpace(textEcdhAlicePublic.Text))
+                {
+                    // 共享密钥框中的内容与密文不匹配，尝试用当前密钥对重新计算并再次解密
+                    var bobPrivFallback = EcdsaKeyHelper.ImportPrivateKeyPem(textEcdhBobPrivate.Text.Trim());
+                    var alicePubFallback = EcdsaKeyHelper.ImportPublicKeyPem(textEcdhAlicePublic.Text.Trim());
+                    shared = EcdhAlgorithm.DeriveSharedSecret(bobPrivFallback, alicePubFallback);
+                    textEcdhSharedKey.Text = Convert.ToHexString(shared).ToLowerInvariant();
+                    key = EcdhAlgorithm.DeriveAesKey(shared, mode);
+                    plain = EcdhAlgorithm.DecryptAesGcm(cipher, key, iv);
+                }
+
+                textEcdhInput.Text = Encoding.UTF8.GetString(plain);
+                AppendValidationResult($"✅ ECDH 解密成功\n模式: {comboEcdhMode.SelectedItem}\n明文长度: {plain.Length} 字节", Color.Green);
+                SetStatus("ECDH 解密完成");
+            }
+            catch (Exception ex)
+            {
+                AppendValidationResult($"❌ ECDH 解密失败: {ex.Message}", Color.Red);
+                SetStatus("ECDH 解密失败");
+            }
+        }
+
+        private EcdhMode GetEcdhMode()
+        {
+            var selected = comboEcdhMode.SelectedItem?.ToString();
+            return selected == "8gwifi.org" ? EcdhMode.GwifiOrg : EcdhMode.CryptoTool;
+        }
+
+        private static bool TryParseHex(string? input, out byte[] bytes)
+        {
+            bytes = [];
+            if (string.IsNullOrWhiteSpace(input))
+                return false;
+            try
+            {
+                bytes = Convert.FromHexString(input.Trim().Replace("0x", "").Replace("0X", "").Replace(" ", ""));
+                return bytes.Length > 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private void BtnEcdhCopyResult_Click(object? sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(textEcdhOutput.Text))
+            {
+                Clipboard.SetText(textEcdhOutput.Text);
+                SetStatus("ECDH 结果已复制");
+            }
+        }
+
+        private void BtnEcdhPasteInput_Click(object? sender, EventArgs e)
+        {
+            if (Clipboard.ContainsText())
+            {
+                textEcdhOutput.Text = Clipboard.GetText().Trim();
+                SetStatus("密文已粘贴到 ECDH 密文框");
+            }
+        }
+
+        private void BtnEcdhClear_Click(object? sender, EventArgs e)
+        {
+            textEcdhInput.Clear();
+            textEcdhOutput.Clear();
+            textEcdhSharedKey.Clear();
+            textEcdhIV.Clear();
+            _ecdhLastIV = null;
+            SetStatus("ECDH 输入/输出已清空");
+        }
+        #endregion
+
+
+        private static TableLayoutPanel CreateLabelControlRow(Label label, Control control)
         {
             var panel = new TableLayoutPanel
             {
@@ -231,7 +1035,7 @@ namespace CryptoTool.Win
             return panel;
         }
 
-        private static Control CreateFormatRow(Label inputLabel, ComboBox inputCombo, Label outputLabel, ComboBox outputCombo)
+        private static FlowLayoutPanel CreateFormatRow(Label inputLabel, ComboBox inputCombo, Label outputLabel, ComboBox outputCombo)
         {
             var panel = new FlowLayoutPanel
             {
@@ -274,43 +1078,8 @@ namespace CryptoTool.Win
         {
             _lastWidth = this.Width;
             _lastHeight = this.Height;
-
-            this.SuspendLayout();
-            try
-            {
-                SetSplitRatio(splitSignEncrypt, 0.5);
-                SetSplitRatio(splitFileResult, 0.5);
-            }
-            finally
-            {
-                this.ResumeLayout(true);
-            }
         }
 
-        private void SetSplitRatio(SplitContainer split, double ratio)
-        {
-            if (split.Width <= 0 || split.Height <= 0) return;
-            int min = split.Panel1MinSize;
-            int max = split.Width - split.Panel2MinSize - split.SplitterWidth;
-            if (max <= min) return;
-            int distance = (int)(split.Width * ratio);
-            if (distance < min) distance = min;
-            if (distance > max) distance = max;
-
-            // 如果距离变化很小，不强制重新布局，减少不必要的绘制
-            if (Math.Abs(split.SplitterDistance - distance) <= 2)
-                return;
-
-            split.SuspendLayout();
-            try
-            {
-                split.SplitterDistance = distance;
-            }
-            finally
-            {
-                split.ResumeLayout(true);
-            }
-        }
 
         #region 初始化与级联下拉框逻辑
         private void InitializeDefaults()
@@ -332,15 +1101,15 @@ namespace CryptoTool.Win
                 comboCategory.SelectedIndex = 0;
 
             comboHashAlgorithm.Items.Clear();
-            comboHashAlgorithm.Items.AddRange(new object[] { "SHA256", "SHA384", "SHA512" });
+            comboHashAlgorithm.Items.AddRange(["SHA256", "SHA384", "SHA512"]);
             comboHashAlgorithm.SelectedIndex = 0;
 
             comboOutputFormat.Items.Clear();
-            comboOutputFormat.Items.AddRange(new object[] { "PEM", "Base64", "Hex大写", "Hex小写" });
+            comboOutputFormat.Items.AddRange(["PEM", "Base64", "Hex大写", "Hex小写"]);
             comboOutputFormat.SelectedIndex = 0;
 
             comboSignatureFormat.Items.Clear();
-            comboSignatureFormat.Items.AddRange(new object[] { "Base64", "Hex" });
+            comboSignatureFormat.Items.AddRange(["Base64", "Hex"]);
             comboSignatureFormat.SelectedIndex = 0;
 
             radioPrivateKey.Checked = true;
@@ -381,7 +1150,7 @@ namespace CryptoTool.Win
         #endregion
 
         #region 哈希算法名称转换
-        private string GetSignerAlgorithm(string uiHash) => uiHash switch
+        private static string GetSignerAlgorithm(string uiHash) => uiHash switch
         {
             "SHA256" => "SHA-256withECDSA",
             "SHA384" => "SHA-384withECDSA",
@@ -393,7 +1162,7 @@ namespace CryptoTool.Win
         #endregion
 
         #region 密钥生成
-        private void btnGenerateKeyPair_Click(object? sender, EventArgs e)
+        private void BtnGenerateKeyPair_Click(object? sender, EventArgs e)
         {
             try
             {
@@ -423,7 +1192,7 @@ namespace CryptoTool.Win
         #endregion
 
         #region 从私钥提取公钥
-        private void btnGetPublicKeyFromPrivate_Click(object? sender, EventArgs e)
+        private void BtnGetPublicKeyFromPrivate_Click(object? sender, EventArgs e)
         {
             try
             {
@@ -465,7 +1234,7 @@ namespace CryptoTool.Win
         #endregion
 
         #region 获取私钥曲线类型
-        private void btnGetCurveType_Click(object? sender, EventArgs e)
+        private void BtnGetCurveType_Click(object? sender, EventArgs e)
         {
             try
             {
@@ -494,7 +1263,7 @@ namespace CryptoTool.Win
         #endregion
 
         #region 密钥对验证
-        private void btnValidateKeyPair_Click(object? sender, EventArgs e)
+        private void BtnValidateKeyPair_Click(object? sender, EventArgs e)
         {
             try
             {
@@ -544,7 +1313,7 @@ namespace CryptoTool.Win
         #endregion
 
         #region 签名
-        private void btnSign_Click(object? sender, EventArgs e)
+        private void BtnSign_Click(object? sender, EventArgs e)
         {
             try
             {
@@ -592,7 +1361,7 @@ namespace CryptoTool.Win
         #endregion
 
         #region 验签
-        private void btnVerify_Click(object? sender, EventArgs e)
+        private void BtnVerify_Click(object? sender, EventArgs e)
         {
             try
             {
@@ -627,7 +1396,7 @@ namespace CryptoTool.Win
         #endregion
 
         #region 格式转换
-        private void btnConvertKey_Click(object? sender, EventArgs e)
+        private void BtnConvertKey_Click(object? sender, EventArgs e)
         {
             try
             {
@@ -659,7 +1428,7 @@ namespace CryptoTool.Win
             }
         }
 
-        private string DetectKeyFormat(string input)
+        private static string DetectKeyFormat(string input)
         {
             if (input.Contains("BEGIN", StringComparison.OrdinalIgnoreCase) || input.Contains("END", StringComparison.OrdinalIgnoreCase))
                 return "PEM";
@@ -678,102 +1447,90 @@ namespace CryptoTool.Win
         #endregion
 
         #region 文件签名/验签
-        private void btnSignFile_Click(object? sender, EventArgs e)
+        private void BtnSignFile_Click(object? sender, EventArgs e)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(_privateKeyPem))
                 { MessageBox.Show("请先生成或导入私钥！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
 
-                using (OpenFileDialog od = new OpenFileDialog() { Title = "选择要签名的文件", Filter = "所有文件|*.*" })
-                {
-                    if (od.ShowDialog() != DialogResult.OK) return;
-                    using (SaveFileDialog sd = new SaveFileDialog() { Title = "保存签名文件", Filter = "签名文件|*.sig", FileName = Path.GetFileNameWithoutExtension(od.FileName) + ".sig" })
-                    {
-                        if (sd.ShowDialog() != DialogResult.OK) return;
-                        string ha = GetSelectedHash(), sa = GetSignerAlgorithm(ha);
-                        ISigner s = SignerUtilities.GetSigner(sa); s.Init(true, EcdsaKeyHelper.ImportPrivateKeyPem(_privateKeyPem));
-                        byte[] fd = File.ReadAllBytes(od.FileName); s.BlockUpdate(fd, 0, fd.Length);
-                        byte[] sig = s.GenerateSignature();
-                        File.WriteAllText(sd.FileName, (comboSignatureFormat.SelectedItem?.ToString() == "Hex") ? Convert.ToHexString(sig).ToLowerInvariant() : Convert.ToBase64String(sig), Encoding.UTF8);
-                        _lastSignHashAlgorithm = ha;
-                        SetStatus("文件签名完成");
-                    }
-                }
+                using OpenFileDialog od = new() { Title = "选择要签名的文件", Filter = "所有文件|*.*" };
+                if (od.ShowDialog() != DialogResult.OK) return;
+                using SaveFileDialog sd = new() { Title = "保存签名文件", Filter = "签名文件|*.sig", FileName = Path.GetFileNameWithoutExtension(od.FileName) + ".sig" };
+                if (sd.ShowDialog() != DialogResult.OK) return;
+                string ha = GetSelectedHash(), sa = GetSignerAlgorithm(ha);
+                ISigner s = SignerUtilities.GetSigner(sa); s.Init(true, EcdsaKeyHelper.ImportPrivateKeyPem(_privateKeyPem));
+                byte[] fd = File.ReadAllBytes(od.FileName); s.BlockUpdate(fd, 0, fd.Length);
+                byte[] sig = s.GenerateSignature();
+                File.WriteAllText(sd.FileName, (comboSignatureFormat.SelectedItem?.ToString() == "Hex") ? Convert.ToHexString(sig).ToLowerInvariant() : Convert.ToBase64String(sig), Encoding.UTF8);
+                _lastSignHashAlgorithm = ha;
+                SetStatus("文件签名完成");
             }
             catch (Exception ex) { MessageBox.Show($"文件签名失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }
 
-        private void btnVerifyFile_Click(object? sender, EventArgs e)
+        private void BtnVerifyFile_Click(object? sender, EventArgs e)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(_publicKeyPem))
                 { MessageBox.Show("请先生成或导入公钥！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
 
-                using (OpenFileDialog od = new OpenFileDialog() { Title = "选择原始文件", Filter = "所有文件|*.*" })
-                {
-                    if (od.ShowDialog() != DialogResult.OK) return;
-                    using (OpenFileDialog sd = new OpenFileDialog() { Title = "选择签名文件", Filter = "签名文件|*.sig" })
-                    {
-                        if (sd.ShowDialog() != DialogResult.OK) return;
-                        string ha = GetSelectedHash(), sa = GetSignerAlgorithm(ha);
-                        ISigner s = SignerUtilities.GetSigner(sa); s.Init(false, EcdsaKeyHelper.ImportPublicKeyPem(_publicKeyPem));
-                        byte[] fd = File.ReadAllBytes(od.FileName); s.BlockUpdate(fd, 0, fd.Length);
-                        string sigText = File.ReadAllText(sd.FileName).Trim();
-                        byte[] sig = (comboSignatureFormat.SelectedItem?.ToString() == "Hex") ? Convert.FromHexString(sigText) : Convert.FromBase64String(sigText);
-                        if (s.VerifySignature(sig)) AppendValidationResult($"✅ 文件签名验证通过（{ha}）", Color.Green);
-                        else AppendValidationResult("❌ 文件签名验证失败", Color.Red);
-                    }
-                }
+                using OpenFileDialog od = new() { Title = "选择原始文件", Filter = "所有文件|*.*" };
+                if (od.ShowDialog() != DialogResult.OK) return;
+                using OpenFileDialog sd = new() { Title = "选择签名文件", Filter = "签名文件|*.sig" };
+                if (sd.ShowDialog() != DialogResult.OK) return;
+                string ha = GetSelectedHash(), sa = GetSignerAlgorithm(ha);
+                ISigner s = SignerUtilities.GetSigner(sa); s.Init(false, EcdsaKeyHelper.ImportPublicKeyPem(_publicKeyPem));
+                byte[] fd = File.ReadAllBytes(od.FileName); s.BlockUpdate(fd, 0, fd.Length);
+                string sigText = File.ReadAllText(sd.FileName).Trim();
+                byte[] sig = (comboSignatureFormat.SelectedItem?.ToString() == "Hex") ? Convert.FromHexString(sigText) : Convert.FromBase64String(sigText);
+                if (s.VerifySignature(sig)) AppendValidationResult($"✅ 文件签名验证通过（{ha}）", Color.Green);
+                else AppendValidationResult("❌ 文件签名验证失败", Color.Red);
             }
             catch (Exception ex) { MessageBox.Show($"文件验签失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error); AppendValidationResult("❌ 文件验签异常", Color.Red); }
         }
         #endregion
 
         #region 导入/保存/粘贴/清空/复制
-        private void btnImportPrivateKey_Click(object? s, EventArgs e) => ImportKey(true);
-        private void btnImportPublicKey_Click(object? s, EventArgs e) => ImportKey(false);
+        private void BtnImportPrivateKey_Click(object? s, EventArgs e) => ImportKey(true);
+        private void BtnImportPublicKey_Click(object? s, EventArgs e) => ImportKey(false);
 
         private void ImportKey(bool isPrivate)
         {
             try
             {
-                using (OpenFileDialog d = new OpenFileDialog() { Title = isPrivate ? "导入私钥文件" : "导入公钥文件", Filter = "密钥文件|*.pem;*.key;*.txt|所有文件|*.*" })
-                {
-                    if (d.ShowDialog() != DialogResult.OK) return;
-                    string c = File.ReadAllText(d.FileName).Trim();
-                    if (isPrivate) EcdsaKeyHelper.ImportPrivateKeyPem(c);
-                    else EcdsaKeyHelper.ImportPublicKeyPem(c);
-                    UIOutputFormat fmt = GetCurrentOutputFormat();
-                    if (isPrivate) { _privateKeyPem = c; textPrivateKey.Text = FormatKeyForDisplay(_privateKeyPem, fmt); }
-                    else { _publicKeyPem = c; textPublicKey.Text = FormatKeyForDisplay(_publicKeyPem, fmt); }
-                    AppendValidationResult("新密钥已导入", Color.Gray);
-                    SetStatus($"{(isPrivate ? "私钥" : "公钥")}导入完成");
-                }
+                using OpenFileDialog d = new() { Title = isPrivate ? "导入私钥文件" : "导入公钥文件", Filter = "密钥文件|*.pem;*.key;*.txt|所有文件|*.*" };
+                if (d.ShowDialog() != DialogResult.OK) return;
+                string c = File.ReadAllText(d.FileName).Trim();
+                if (isPrivate) EcdsaKeyHelper.ImportPrivateKeyPem(c);
+                else EcdsaKeyHelper.ImportPublicKeyPem(c);
+                UIOutputFormat fmt = GetCurrentOutputFormat();
+                if (isPrivate) { _privateKeyPem = c; textPrivateKey.Text = FormatKeyForDisplay(_privateKeyPem, fmt); }
+                else { _publicKeyPem = c; textPublicKey.Text = FormatKeyForDisplay(_publicKeyPem, fmt); }
+                AppendValidationResult("新密钥已导入", Color.Gray);
+                SetStatus($"{(isPrivate ? "私钥" : "公钥")}导入完成");
             }
             catch (Exception ex) { MessageBox.Show($"导入失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }
 
-        private void btnSavePrivateKey_Click(object? s, EventArgs e) => SaveKeyToFile(_privateKeyPem, "私钥", "private");
-        private void btnSavePublicKey_Click(object? s, EventArgs e) => SaveKeyToFile(_publicKeyPem, "公钥", "public");
+        private void BtnSavePrivateKey_Click(object? s, EventArgs e) => SaveKeyToFile(_privateKeyPem, "私钥", "private");
+        private void BtnSavePublicKey_Click(object? s, EventArgs e) => SaveKeyToFile(_publicKeyPem, "公钥", "public");
 
         private void SaveKeyToFile(string keyContent, string keyTypeName, string fileSuffix)
         {
             if (string.IsNullOrEmpty(keyContent))
             { MessageBox.Show($"没有可保存的{keyTypeName}！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
-            using (SaveFileDialog d = new SaveFileDialog() { Title = $"保存{keyTypeName}", Filter = "PEM文件|*.pem|文本文件|*.txt", FileName = $"ecdsa_{fileSuffix}_key.pem" })
-            {
-                if (d.ShowDialog() == DialogResult.OK) { File.WriteAllText(d.FileName, keyContent, Encoding.UTF8); SetStatus($"{keyTypeName}保存成功"); }
-            }
+            using SaveFileDialog d = new() { Title = $"保存{keyTypeName}", Filter = "PEM文件|*.pem|文本文件|*.txt", FileName = $"ecdsa_{fileSuffix}_key.pem" };
+            if (d.ShowDialog() == DialogResult.OK) { File.WriteAllText(d.FileName, keyContent, Encoding.UTF8); SetStatus($"{keyTypeName}保存成功"); }
         }
 
-        private void btnCopySignature_Click(object? s, EventArgs e)
+        private void BtnCopySignature_Click(object? s, EventArgs e)
         {
             if (!string.IsNullOrEmpty(textSignature.Text)) { Clipboard.SetText(textSignature.Text); SetStatus("签名已复制到剪贴板"); }
         }
 
-        private void btnClearAll_Click(object? s, EventArgs e)
+        private void BtnClearAll_Click(object? s, EventArgs e)
         {
             textPrivateKey.Clear(); textPublicKey.Clear(); textPlainData.Clear(); textSignature.Clear();
             _privateKeyPem = _publicKeyPem = _lastSignHashAlgorithm = string.Empty;
@@ -784,24 +1541,24 @@ namespace CryptoTool.Win
             SetStatus("已清空所有内容");
         }
 
-        private void btnPastePrivateKey_Click(object? s, EventArgs e)
+        private void BtnPastePrivateKey_Click(object? s, EventArgs e)
         {
             if (Clipboard.ContainsText()) { textPrivateKey.Text = Clipboard.GetText().Trim(); _privateKeyPem = textPrivateKey.Text; SetStatus("私钥已从剪贴板粘贴"); }
             else MessageBox.Show("剪贴板中没有文本内容！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private void btnClearPrivateKey_Click(object? s, EventArgs e) { textPrivateKey.Clear(); _privateKeyPem = string.Empty; SetStatus("私钥已清空"); }
+        private void BtnClearPrivateKey_Click(object? s, EventArgs e) { textPrivateKey.Clear(); _privateKeyPem = string.Empty; SetStatus("私钥已清空"); }
 
-        private void btnPastePublicKey_Click(object? s, EventArgs e)
+        private void BtnPastePublicKey_Click(object? s, EventArgs e)
         {
             if (Clipboard.ContainsText()) { textPublicKey.Text = Clipboard.GetText().Trim(); _publicKeyPem = textPublicKey.Text; SetStatus("公钥已从剪贴板粘贴"); }
             else MessageBox.Show("剪贴板中没有文本内容！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private void btnClearPublicKey_Click(object? s, EventArgs e) { textPublicKey.Clear(); _publicKeyPem = string.Empty; SetStatus("公钥已清空"); }
+        private void BtnClearPublicKey_Click(object? s, EventArgs e) { textPublicKey.Clear(); _publicKeyPem = string.Empty; SetStatus("公钥已清空"); }
 
         // ✅ 新增：复制私钥按钮点击事件
-        private void btnCopyPrivateKey_Click(object? sender, EventArgs e)
+        private void BtnCopyPrivateKey_Click(object? sender, EventArgs e)
         {
             if (!string.IsNullOrEmpty(textPrivateKey.Text))
             {
@@ -816,7 +1573,7 @@ namespace CryptoTool.Win
         }
 
         // ✅ 新增：复制公钥按钮点击事件
-        private void btnCopyPublicKey_Click(object? sender, EventArgs e)
+        private void BtnCopyPublicKey_Click(object? sender, EventArgs e)
         {
             if (!string.IsNullOrEmpty(textPublicKey.Text))
             {
@@ -832,9 +1589,9 @@ namespace CryptoTool.Win
         #endregion
 
         #region 控件事件
-        private void comboOutputFormat_SelectedIndexChanged(object? s, EventArgs e) => RefreshKeyDisplay();
+        private void ComboOutputFormat_SelectedIndexChanged(object? s, EventArgs e) => RefreshKeyDisplay();
 
-        private void textPrivateKey_TextChanged(object? s, EventArgs e)
+        private void TextPrivateKey_TextChanged(object? s, EventArgs e)
         {
             // 不再自动清空左侧运行结果历史，保证生成/验证等记录持续累积
         }
@@ -843,7 +1600,7 @@ namespace CryptoTool.Win
         #region 辅助方法
         private void SetGenerateResult(string curveName, string status)
         {
-            Color color = status.Contains("❌") ? Color.Red : Color.Green;
+            Color color = status.Contains('❌') ? Color.Red : Color.Green;
             AppendValidationResult($"{status}\n生成时间: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n使用曲线: {EcdsaCurveNames.GetDisplayName(curveName)}", color);
         }
 
@@ -913,7 +1670,7 @@ namespace CryptoTool.Win
             _ => UIOutputFormat.PEM
         };
 
-        private string FormatKeyForDisplay(string pem, UIOutputFormat format)
+        private static string FormatKeyForDisplay(string pem, UIOutputFormat format)
         {
             if (format == UIOutputFormat.PEM) return pem;
             var sb = new StringBuilder();
@@ -943,7 +1700,7 @@ namespace CryptoTool.Win
             };
         }
 
-        private byte[] GetEncKey(string mode)
+        private byte[] GetEncKey()
         {
             if (!string.IsNullOrWhiteSpace(textEncKey.Text))
             {
@@ -985,7 +1742,7 @@ namespace CryptoTool.Win
 
         #region 加密算法实现
 
-        private byte[] EncryptAesGcm(byte[] plain, byte[] key, byte[] nonce)
+        private static byte[] EncryptAesGcm(byte[] plain, byte[] key, byte[] nonce)
         {
             using var aes = new AesGcm(key, 16);
             byte[] cipher = new byte[plain.Length];
@@ -997,7 +1754,7 @@ namespace CryptoTool.Win
             return result;
         }
 
-        private byte[] DecryptAesGcm(byte[] cipherWithTag, byte[] key, byte[] nonce)
+        private static byte[] DecryptAesGcm(byte[] cipherWithTag, byte[] key, byte[] nonce)
         {
             byte[] cipher = cipherWithTag.AsSpan(0, cipherWithTag.Length - 16).ToArray();
             byte[] tag = cipherWithTag.AsSpan(cipherWithTag.Length - 16, 16).ToArray();
@@ -1007,7 +1764,7 @@ namespace CryptoTool.Win
             return plain;
         }
 
-        private byte[] EncryptAesCbc(byte[] plain, byte[] key, byte[] iv)
+        private static byte[] EncryptAesCbc(byte[] plain, byte[] key, byte[] iv)
         {
             using var aes = Aes.Create();
             aes.Key = key;
@@ -1018,7 +1775,7 @@ namespace CryptoTool.Win
             return encryptor.TransformFinalBlock(plain, 0, plain.Length);
         }
 
-        private byte[] DecryptAesCbc(byte[] cipher, byte[] key, byte[] iv)
+        private static byte[] DecryptAesCbc(byte[] cipher, byte[] key, byte[] iv)
         {
             using var aes = Aes.Create();
             aes.Key = key;
@@ -1029,7 +1786,7 @@ namespace CryptoTool.Win
             return decryptor.TransformFinalBlock(cipher, 0, cipher.Length);
         }
 
-        private byte[] EncryptChaCha20(byte[] plain, byte[] key, byte[] nonce)
+        private static byte[] EncryptChaCha20(byte[] plain, byte[] key, byte[] nonce)
         {
             using var chacha = new ChaCha20Poly1305(key);
             byte[] cipher = new byte[plain.Length];
@@ -1041,7 +1798,7 @@ namespace CryptoTool.Win
             return result;
         }
 
-        private byte[] DecryptChaCha20(byte[] cipherWithTag, byte[] key, byte[] nonce)
+        private static byte[] DecryptChaCha20(byte[] cipherWithTag, byte[] key, byte[] nonce)
         {
             byte[] cipher = cipherWithTag.AsSpan(0, cipherWithTag.Length - 16).ToArray();
             byte[] tag = cipherWithTag.AsSpan(cipherWithTag.Length - 16, 16).ToArray();
@@ -1054,7 +1811,7 @@ namespace CryptoTool.Win
 
         #region 按钮事件：加密/解密/清空/复制/粘贴
 
-        private void btnEncrypt_Click(object? sender, EventArgs e)
+        private void BtnEncrypt_Click(object? sender, EventArgs e)
         {
             try
             {
@@ -1066,7 +1823,7 @@ namespace CryptoTool.Win
 
                 string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM)";
                 byte[] plain = GetEncInputBytes();
-                byte[] key = GetEncKey(mode);
+                byte[] key = GetEncKey();
                 byte[] iv = GetEncIV(mode);
 
                 byte[] cipher = mode switch
@@ -1093,7 +1850,7 @@ namespace CryptoTool.Win
             }
         }
 
-        private void btnDecrypt_Click(object? sender, EventArgs e)
+        private void BtnDecrypt_Click(object? sender, EventArgs e)
         {
             try
             {
@@ -1105,7 +1862,7 @@ namespace CryptoTool.Win
 
                 string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM)";
                 byte[] cipher = GetEncInputBytes();
-                byte[] key = GetEncKey(mode);
+                byte[] key = GetEncKey();
                 byte[] iv = GetEncIV(mode);
 
                 byte[] plain = mode switch
@@ -1127,7 +1884,7 @@ namespace CryptoTool.Win
             }
         }
 
-        private void btnEncClear_Click(object? sender, EventArgs e)
+        private void BtnEncClear_Click(object? sender, EventArgs e)
         {
             textEncInput.Clear();
             textEncOutput.Clear();
@@ -1137,7 +1894,7 @@ namespace CryptoTool.Win
             _lastEncIV = null;
         }
 
-        private void btnEncCopy_Click(object? sender, EventArgs e)
+        private void BtnEncCopy_Click(object? sender, EventArgs e)
         {
             if (!string.IsNullOrEmpty(textEncOutput.Text))
             {
@@ -1146,7 +1903,7 @@ namespace CryptoTool.Win
             }
         }
 
-        private void btnEncPaste_Click(object? sender, EventArgs e)
+        private void BtnEncPaste_Click(object? sender, EventArgs e)
         {
             if (Clipboard.ContainsText())
             {
@@ -1158,7 +1915,7 @@ namespace CryptoTool.Win
 
         #region 按钮事件：文件加密/解密
 
-        private void btnEncryptFile_Click(object? sender, EventArgs e)
+        private void BtnEncryptFile_Click(object? sender, EventArgs e)
         {
             try
             {
@@ -1174,7 +1931,7 @@ namespace CryptoTool.Win
                 if (saveDlg.ShowDialog() != DialogResult.OK) return;
 
                 string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM)";
-                byte[] key = GetEncKey(mode);
+                byte[] key = GetEncKey();
                 byte[] iv = RandomNumberGenerator.GetBytes(mode == "AES-256-CBC" ? 16 : 12);
                 byte[] plain = File.ReadAllBytes(openDlg.FileName);
                 byte[] cipher = mode switch
@@ -1199,7 +1956,7 @@ namespace CryptoTool.Win
             }
         }
 
-        private void btnDecryptFile_Click(object? sender, EventArgs e)
+        private void BtnDecryptFile_Click(object? sender, EventArgs e)
         {
             try
             {
@@ -1219,11 +1976,11 @@ namespace CryptoTool.Win
                 if (saveDlg.ShowDialog() != DialogResult.OK) return;
 
                 string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM)";
-                byte[] key = GetEncKey(mode);
+                byte[] key = GetEncKey();
                 byte[] allBytes = File.ReadAllBytes(openDlg.FileName);
                 int ivLen = mode == "AES-256-CBC" ? 16 : 12;
-                byte[] iv = allBytes.Take(ivLen).ToArray();
-                byte[] cipher = allBytes.Skip(ivLen).ToArray();
+                byte[] iv = [.. allBytes.Take(ivLen)];
+                byte[] cipher = [.. allBytes.Skip(ivLen)];
 
                 byte[] plain = mode switch
                 {
@@ -1248,12 +2005,12 @@ namespace CryptoTool.Win
 
         #endregion
 
-        private void labelCurveHeader_Click(object sender, EventArgs e)
+        private void LabelCurveHeader_Click(object sender, EventArgs e)
         {
 
         }
 
-        private void labelCurve_Click(object sender, EventArgs e)
+        private void LabelCurve_Click(object sender, EventArgs e)
         {
 
         }
