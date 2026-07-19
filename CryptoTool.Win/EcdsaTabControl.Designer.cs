@@ -1627,7 +1627,6 @@ namespace CryptoTool.Win
             textEncOutput.Margin = new Padding(4, 3, 4, 3);
             textEncOutput.Multiline = true;
             textEncOutput.Name = "textEncOutput";
-            textEncOutput.ReadOnly = true;
             textEncOutput.ScrollBars = ScrollBars.Vertical;
             textEncOutput.Size = new Size(3241, 14);
             textEncOutput.TabIndex = 14;
@@ -1708,9 +1707,9 @@ namespace CryptoTool.Win
             labelEncOutputLabel.Location = new Point(4, 746);
             labelEncOutputLabel.Margin = new Padding(4, 4, 2, 4);
             labelEncOutputLabel.Name = "labelEncOutputLabel";
-            labelEncOutputLabel.Size = new Size(144, 12);
+            labelEncOutputLabel.Size = new Size(200, 12);
             labelEncOutputLabel.TabIndex = 13;
-            labelEncOutputLabel.Text = "加密/解密结果：";
+            labelEncOutputLabel.Text = "加密结果 / 解密输入：";
             // 
             // groupFile
             // 

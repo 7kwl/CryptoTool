@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using CryptoTool.Algorithm.Algorithms.ECDSA;
@@ -124,6 +125,17 @@ namespace CryptoTool.Win
                 var mode = GetEcdhMode();
                 string curve = GetEcdhSelectedCurve();
                 byte[] plain = GetEcdhEncoding().GetBytes(textEcdhInput.Text);
+                byte[]? userIv = null;
+                if (!string.IsNullOrWhiteSpace(textEcdhIV.Text))
+                {
+                    try { userIv = EcdhAlgorithm.ParseIv(textEcdhIV.Text.Trim(), mode); }
+                    catch (FormatException ex)
+                    {
+                        AppendValidationResult($"❌ IV 格式无效: {ex.Message}", Color.Red);
+                        SetStatus("IV 格式错误");
+                        return;
+                    }
+                }
                 byte[] shared, iv;
                 string output;
 
@@ -134,7 +146,7 @@ namespace CryptoTool.Win
                     { MessageBox.Show("请输入 Bob 公钥（接收方公钥）", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
 
                     var bobPub = EcdsaKeyHelper.ImportPublicKeyPem(textEcdhBobPublic.Text.Trim());
-                    byte[] combined = EcdhAlgorithm.EciesEncrypt(plain, bobPub, curve, mode, out shared, out iv);
+                    byte[] combined = EcdhAlgorithm.EciesEncrypt(plain, bobPub, curve, mode, out shared, out iv, userIv);
                     output = Convert.ToBase64String(combined);
                     AppendValidationResult($"✅ ECIES 加密成功\n模式: {comboEcdhMode.SelectedItem}\n曲线: {EcdsaCurveNames.GetDisplayName(curve)}\n临时公钥: {EcdhAlgorithm.GetEphemeralPubKeyLength(curve)} 字节\n明文: {plain.Length} 字节 → 密文: {combined.Length} 字节", Color.Green);
                 }
@@ -146,7 +158,7 @@ namespace CryptoTool.Win
 
                     var alicePriv = EcdsaKeyHelper.ImportPrivateKeyPem(textEcdhAlicePrivate.Text.Trim());
                     var bobPub = EcdsaKeyHelper.ImportPublicKeyPem(textEcdhBobPublic.Text.Trim());
-                    output = EcdhAlgorithm.StaticEcdhEncrypt(plain, alicePriv, bobPub, mode, out shared, out iv);
+                    output = EcdhAlgorithm.StaticEcdhEncrypt(plain, alicePriv, bobPub, mode, out shared, out iv, userIv);
                     AppendValidationResult($"✅ 8gwifi.org 加密成功\n模式: {comboEcdhMode.SelectedItem}\n曲线: {EcdsaCurveNames.GetDisplayName(curve)}\n明文: {plain.Length} 字节\n密文（不含 IV）: {Convert.FromBase64String(output).Length} 字节", Color.Green);
                 }
 
@@ -167,9 +179,15 @@ namespace CryptoTool.Win
         {
             try
             {
-                string cipherSource = string.IsNullOrWhiteSpace(textEcdhOutput.Text) ? textEcdhInput.Text.Trim() : textEcdhOutput.Text.Trim();
+                // 解密固定从"密文（可编辑）"框读取，不再回退到"明文"框
+                // 避免用户误将明文当密文解密
+                string cipherSource = textEcdhOutput.Text.Trim();
                 if (string.IsNullOrWhiteSpace(cipherSource))
-                { MessageBox.Show("请输入或粘贴要解密的 Base64 密文", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+                {
+                    AppendValidationResult("⚠️ 请先加密生成密文，或将 Base64 密文粘贴到 密文（可编辑） 框", Color.Orange);
+                    SetStatus("无密文输入");
+                    return;
+                }
 
                 var mode = GetEcdhMode();
                 string curve = GetEcdhSelectedCurve();
@@ -185,7 +203,17 @@ namespace CryptoTool.Win
                     { MessageBox.Show("请输入 Bob 私钥（接收方私钥）来解密", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
 
                     var bobPriv = EcdsaKeyHelper.ImportPrivateKeyPem(textEcdhBobPrivate.Text.Trim());
-                    byte[] combined = Convert.FromBase64String(cipherSource);
+                    byte[] combined;
+                    try
+                    {
+                        combined = Convert.FromBase64String(cipherSource);
+                    }
+                    catch (FormatException)
+                    {
+                        AppendValidationResult("❌ 密文格式无效: 请输入 Base64 编码的密文，不是原始数字或字符串", Color.Red);
+                        SetStatus("Base64 格式错误");
+                        return;
+                    }
                     try
                     {
                         plain = EcdhAlgorithm.EciesDecrypt(combined, bobPriv, curve, mode, out shared, out iv);
@@ -194,6 +222,12 @@ namespace CryptoTool.Win
                     {
                         AppendValidationResult($"❌ ECIES 解密失败: MAC 校验不通过，密钥或密文不匹配", Color.Red);
                         SetStatus("ECIES 解密失败");
+                        return;
+                    }
+                    catch (ArgumentException argEx) when (argEx.Message.Contains("Specified argument"))
+                    {
+                        AppendValidationResult($"❌ 密文结构无效: {argEx.Message}。请检查密文是否完整、曲线是否匹配", Color.Red);
+                        SetStatus("密文结构错误");
                         return;
                     }
                     textEcdhSharedKey.Text = Convert.ToBase64String(shared);
@@ -280,11 +314,7 @@ namespace CryptoTool.Win
 
         private void BtnEcdhCopyResult_Click(object? sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(textEcdhOutput.Text))
-            {
-                Clipboard.SetText(textEcdhOutput.Text);
-                SetStatus("ECDH 结果已复制");
-            }
+            TrySetClipboardText(textEcdhOutput.Text, "ECDH 结果已复制");
         }
 
         private void BtnEcdhPasteInput_Click(object? sender, EventArgs e)
@@ -759,12 +789,12 @@ namespace CryptoTool.Win
 
         private void BtnCopySignature_Click(object? s, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(textSignature.Text)) { Clipboard.SetText(textSignature.Text); SetStatus("签名已复制到剪贴板"); }
+            TrySetClipboardText(textSignature.Text, "签名已复制到剪贴板");
         }
 
         private void BtnCopyPlainData_Click(object? s, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(textPlainData.Text)) { Clipboard.SetText(textPlainData.Text); SetStatus("原始数据已复制到剪贴板"); }
+            TrySetClipboardText(textPlainData.Text, "原始数据已复制到剪贴板");
         }
 
         private void BtnPastePlainData_Click(object? s, EventArgs e)
@@ -780,7 +810,7 @@ namespace CryptoTool.Win
 
         private void BtnCopySignatureData_Click(object? s, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(textSignature.Text)) { Clipboard.SetText(textSignature.Text); SetStatus("签名已复制到剪贴板"); }
+            TrySetClipboardText(textSignature.Text, "签名已复制到剪贴板");
         }
 
         private void BtnPasteSignatureData_Click(object? s, EventArgs e)
@@ -821,32 +851,58 @@ namespace CryptoTool.Win
 
         private void BtnClearPublicKey_Click(object? s, EventArgs e) { textPublicKey.Clear(); _publicKeyPem = string.Empty; SetStatus("公钥已清空"); }
 
+        /// <summary>
+        /// 安全地将文本复制到剪贴板，自动重试并在失败时给出友好提示。
+        /// 避免剪贴板被其他进程临时占用时直接崩溃。
+        /// </summary>
+        private bool TrySetClipboardText(string text, string successStatus, string? emptyMessage = null)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                if (!string.IsNullOrEmpty(emptyMessage))
+                {
+                    MessageBox.Show(emptyMessage, "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                SetStatus(string.IsNullOrEmpty(emptyMessage) ? "复制失败：内容为空" : $"复制失败：{emptyMessage}");
+                return false;
+            }
+
+            const int maxAttempts = 3;
+            Exception? lastEx = null;
+            for (int i = 0; i < maxAttempts; i++)
+            {
+                try
+                {
+                    Clipboard.SetText(text);
+                    if (!string.IsNullOrEmpty(successStatus))
+                        SetStatus(successStatus);
+                    return true;
+                }
+                catch (ExternalException ex)
+                {
+                    lastEx = ex;
+                    // 剪贴板可能被其他进程临时锁定，短暂等待后重试
+                    System.Threading.Thread.Sleep(50);
+                }
+            }
+
+            MessageBox.Show(
+                $"剪贴板操作失败: {lastEx?.Message}\n请稍后再试或关闭可能占用剪贴板的程序。",
+                "复制失败",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+            SetStatus("复制失败：剪贴板被占用");
+            return false;
+        }
+
         private void BtnCopyPrivateKey_Click(object? sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(textPrivateKey.Text))
-            {
-                Clipboard.SetText(textPrivateKey.Text);
-                SetStatus("私钥已复制到剪贴板");
-            }
-            else
-            {
-                MessageBox.Show("私钥为空，无法复制！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                SetStatus("复制私钥失败：私钥为空");
-            }
+            TrySetClipboardText(textPrivateKey.Text, "私钥已复制到剪贴板", "私钥为空，无法复制！");
         }
 
         private void BtnCopyPublicKey_Click(object? sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(textPublicKey.Text))
-            {
-                Clipboard.SetText(textPublicKey.Text);
-                SetStatus("公钥已复制到剪贴板");
-            }
-            else
-            {
-                MessageBox.Show("公钥为空，无法复制！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                SetStatus("复制公钥失败：公钥为空");
-            }
+            TrySetClipboardText(textPublicKey.Text, "公钥已复制到剪贴板", "公钥为空，无法复制！");
         }
         #endregion
 
@@ -962,6 +1018,22 @@ namespace CryptoTool.Win
             };
         }
 
+        /// <summary>
+        /// 解析加密结果框中的密文，按输出格式（Base64/Hex）解码。
+        /// </summary>
+        private byte[] GetCipherBytes(string cipherText, string mode)
+        {
+            string outFormat = comboEncOutputFormat.SelectedItem?.ToString() ?? "Base64";
+            if (outFormat == "Hex")
+            {
+                return Convert.FromHexString(cipherText.Trim().Replace("0x", "").Replace("0X", "").Replace(" ", ""));
+            }
+            else
+            {
+                return Convert.FromBase64String(cipherText.Trim());
+            }
+        }
+
         private byte[] GetEncKey()
         {
             if (!string.IsNullOrWhiteSpace(textEncKey.Text))
@@ -986,19 +1058,38 @@ namespace CryptoTool.Win
             return derivedKey;
         }
 
-        private byte[] GetEncIV(string mode)
+        private byte[] GetEncIV(string mode, bool forEncryption)
         {
-            if (!string.IsNullOrWhiteSpace(textEncIV.Text))
-                return Convert.FromHexString(textEncIV.Text.Trim());
-
             int ivLen = mode switch
             {
                 "AES-256-CBC" => 16,
                 _ => 12
             };
-            byte[] iv = RandomNumberGenerator.GetBytes(ivLen);
-            _lastEncIV = iv;
-            return iv;
+
+            if (forEncryption)
+            {
+                // 加密：如果 IV 框内容是用户手动指定的，则使用；否则随机生成
+                if (!string.IsNullOrWhiteSpace(textEncIV.Text))
+                {
+                    string currentHex = textEncIV.Text.Trim().ToLowerInvariant();
+                    string lastHex = _lastEncIV != null ? Convert.ToHexString(_lastEncIV).ToLowerInvariant() : string.Empty;
+                    if (currentHex != lastHex)
+                    {
+                        return Convert.FromHexString(currentHex);
+                    }
+                }
+
+                byte[] iv = RandomNumberGenerator.GetBytes(ivLen);
+                _lastEncIV = iv;
+                return iv;
+            }
+            else
+            {
+                // 解密：必须提供 IV，不允许随机生成
+                if (string.IsNullOrWhiteSpace(textEncIV.Text))
+                    throw new InvalidOperationException("解密需要 IV/Nonce，请先从加密结果获取或手动输入");
+                return Convert.FromHexString(textEncIV.Text.Trim());
+            }
         }
         #endregion
 
@@ -1086,7 +1177,7 @@ namespace CryptoTool.Win
                 string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM)";
                 byte[] plain = GetEncInputBytes();
                 byte[] key = GetEncKey();
-                byte[] iv = GetEncIV(mode);
+                byte[] iv = GetEncIV(mode, true);
 
                 byte[] cipher = mode switch
                 {
@@ -1116,16 +1207,21 @@ namespace CryptoTool.Win
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(textEncInput.Text))
+                // 解密优先从"加密结果 / 解密输入"框读取密文，方便用户直接编辑密文后解密
+                string cipherSource = string.IsNullOrWhiteSpace(textEncOutput.Text)
+                    ? textEncInput.Text.Trim()
+                    : textEncOutput.Text.Trim();
+
+                if (string.IsNullOrWhiteSpace(cipherSource))
                 {
                     MessageBox.Show("请输入要解密的密文！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
                 string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM)";
-                byte[] cipher = GetEncInputBytes();
+                byte[] cipher = GetCipherBytes(cipherSource, mode);
                 byte[] key = GetEncKey();
-                byte[] iv = GetEncIV(mode);
+                byte[] iv = GetEncIV(mode, false);
 
                 byte[] plain = mode switch
                 {
@@ -1135,7 +1231,9 @@ namespace CryptoTool.Win
                     _ => DecryptAesGcm(cipher, key, iv)
                 };
 
-                textEncOutput.Text = Encoding.UTF8.GetString(plain);
+                textEncInput.Text = Encoding.UTF8.GetString(plain);
+                textEncIV.Text = Convert.ToHexString(iv).ToLowerInvariant();
+                _lastEncIV = iv;
                 AppendValidationResult($"✅ 解密成功\r\n算法: {mode}\r\n明文长度: {plain.Length}字节", Color.Green);
                 SetStatus("解密完成");
             }
@@ -1158,11 +1256,7 @@ namespace CryptoTool.Win
 
         private void BtnEncCopy_Click(object? sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(textEncOutput.Text))
-            {
-                Clipboard.SetText(textEncOutput.Text);
-                SetStatus("加密结果已复制");
-            }
+            TrySetClipboardText(textEncOutput.Text, "加密结果已复制");
         }
 
         private void BtnEncPaste_Click(object? sender, EventArgs e)

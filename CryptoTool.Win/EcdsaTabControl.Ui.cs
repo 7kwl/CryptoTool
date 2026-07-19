@@ -501,7 +501,7 @@ namespace CryptoTool.Win
                 comboEcdhMode.SelectedIndex = 0;
                 comboEcdhMode.SelectedIndexChanged += (s, e) =>
                 {
-                    lblEcdhIV.Text = GetEcdhMode() == EcdhMode.GwifiOrg ? "IV (Hex):" : "IV (Base64):";
+                    lblEcdhIV.Text = GetEcdhMode() == EcdhMode.GwifiOrg ? "IV (Hex，可编辑/留空随机):" : "IV (Base64，可编辑/留空随机):";
                 };
                 btnGenerateEcdhKeys = new Button
                 {
@@ -571,7 +571,7 @@ namespace CryptoTool.Win
                 btnEcdhCopyResult = new Button { Text = "复制结果", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
                 btnEcdhPasteInput = new Button { Text = "粘贴输入", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
                 btnEcdhClear = new Button { Text = "清空", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
-                lblEcdhIV = new Label { Text = "IV (Base64):", AutoSize = false, Height = 22, Margin = new Padding(0, 0, 4, 2), TextAlign = ContentAlignment.MiddleLeft };
+                lblEcdhIV = new Label { Text = "IV (Base64，可编辑/留空随机):", AutoSize = false, Height = 22, Margin = new Padding(0, 0, 4, 2), TextAlign = ContentAlignment.MiddleLeft };
                 textEcdhIV = new TextBox
                 {
                     Dock = DockStyle.Fill,
@@ -702,14 +702,7 @@ namespace CryptoTool.Win
                     };
                     btnCopy.Click += (s, e) =>
                     {
-                        if (string.IsNullOrEmpty(target.Text))
-                        {
-                            MessageBox.Show("复制为空", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        }
-                        else
-                        {
-                            Clipboard.SetText(target.Text);
-                        }
+                        TrySetClipboardText(target.Text, "已复制到剪贴板", "复制为空");
                     };
                     btnPaste.Click += (s, e) => { if (Clipboard.ContainsText()) target.Text = Clipboard.GetText(); };
                     panel.Controls.Add(btnCopy, 0, 0);

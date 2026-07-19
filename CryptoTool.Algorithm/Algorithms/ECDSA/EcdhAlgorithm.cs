@@ -252,13 +252,15 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
         /// ECIES 加密：生成临时密钥对，用接收方公钥加密
         /// 输出格式：ephemeral_pub(未压缩) || IV || cipher+tag
         /// </summary>
+        /// <param name="userIv">可选：用户指定 IV，留空则自动生成随机 IV</param>
         public static byte[] EciesEncrypt(
             byte[] plain,
             ECPublicKeyParameters recipientPub,
             string curveName,
             EcdhMode mode,
             out byte[] sharedSecret,
-            out byte[] iv)
+            out byte[] iv,
+            byte[]? userIv = null)
         {
             // 1. 生成临时 EC 密钥对
             var ephemeralKp = GenerateKeyPair(curveName);
@@ -274,8 +276,18 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
             // 4. 派生 AES 密钥
             byte[] key = DeriveAesKey(sharedSecret, mode);
 
-            // 5. 生成随机 IV
-            iv = GenerateNonce(GetNonceLength(mode));
+            // 5. 使用用户 IV 或生成随机 IV
+            int expectedIvLength = GetNonceLength(mode);
+            if (userIv != null && userIv.Length > 0)
+            {
+                if (userIv.Length != expectedIvLength)
+                    throw new ArgumentException($"IV 长度必须为 {expectedIvLength} 字节，当前为 {userIv.Length} 字节");
+                iv = (byte[])userIv.Clone();
+            }
+            else
+            {
+                iv = GenerateNonce(expectedIvLength);
+            }
 
             // 6. AES-GCM 加密
             byte[] cipher = EncryptAesGcm(plain, key, iv);
@@ -344,17 +356,31 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
         /// 静态 ECDH 加密（8gwifi.org 兼容模式）：使用 Alice 私钥 + Bob 公钥计算共享密钥
         /// 输出格式：Base64(IV + cipher+tag)，与 8gwifi.org 的解密流程兼容
         /// </summary>
+        /// <param name="userIv">可选：用户指定 IV，留空则自动生成随机 IV</param>
         public static string StaticEcdhEncrypt(
             byte[] plain,
             ECPrivateKeyParameters alicePriv,
             ECPublicKeyParameters bobPub,
             EcdhMode mode,
             out byte[] sharedSecret,
-            out byte[] iv)
+            out byte[] iv,
+            byte[]? userIv = null)
         {
             sharedSecret = DeriveSharedSecret(alicePriv, bobPub);
             byte[] key = DeriveAesKey(sharedSecret, mode);
-            iv = GenerateNonce(GetNonceLength(mode));
+
+            int expectedIvLength = GetNonceLength(mode);
+            if (userIv != null && userIv.Length > 0)
+            {
+                if (userIv.Length != expectedIvLength)
+                    throw new ArgumentException($"IV 长度必须为 {expectedIvLength} 字节，当前为 {userIv.Length} 字节");
+                iv = (byte[])userIv.Clone();
+            }
+            else
+            {
+                iv = GenerateNonce(expectedIvLength);
+            }
+
             byte[] cipher = EncryptAesGcm(plain, key, iv);
             return FormatCipher(iv, cipher, mode);
         }
