@@ -1,3 +1,9 @@
+#nullable disable
+
+using CryptoTool.Algorithm.Algorithms.ECDSA;
+using CryptoTool.Win.Enums;
+using CryptoTool.Win.Helpers;
+
 namespace CryptoTool.Win
 {
     partial class EcdsaTabControl
@@ -1733,5 +1739,27 @@ namespace CryptoTool.Win
         private System.Windows.Forms.Button btnViewEcdh;
         private System.Windows.Forms.Panel panelViewContent;
         private System.Windows.Forms.Panel groupEcdh;
+
+        // ECDH 视图控件
+        private System.Windows.Forms.ComboBox comboEcdhCategory;
+        private System.Windows.Forms.ComboBox comboEcdhCurve;
+        private System.Windows.Forms.ComboBox comboEcdhMode;
+        private System.Windows.Forms.ComboBox comboEcdhEncoding;
+        private System.Windows.Forms.Button btnGenerateEcdhKeys;
+        private System.Windows.Forms.TextBox textEcdhAlicePrivate;
+        private System.Windows.Forms.TextBox textEcdhAlicePublic;
+        private System.Windows.Forms.TextBox textEcdhBobPrivate;
+        private System.Windows.Forms.TextBox textEcdhBobPublic;
+        private System.Windows.Forms.TextBox textEcdhInput;
+        private System.Windows.Forms.TextBox textEcdhOutput;
+        private System.Windows.Forms.TextBox textEcdhSharedKey;
+        private System.Windows.Forms.TextBox textEcdhIV;
+        private System.Windows.Forms.Label lblEcdhIV;
+        private System.Windows.Forms.Button btnEcdhEncrypt;
+        private System.Windows.Forms.Button btnEcdhDecrypt;
+        private System.Windows.Forms.Button btnEcdhCopyResult;
+        private System.Windows.Forms.Button btnEcdhPasteInput;
+        private System.Windows.Forms.Button btnEcdhClear;
     }
 }
+
