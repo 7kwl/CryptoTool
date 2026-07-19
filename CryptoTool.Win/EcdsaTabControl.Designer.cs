@@ -167,6 +167,10 @@ namespace CryptoTool.Win
             textEncKey = new TextBox();
             labelEncIV = new Label();
             textEncIV = new TextBox();
+            labelEncBobPublic = new Label();
+            textEncBobPublic = new TextBox();
+            labelEncCurve = new Label();
+            comboEncCurve = new ComboBox();
             labelEncInput = new Label();
             textEncInput = new TextBox();
             textEncOutput = new TextBox();
@@ -1011,7 +1015,7 @@ namespace CryptoTool.Win
             btnViewEncrypt.Padding = new Padding(12, 4, 12, 4);
             btnViewEncrypt.Size = new Size(136, 44);
             btnViewEncrypt.TabIndex = 2;
-            btnViewEncrypt.Text = "加密与解密";
+            btnViewEncrypt.Text = "ECIES加密解密";
             btnViewEncrypt.UseVisualStyleBackColor = true;
             // 
             // btnViewFile
@@ -1465,6 +1469,10 @@ namespace CryptoTool.Win
             tableLayoutEncrypt.Controls.Add(textEncKey, 0, 2);
             tableLayoutEncrypt.Controls.Add(labelEncIV, 0, 3);
             tableLayoutEncrypt.Controls.Add(textEncIV, 0, 3);
+            tableLayoutEncrypt.Controls.Add(labelEncBobPublic, 0, 4);
+            tableLayoutEncrypt.Controls.Add(textEncBobPublic, 0, 4);
+            tableLayoutEncrypt.Controls.Add(labelEncCurve, 0, 5);
+            tableLayoutEncrypt.Controls.Add(comboEncCurve, 0, 5);
             tableLayoutEncrypt.Controls.Add(labelEncInput, 0, 4);
             tableLayoutEncrypt.Controls.Add(textEncInput, 0, 5);
             tableLayoutEncrypt.Controls.Add(textEncOutput, 0, 7);
@@ -1596,6 +1604,50 @@ namespace CryptoTool.Win
             textEncIV.PlaceholderText = "加密时自动生成，解密时需填写";
             textEncIV.Size = new Size(3241, 29);
             textEncIV.TabIndex = 10;
+            // 
+            // labelEncBobPublic
+            // 
+            labelEncBobPublic.AutoSize = true;
+            labelEncBobPublic.Location = new Point(4, 468);
+            labelEncBobPublic.Margin = new Padding(4, 4, 2, 4);
+            labelEncBobPublic.Name = "labelEncBobPublic";
+            labelEncBobPublic.Size = new Size(288, 24);
+            labelEncBobPublic.TabIndex = 15;
+            labelEncBobPublic.Text = "Bob 公钥 (接收方)：";
+            // 
+            // textEncBobPublic
+            // 
+            textEncBobPublic.Dock = DockStyle.Fill;
+            textEncBobPublic.Font = new Font("Consolas", 9F);
+            textEncBobPublic.Location = new Point(4, 445);
+            textEncBobPublic.Margin = new Padding(4, 3, 4, 3);
+            textEncBobPublic.Name = "textEncBobPublic";
+            textEncBobPublic.PlaceholderText = "粘贴 PEM 格式公钥（支持多行）";
+            textEncBobPublic.Size = new Size(3241, 29);
+            textEncBobPublic.Multiline = true;
+            textEncBobPublic.ScrollBars = ScrollBars.Vertical;
+            textEncBobPublic.TabIndex = 16;
+            // 
+            // labelEncCurve
+            // 
+            labelEncCurve.AutoSize = true;
+            labelEncCurve.Location = new Point(4, 555);
+            labelEncCurve.Margin = new Padding(4, 4, 2, 4);
+            labelEncCurve.Name = "labelEncCurve";
+            labelEncCurve.Size = new Size(100, 24);
+            labelEncCurve.TabIndex = 17;
+            labelEncCurve.Text = "曲线：";
+            // 
+            // comboEncCurve
+            // 
+            comboEncCurve.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboEncCurve.FormattingEnabled = true;
+            comboEncCurve.Items.AddRange(new object[] { "P-256", "P-384", "P-521" });
+            comboEncCurve.Location = new Point(0, 579);
+            comboEncCurve.Margin = new Padding(0, 3, 4, 3);
+            comboEncCurve.Name = "comboEncCurve";
+            comboEncCurve.Size = new Size(192, 32);
+            comboEncCurve.TabIndex = 18;
             // 
             // labelEncInput
             // 
@@ -2024,6 +2076,10 @@ namespace CryptoTool.Win
         private System.Windows.Forms.TextBox textEncKey;
         private System.Windows.Forms.Label labelEncIV;
         private System.Windows.Forms.TextBox textEncIV;
+        private System.Windows.Forms.Label labelEncBobPublic;
+        private System.Windows.Forms.TextBox textEncBobPublic;
+        private System.Windows.Forms.Label labelEncCurve;
+        private System.Windows.Forms.ComboBox comboEncCurve;
         private System.Windows.Forms.Label labelEncInput;
         private System.Windows.Forms.TextBox textEncInput;
         private System.Windows.Forms.Label labelEncOutputLabel;

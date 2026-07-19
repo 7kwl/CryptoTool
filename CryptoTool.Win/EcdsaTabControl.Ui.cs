@@ -261,13 +261,15 @@ namespace CryptoTool.Win
                 {
                     Dock = DockStyle.Fill,
                     ColumnCount = 1,
-                    RowCount = 4,
+                    RowCount = 6,
                     Margin = new Padding(0),
                     Padding = new Padding(0)
                 };
                 rightLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
                 rightLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
                 rightLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
+                rightLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
+                rightLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 72F));
                 rightLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
 
                 rightLayout.Controls.Add(CreateLabelControlRow(labelEncMode, comboEncMode), 0, 0);
@@ -276,6 +278,12 @@ namespace CryptoTool.Win
                     labelEncOutputFormat, comboEncOutputFormat), 0, 1);
                 rightLayout.Controls.Add(CreateLabelControlRow(labelEncKey, textEncKey), 0, 2);
                 rightLayout.Controls.Add(CreateLabelControlRow(labelEncIV, textEncIV), 0, 3);
+                rightLayout.Controls.Add(CreateLabelControlRow(labelEncBobPublic, textEncBobPublic), 0, 4);
+                rightLayout.Controls.Add(CreateLabelControlRow(labelEncCurve, comboEncCurve), 0, 5);
+
+                // 非 ECIES 模式时隐藏 Bob 公钥和曲线
+                labelEncBobPublic.Visible = false; textEncBobPublic.Visible = false;
+                labelEncCurve.Visible = false; comboEncCurve.Visible = false;
 
                 rightGroup.Controls.Add(rightLayout);
 
