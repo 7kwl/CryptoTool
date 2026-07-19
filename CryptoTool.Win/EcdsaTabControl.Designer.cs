@@ -1030,11 +1030,11 @@ namespace CryptoTool.Win
             panelSignActions.Controls.Add(btnCopySignature);
             panelSignActions.Dock = DockStyle.Fill;
             panelSignActions.FlowDirection = FlowDirection.TopDown;
-            panelSignActions.Location = new Point(3052, 3);
+            panelSignActions.Location = new Point(1627, 3);
             panelSignActions.Name = "panelSignActions";
             panelSignActions.Padding = new Padding(8, 4, 8, 4);
             tableLayoutSign.SetRowSpan(panelSignActions, 4);
-            panelSignActions.Size = new Size(194, 796);
+            panelSignActions.Size = new Size(1619, 796);
             panelSignActions.TabIndex = 1;
             panelSignActions.WrapContents = false;
             // 
@@ -1130,7 +1130,7 @@ namespace CryptoTool.Win
             textPlainData.Multiline = true;
             textPlainData.Name = "textPlainData";
             textPlainData.ScrollBars = ScrollBars.Vertical;
-            textPlainData.Size = new Size(3043, 367);
+            textPlainData.Size = new Size(1618, 367);
             textPlainData.TabIndex = 2;
             // 
             // labelSignature
@@ -1152,7 +1152,7 @@ namespace CryptoTool.Win
             textSignature.Multiline = true;
             textSignature.Name = "textSignature";
             textSignature.ScrollBars = ScrollBars.Vertical;
-            textSignature.Size = new Size(3043, 367);
+            textSignature.Size = new Size(1618, 367);
             textSignature.TabIndex = 4;
             // 
             // groupEncrypt
@@ -1561,7 +1561,8 @@ namespace CryptoTool.Win
             // 
             // EcdsaTabControl
             // 
-            AutoScaleMode = AutoScaleMode.None;
+            AutoScaleDimensions = new SizeF(11F, 24F);
+            AutoScaleMode = AutoScaleMode.Font;
             Controls.Add(mainTableLayout);
             Name = "EcdsaTabControl";
             Size = new Size(3287, 1616);

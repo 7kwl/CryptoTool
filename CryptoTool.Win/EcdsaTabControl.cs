@@ -327,7 +327,7 @@ namespace CryptoTool.Win
                 comboCategory.SelectedIndex = 0;
 
             comboHashAlgorithm.Items.Clear();
-            comboHashAlgorithm.Items.AddRange(["SHA256", "SHA384", "SHA512"]);
+            comboHashAlgorithm.Items.AddRange(["SHA-224", "SHA-256", "SHA-384", "SHA-512", "SHA3-224", "SHA3-256", "SHA3-384", "SHA3-512"]);
             comboHashAlgorithm.SelectedIndex = 0;
 
             comboOutputFormat.Items.Clear();
@@ -378,13 +378,18 @@ namespace CryptoTool.Win
         #region 哈希算法名称转换
         private static string GetSignerAlgorithm(string uiHash) => uiHash switch
         {
-            "SHA256" => "SHA-256withECDSA",
-            "SHA384" => "SHA-384withECDSA",
-            "SHA512" => "SHA-512withECDSA",
+            "SHA-224" => "SHA-224withECDSA",
+            "SHA-256" => "SHA-256withECDSA",
+            "SHA-384" => "SHA-384withECDSA",
+            "SHA-512" => "SHA-512withECDSA",
+            "SHA3-224" => "SHA3-224withECDSA",
+            "SHA3-256" => "SHA3-256withECDSA",
+            "SHA3-384" => "SHA3-384withECDSA",
+            "SHA3-512" => "SHA3-512withECDSA",
             _ => "SHA-256withECDSA"
         };
 
-        private string GetSelectedHash() => comboHashAlgorithm.SelectedItem?.ToString() ?? "SHA256";
+        private string GetSelectedHash() => comboHashAlgorithm.SelectedItem?.ToString() ?? "SHA-256";
         #endregion
 
         #region 密钥生成
