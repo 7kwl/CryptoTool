@@ -6,7 +6,7 @@ using CryptoTool.Win.Helpers;
 
 namespace CryptoTool.Win
 {
-    public partial class EcdsaTabControl
+    partial class EcdsaTabControl
     {
         private System.ComponentModel.IContainer components = null;
 
@@ -1944,14 +1944,14 @@ namespace CryptoTool.Win
         private System.Windows.Forms.Panel panelPlainDataBox;
         private System.Windows.Forms.Label labelPlainData;
         private System.Windows.Forms.TextBox textPlainData;
-        private System.Windows.Forms.Panel panelSignatureBox;
-        private System.Windows.Forms.Label labelSignature;
-        private System.Windows.Forms.TextBox textSignature;
         private System.Windows.Forms.TableLayoutPanel panelPlainDataActions;
         private System.Windows.Forms.Label labelPlainDataActionsTitle;
         private System.Windows.Forms.Button btnCopyPlainData;
         private System.Windows.Forms.Button btnPastePlainData;
         private System.Windows.Forms.Button btnClearPlainData;
+        private System.Windows.Forms.Panel panelSignatureBox;
+        private System.Windows.Forms.Label labelSignature;
+        private System.Windows.Forms.TextBox textSignature;
         private System.Windows.Forms.TableLayoutPanel panelSignatureActions;
         private System.Windows.Forms.Label labelSignatureActionsTitle;
         private System.Windows.Forms.Button btnCopySignatureData;

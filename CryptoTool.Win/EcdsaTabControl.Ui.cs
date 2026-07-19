@@ -102,46 +102,112 @@ namespace CryptoTool.Win
                 tableLayoutEncrypt.ColumnStyles.Clear();
                 tableLayoutEncrypt.RowStyles.Clear();
 
-                tableLayoutEncrypt.ColumnCount = 1;
-                tableLayoutEncrypt.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-
-                tableLayoutEncrypt.RowCount = 9;
-                tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
-                tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
-                tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
-                tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
-                tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 22F));
-                tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Percent, 35F));
-                tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 22F));
-                tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Percent, 35F));
-                tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 44F));
+                tableLayoutEncrypt.ColumnCount = 3;
+                tableLayoutEncrypt.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 45F));
+                tableLayoutEncrypt.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 15F));
+                tableLayoutEncrypt.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F));
+                tableLayoutEncrypt.RowCount = 1;
+                tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
 
                 labelEncResult.Visible = false;
                 labelEncResult.Enabled = false;
 
-                tableLayoutEncrypt.Controls.Add(CreateLabelControlRow(labelEncMode, comboEncMode), 0, 0);
-
-                tableLayoutEncrypt.Controls.Add(CreateFormatRow(
-                    labelEncInputFormat, comboEncInputFormat,
-                    labelEncOutputFormat, comboEncOutputFormat), 0, 1);
-
-                tableLayoutEncrypt.Controls.Add(CreateLabelControlRow(labelEncKey, textEncKey), 0, 2);
-
-                tableLayoutEncrypt.Controls.Add(CreateLabelControlRow(labelEncIV, textEncIV), 0, 3);
+                // 左侧：输入 / 输出区域
+                var leftGroup = new GroupBox
+                {
+                    Text = "加密 / 解密",
+                    Dock = DockStyle.Fill,
+                    Padding = new Padding(6)
+                };
+                var leftLayout = new TableLayoutPanel
+                {
+                    Dock = DockStyle.Fill,
+                    ColumnCount = 1,
+                    RowCount = 4,
+                    Margin = new Padding(0),
+                    Padding = new Padding(0)
+                };
+                leftLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 22F));
+                leftLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+                leftLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 22F));
+                leftLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
 
                 labelEncInput.Dock = DockStyle.Fill;
                 labelEncInput.TextAlign = ContentAlignment.MiddleLeft;
-                tableLayoutEncrypt.Controls.Add(labelEncInput, 0, 4);
-
-                tableLayoutEncrypt.Controls.Add(textEncInput, 0, 5);
+                leftLayout.Controls.Add(labelEncInput, 0, 0);
+                leftLayout.Controls.Add(textEncInput, 0, 1);
 
                 labelEncOutputLabel.Dock = DockStyle.Fill;
                 labelEncOutputLabel.TextAlign = ContentAlignment.MiddleLeft;
-                tableLayoutEncrypt.Controls.Add(labelEncOutputLabel, 0, 6);
+                leftLayout.Controls.Add(labelEncOutputLabel, 0, 2);
+                leftLayout.Controls.Add(textEncOutput, 0, 3);
 
-                tableLayoutEncrypt.Controls.Add(textEncOutput, 0, 7);
+                leftGroup.Controls.Add(leftLayout);
 
-                tableLayoutEncrypt.Controls.Add(panelEncBtns, 0, 8);
+                // 中间：操作按钮
+                var middleGroup = new GroupBox
+                {
+                    Text = "操作",
+                    Dock = DockStyle.Fill,
+                    Padding = new Padding(6)
+                };
+                var middleLayout = new TableLayoutPanel
+                {
+                    Dock = DockStyle.Fill,
+                    ColumnCount = 1,
+                    RowCount = 5,
+                    Margin = new Padding(0),
+                    Padding = new Padding(0)
+                };
+                middleLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+                middleLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+                middleLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+                middleLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+                middleLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+
+                Button[] buttons = [btnEncrypt, btnDecrypt, btnEncClear, btnEncCopy, btnEncPaste];
+                for (int i = 0; i < buttons.Length; i++)
+                {
+                    buttons[i].Dock = DockStyle.Fill;
+                    buttons[i].Margin = new Padding(0, 4, 0, 4);
+                    buttons[i].AutoSize = false;
+                    middleLayout.Controls.Add(buttons[i], 0, i);
+                }
+
+                middleGroup.Controls.Add(middleLayout);
+
+                // 右侧：参数配置
+                var rightGroup = new GroupBox
+                {
+                    Text = "参数",
+                    Dock = DockStyle.Fill,
+                    Padding = new Padding(6)
+                };
+                var rightLayout = new TableLayoutPanel
+                {
+                    Dock = DockStyle.Fill,
+                    ColumnCount = 1,
+                    RowCount = 4,
+                    Margin = new Padding(0),
+                    Padding = new Padding(0)
+                };
+                rightLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
+                rightLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
+                rightLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
+                rightLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
+
+                rightLayout.Controls.Add(CreateLabelControlRow(labelEncMode, comboEncMode), 0, 0);
+                rightLayout.Controls.Add(CreateFormatRow(
+                    labelEncInputFormat, comboEncInputFormat,
+                    labelEncOutputFormat, comboEncOutputFormat), 0, 1);
+                rightLayout.Controls.Add(CreateLabelControlRow(labelEncKey, textEncKey), 0, 2);
+                rightLayout.Controls.Add(CreateLabelControlRow(labelEncIV, textEncIV), 0, 3);
+
+                rightGroup.Controls.Add(rightLayout);
+
+                tableLayoutEncrypt.Controls.Add(leftGroup, 0, 0);
+                tableLayoutEncrypt.Controls.Add(middleGroup, 1, 0);
+                tableLayoutEncrypt.Controls.Add(rightGroup, 2, 0);
 
                 groupEncFile.Visible = false;
                 groupEncFile.Enabled = false;

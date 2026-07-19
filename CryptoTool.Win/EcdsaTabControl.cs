@@ -761,6 +761,38 @@ namespace CryptoTool.Win
             if (!string.IsNullOrEmpty(textSignature.Text)) { Clipboard.SetText(textSignature.Text); SetStatus("签名已复制到剪贴板"); }
         }
 
+        private void BtnCopyPlainData_Click(object? s, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(textPlainData.Text)) { Clipboard.SetText(textPlainData.Text); SetStatus("原始数据已复制到剪贴板"); }
+        }
+
+        private void BtnPastePlainData_Click(object? s, EventArgs e)
+        {
+            if (Clipboard.ContainsText()) { textPlainData.Text = Clipboard.GetText(); SetStatus("原始数据已粘贴"); }
+        }
+
+        private void BtnClearPlainData_Click(object? s, EventArgs e)
+        {
+            textPlainData.Clear();
+            SetStatus("原始数据已清空");
+        }
+
+        private void BtnCopySignatureData_Click(object? s, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(textSignature.Text)) { Clipboard.SetText(textSignature.Text); SetStatus("签名已复制到剪贴板"); }
+        }
+
+        private void BtnPasteSignatureData_Click(object? s, EventArgs e)
+        {
+            if (Clipboard.ContainsText()) { textSignature.Text = Clipboard.GetText(); SetStatus("签名已粘贴"); }
+        }
+
+        private void BtnClearSignatureData_Click(object? s, EventArgs e)
+        {
+            textSignature.Clear();
+            SetStatus("签名已清空");
+        }
+
         private void BtnClearAll_Click(object? s, EventArgs e)
         {
             textPrivateKey.Clear(); textPublicKey.Clear(); textPlainData.Clear(); textSignature.Clear();
@@ -815,72 +847,6 @@ namespace CryptoTool.Win
                 SetStatus("复制公钥失败：公钥为空");
             }
         }
-
-        private void BtnCopyPlainData_Click(object? sender, EventArgs e)
-        {
-            if (!string.IsNullOrEmpty(textPlainData.Text))
-            {
-                Clipboard.SetText(textPlainData.Text);
-                SetStatus("原始数据已复制到剪贴板");
-            }
-            else
-            {
-                MessageBox.Show("原始数据为空，无法复制！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                SetStatus("复制原始数据失败：数据为空");
-            }
-        }
-
-        private void BtnPastePlainData_Click(object? sender, EventArgs e)
-        {
-            if (Clipboard.ContainsText())
-            {
-                textPlainData.Text = Clipboard.GetText().Trim();
-                SetStatus("原始数据已从剪贴板粘贴");
-            }
-            else
-            {
-                MessageBox.Show("剪贴板中没有文本内容！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
-
-        private void BtnClearPlainData_Click(object? sender, EventArgs e)
-        {
-            textPlainData.Clear();
-            SetStatus("原始数据已清空");
-        }
-
-        private void BtnCopySignatureData_Click(object? sender, EventArgs e)
-        {
-            if (!string.IsNullOrEmpty(textSignature.Text))
-            {
-                Clipboard.SetText(textSignature.Text);
-                SetStatus("签名已复制到剪贴板");
-            }
-            else
-            {
-                MessageBox.Show("签名为空，无法复制！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                SetStatus("复制签名失败：签名为空");
-            }
-        }
-
-        private void BtnPasteSignatureData_Click(object? sender, EventArgs e)
-        {
-            if (Clipboard.ContainsText())
-            {
-                textSignature.Text = Clipboard.GetText().Trim();
-                SetStatus("签名已从剪贴板粘贴");
-            }
-            else
-            {
-                MessageBox.Show("剪贴板中没有文本内容！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
-
-        private void BtnClearSignatureData_Click(object? sender, EventArgs e)
-        {
-            textSignature.Clear();
-            SetStatus("签名已清空");
-        }
         #endregion
 
         #region 控件事件
@@ -901,7 +867,7 @@ namespace CryptoTool.Win
 
         private void SetSignResult(string status, Color color)
         {
-            AppendValidationResult($"{status}\n使用曲线: {EcdsaCurveNames.GetDisplayName(GetSelectedCurve())}", color);
+            AppendValidationResult($"{status}\n使用曲线: {EcdsaCurveNames.GetDisplayName(GetSelectedCurve())}（{GetSelectedHash()}）", color);
         }
 
         private void ResetValidationResult(string text, Color color)
