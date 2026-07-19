@@ -896,12 +896,12 @@ namespace CryptoTool.Win
         private void SetGenerateResult(string curveName, string status)
         {
             Color color = status.Contains('❌') ? Color.Red : Color.Green;
-            AppendValidationResult($"{status}\n生成时间: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n使用曲线: {EcdsaCurveNames.GetDisplayName(curveName)}", color);
+            AppendValidationResult($"{status}\n使用曲线: {EcdsaCurveNames.GetDisplayName(curveName)}", color);
         }
 
         private void SetSignResult(string status, Color color)
         {
-            AppendValidationResult($"{status}\n生成时间: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n使用曲线: {EcdsaCurveNames.GetDisplayName(GetSelectedCurve())}（{GetSelectedHash()}）", color);
+            AppendValidationResult($"{status}\n使用曲线: {EcdsaCurveNames.GetDisplayName(GetSelectedCurve())}", color);
         }
 
         private void ResetValidationResult(string text, Color color)
@@ -918,7 +918,7 @@ namespace CryptoTool.Win
             if (labelValidationResult.Text.Contains("未验证") || labelValidationResult.Text.Contains("等待操作"))
                 labelValidationResult.Clear();
 
-            string entry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss}  {message}{Environment.NewLine}{Environment.NewLine}";
+            string entry = $"运行时间: {DateTime.Now:yyyy-MM-dd HH:mm:ss}{Environment.NewLine}此次任务: {message}{Environment.NewLine}{Environment.NewLine}";
 
             // 与右侧运行结果一致：上面新、下面旧
             labelValidationResult.Select(0, 0);
@@ -937,10 +937,10 @@ namespace CryptoTool.Win
             string detail = message;
             if (!string.IsNullOrEmpty(curveName))
             {
-                detail += $"\n生成时间: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n使用曲线: {EcdsaCurveNames.GetDisplayName(curveName)}";
+                detail += $"\n使用曲线: {EcdsaCurveNames.GetDisplayName(curveName)}";
             }
 
-            string entry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss}  {detail}{Environment.NewLine}{Environment.NewLine}";
+            string entry = $"运行时间: {DateTime.Now:yyyy-MM-dd HH:mm:ss}{Environment.NewLine}此次任务: {detail}{Environment.NewLine}{Environment.NewLine}";
 
             textKeyResult.Select(0, 0);
             textKeyResult.SelectionColor = color;
