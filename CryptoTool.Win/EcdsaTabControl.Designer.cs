@@ -6,7 +6,7 @@ using CryptoTool.Win.Helpers;
 
 namespace CryptoTool.Win
 {
-    partial class EcdsaTabControl
+    public partial class EcdsaTabControl
     {
         private System.ComponentModel.IContainer components = null;
 

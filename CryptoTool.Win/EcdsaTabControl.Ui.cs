@@ -12,7 +12,7 @@ namespace CryptoTool.Win
     /// 手写 UI 布局初始化代码，与 EcdsaTabControl.Designer.cs 中设计器生成的代码分离
     /// 与 EcdsaTabControl.cs 中的业务逻辑分离
     /// </summary>
-    partial class EcdsaTabControl
+    public partial class EcdsaTabControl
     {
         // ============ 加密布局初始化 ============
 
