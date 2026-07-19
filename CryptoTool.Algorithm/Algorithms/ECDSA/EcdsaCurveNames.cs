@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 
+#pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配：该类被多个 Win 项目文件使用，保留 CryptoTool.Win.Helpers 命名空间
 namespace CryptoTool.Win.Helpers
 {
     /// <summary>

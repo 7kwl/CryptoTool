@@ -91,9 +91,19 @@ namespace CryptoTool.Win
             panelPlainDataBox = new Panel();
             labelPlainData = new Label();
             textPlainData = new TextBox();
+            panelPlainDataActions = new TableLayoutPanel();
+            labelPlainDataActionsTitle = new Label();
+            btnCopyPlainData = new Button();
+            btnPastePlainData = new Button();
+            btnClearPlainData = new Button();
             panelSignatureBox = new Panel();
             labelSignature = new Label();
             textSignature = new TextBox();
+            panelSignatureActions = new TableLayoutPanel();
+            labelSignatureActionsTitle = new Label();
+            btnCopySignatureData = new Button();
+            btnPasteSignatureData = new Button();
+            btnClearSignatureData = new Button();
             groupSignActions = new GroupBox();
             panelSignActions = new TableLayoutPanel();
             btnSign = new Button();
@@ -169,7 +179,9 @@ namespace CryptoTool.Win
             groupSignInput.SuspendLayout();
             panelSignInput.SuspendLayout();
             panelPlainDataBox.SuspendLayout();
+            panelPlainDataActions.SuspendLayout();
             panelSignatureBox.SuspendLayout();
+            panelSignatureActions.SuspendLayout();
             groupSignActions.SuspendLayout();
             panelSignActions.SuspendLayout();
             panelSignOptions.SuspendLayout();
@@ -1026,16 +1038,22 @@ namespace CryptoTool.Win
             // 
             // panelSignInput
             // 
-            panelSignInput.ColumnCount = 1;
+            panelSignInput.ColumnCount = 2;
             panelSignInput.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            panelSignInput.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 200F));
             panelSignInput.Controls.Add(panelPlainDataBox, 0, 0);
-            panelSignInput.Controls.Add(panelSignatureBox, 0, 1);
+            panelSignInput.Controls.Add(panelPlainDataActions, 1, 0);
+            panelSignInput.Controls.Add(panelSignatureBox, 0, 2);
+            panelSignInput.Controls.Add(panelSignatureActions, 1, 2);
             panelSignInput.Dock = DockStyle.Fill;
             panelSignInput.Location = new Point(8, 31);
             panelSignInput.Name = "panelSignInput";
-            panelSignInput.RowCount = 2;
+            panelSignInput.Padding = new Padding(6);
+            panelSignInput.RowCount = 4;
             panelSignInput.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            panelSignInput.RowStyles.Add(new RowStyle(SizeType.Percent, 0F));
             panelSignInput.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            panelSignInput.RowStyles.Add(new RowStyle(SizeType.Percent, 0F));
             panelSignInput.Size = new Size(1606, 788);
             panelSignInput.TabIndex = 0;
             // 
@@ -1044,9 +1062,10 @@ namespace CryptoTool.Win
             panelPlainDataBox.Controls.Add(labelPlainData);
             panelPlainDataBox.Controls.Add(textPlainData);
             panelPlainDataBox.Dock = DockStyle.Fill;
-            panelPlainDataBox.Location = new Point(3, 3);
+            panelPlainDataBox.Location = new Point(9, 9);
             panelPlainDataBox.Name = "panelPlainDataBox";
-            panelPlainDataBox.Size = new Size(1600, 388);
+            panelSignInput.SetRowSpan(panelPlainDataBox, 2);
+            panelPlainDataBox.Size = new Size(1388, 382);
             panelPlainDataBox.TabIndex = 0;
             // 
             // labelPlainData
@@ -1054,7 +1073,7 @@ namespace CryptoTool.Win
             labelPlainData.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             labelPlainData.AutoSize = true;
             labelPlainData.BackColor = Color.Transparent;
-            labelPlainData.Location = new Point(1488, 4);
+            labelPlainData.Location = new Point(1276, 4);
             labelPlainData.Margin = new Padding(4, 4, 4, 2);
             labelPlainData.Name = "labelPlainData";
             labelPlainData.Padding = new Padding(4, 0, 4, 0);
@@ -1069,17 +1088,87 @@ namespace CryptoTool.Win
             textPlainData.Multiline = true;
             textPlainData.Name = "textPlainData";
             textPlainData.ScrollBars = ScrollBars.Vertical;
-            textPlainData.Size = new Size(1600, 388);
+            textPlainData.Size = new Size(1388, 382);
             textPlainData.TabIndex = 2;
+            // 
+            // panelPlainDataActions
+            // 
+            panelPlainDataActions.ColumnCount = 1;
+            panelPlainDataActions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            panelPlainDataActions.Controls.Add(labelPlainDataActionsTitle, 0, 0);
+            panelPlainDataActions.Controls.Add(btnCopyPlainData, 0, 1);
+            panelPlainDataActions.Controls.Add(btnPastePlainData, 0, 2);
+            panelPlainDataActions.Controls.Add(btnClearPlainData, 0, 3);
+            panelPlainDataActions.Dock = DockStyle.Fill;
+            panelPlainDataActions.Location = new Point(1403, 9);
+            panelPlainDataActions.Name = "panelPlainDataActions";
+            panelPlainDataActions.Padding = new Padding(8, 4, 8, 4);
+            panelPlainDataActions.RowCount = 4;
+            panelSignInput.SetRowSpan(panelPlainDataActions, 2);
+            panelPlainDataActions.RowStyles.Add(new RowStyle(SizeType.Absolute, 26F));
+            panelPlainDataActions.RowStyles.Add(new RowStyle(SizeType.Percent, 33F));
+            panelPlainDataActions.RowStyles.Add(new RowStyle(SizeType.Percent, 33F));
+            panelPlainDataActions.RowStyles.Add(new RowStyle(SizeType.Percent, 34F));
+            panelPlainDataActions.Size = new Size(194, 382);
+            panelPlainDataActions.TabIndex = 4;
+            // 
+            // labelPlainDataActionsTitle
+            // 
+            labelPlainDataActionsTitle.AutoSize = true;
+            labelPlainDataActionsTitle.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            labelPlainDataActionsTitle.ForeColor = Color.FromArgb(192, 0, 0);
+            labelPlainDataActionsTitle.Location = new Point(8, 4);
+            labelPlainDataActionsTitle.Margin = new Padding(0);
+            labelPlainDataActionsTitle.Name = "labelPlainDataActionsTitle";
+            labelPlainDataActionsTitle.Size = new Size(92, 25);
+            labelPlainDataActionsTitle.TabIndex = 0;
+            labelPlainDataActionsTitle.Text = "数据操作";
+            // 
+            // btnCopyPlainData
+            // 
+            btnCopyPlainData.Dock = DockStyle.Fill;
+            btnCopyPlainData.Location = new Point(10, 32);
+            btnCopyPlainData.Margin = new Padding(2);
+            btnCopyPlainData.MinimumSize = new Size(120, 30);
+            btnCopyPlainData.Name = "btnCopyPlainData";
+            btnCopyPlainData.Size = new Size(174, 110);
+            btnCopyPlainData.TabIndex = 1;
+            btnCopyPlainData.Text = "复制数据";
+            btnCopyPlainData.Click += BtnCopyPlainData_Click;
+            // 
+            // btnPastePlainData
+            // 
+            btnPastePlainData.Dock = DockStyle.Fill;
+            btnPastePlainData.Location = new Point(10, 146);
+            btnPastePlainData.Margin = new Padding(2);
+            btnPastePlainData.MinimumSize = new Size(120, 30);
+            btnPastePlainData.Name = "btnPastePlainData";
+            btnPastePlainData.Size = new Size(174, 110);
+            btnPastePlainData.TabIndex = 2;
+            btnPastePlainData.Text = "粘贴数据";
+            btnPastePlainData.Click += BtnPastePlainData_Click;
+            // 
+            // btnClearPlainData
+            // 
+            btnClearPlainData.Dock = DockStyle.Fill;
+            btnClearPlainData.Location = new Point(10, 260);
+            btnClearPlainData.Margin = new Padding(2);
+            btnClearPlainData.MinimumSize = new Size(120, 30);
+            btnClearPlainData.Name = "btnClearPlainData";
+            btnClearPlainData.Size = new Size(174, 116);
+            btnClearPlainData.TabIndex = 3;
+            btnClearPlainData.Text = "清空数据";
+            btnClearPlainData.Click += BtnClearPlainData_Click;
             // 
             // panelSignatureBox
             // 
             panelSignatureBox.Controls.Add(labelSignature);
             panelSignatureBox.Controls.Add(textSignature);
             panelSignatureBox.Dock = DockStyle.Fill;
-            panelSignatureBox.Location = new Point(3, 397);
+            panelSignatureBox.Location = new Point(9, 397);
             panelSignatureBox.Name = "panelSignatureBox";
-            panelSignatureBox.Size = new Size(1600, 388);
+            panelSignInput.SetRowSpan(panelSignatureBox, 2);
+            panelSignatureBox.Size = new Size(1388, 382);
             panelSignatureBox.TabIndex = 1;
             // 
             // labelSignature
@@ -1087,7 +1176,7 @@ namespace CryptoTool.Win
             labelSignature.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             labelSignature.AutoSize = true;
             labelSignature.BackColor = Color.Transparent;
-            labelSignature.Location = new Point(1524, 4);
+            labelSignature.Location = new Point(1312, 4);
             labelSignature.Margin = new Padding(4, 4, 4, 2);
             labelSignature.Name = "labelSignature";
             labelSignature.Padding = new Padding(4, 0, 4, 0);
@@ -1102,8 +1191,77 @@ namespace CryptoTool.Win
             textSignature.Multiline = true;
             textSignature.Name = "textSignature";
             textSignature.ScrollBars = ScrollBars.Vertical;
-            textSignature.Size = new Size(1600, 388);
+            textSignature.Size = new Size(1388, 382);
             textSignature.TabIndex = 4;
+            // 
+            // panelSignatureActions
+            // 
+            panelSignatureActions.ColumnCount = 1;
+            panelSignatureActions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            panelSignatureActions.Controls.Add(labelSignatureActionsTitle, 0, 0);
+            panelSignatureActions.Controls.Add(btnCopySignatureData, 0, 1);
+            panelSignatureActions.Controls.Add(btnPasteSignatureData, 0, 2);
+            panelSignatureActions.Controls.Add(btnClearSignatureData, 0, 3);
+            panelSignatureActions.Dock = DockStyle.Fill;
+            panelSignatureActions.Location = new Point(1403, 397);
+            panelSignatureActions.Name = "panelSignatureActions";
+            panelSignatureActions.Padding = new Padding(8, 4, 8, 4);
+            panelSignatureActions.RowCount = 4;
+            panelSignInput.SetRowSpan(panelSignatureActions, 2);
+            panelSignatureActions.RowStyles.Add(new RowStyle(SizeType.Absolute, 26F));
+            panelSignatureActions.RowStyles.Add(new RowStyle(SizeType.Percent, 33F));
+            panelSignatureActions.RowStyles.Add(new RowStyle(SizeType.Percent, 33F));
+            panelSignatureActions.RowStyles.Add(new RowStyle(SizeType.Percent, 34F));
+            panelSignatureActions.Size = new Size(194, 382);
+            panelSignatureActions.TabIndex = 5;
+            // 
+            // labelSignatureActionsTitle
+            // 
+            labelSignatureActionsTitle.AutoSize = true;
+            labelSignatureActionsTitle.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            labelSignatureActionsTitle.ForeColor = Color.FromArgb(192, 0, 0);
+            labelSignatureActionsTitle.Location = new Point(8, 4);
+            labelSignatureActionsTitle.Margin = new Padding(0);
+            labelSignatureActionsTitle.Name = "labelSignatureActionsTitle";
+            labelSignatureActionsTitle.Size = new Size(92, 25);
+            labelSignatureActionsTitle.TabIndex = 0;
+            labelSignatureActionsTitle.Text = "签名操作";
+            // 
+            // btnCopySignatureData
+            // 
+            btnCopySignatureData.Dock = DockStyle.Fill;
+            btnCopySignatureData.Location = new Point(10, 32);
+            btnCopySignatureData.Margin = new Padding(2);
+            btnCopySignatureData.MinimumSize = new Size(120, 30);
+            btnCopySignatureData.Name = "btnCopySignatureData";
+            btnCopySignatureData.Size = new Size(174, 110);
+            btnCopySignatureData.TabIndex = 1;
+            btnCopySignatureData.Text = "复制签名";
+            btnCopySignatureData.Click += BtnCopySignatureData_Click;
+            // 
+            // btnPasteSignatureData
+            // 
+            btnPasteSignatureData.Dock = DockStyle.Fill;
+            btnPasteSignatureData.Location = new Point(10, 146);
+            btnPasteSignatureData.Margin = new Padding(2);
+            btnPasteSignatureData.MinimumSize = new Size(120, 30);
+            btnPasteSignatureData.Name = "btnPasteSignatureData";
+            btnPasteSignatureData.Size = new Size(174, 110);
+            btnPasteSignatureData.TabIndex = 2;
+            btnPasteSignatureData.Text = "粘贴签名";
+            btnPasteSignatureData.Click += BtnPasteSignatureData_Click;
+            // 
+            // btnClearSignatureData
+            // 
+            btnClearSignatureData.Dock = DockStyle.Fill;
+            btnClearSignatureData.Location = new Point(10, 260);
+            btnClearSignatureData.Margin = new Padding(2);
+            btnClearSignatureData.MinimumSize = new Size(120, 30);
+            btnClearSignatureData.Name = "btnClearSignatureData";
+            btnClearSignatureData.Size = new Size(174, 116);
+            btnClearSignatureData.TabIndex = 3;
+            btnClearSignatureData.Text = "清空签名";
+            btnClearSignatureData.Click += BtnClearSignatureData_Click;
             // 
             // groupSignActions
             // 
@@ -1693,8 +1851,12 @@ namespace CryptoTool.Win
             panelSignInput.ResumeLayout(false);
             panelPlainDataBox.ResumeLayout(false);
             panelPlainDataBox.PerformLayout();
+            panelPlainDataActions.ResumeLayout(false);
+            panelPlainDataActions.PerformLayout();
             panelSignatureBox.ResumeLayout(false);
             panelSignatureBox.PerformLayout();
+            panelSignatureActions.ResumeLayout(false);
+            panelSignatureActions.PerformLayout();
             groupSignActions.ResumeLayout(false);
             panelSignActions.ResumeLayout(false);
             panelSignActions.PerformLayout();
@@ -1785,6 +1947,16 @@ namespace CryptoTool.Win
         private System.Windows.Forms.Panel panelSignatureBox;
         private System.Windows.Forms.Label labelSignature;
         private System.Windows.Forms.TextBox textSignature;
+        private System.Windows.Forms.TableLayoutPanel panelPlainDataActions;
+        private System.Windows.Forms.Label labelPlainDataActionsTitle;
+        private System.Windows.Forms.Button btnCopyPlainData;
+        private System.Windows.Forms.Button btnPastePlainData;
+        private System.Windows.Forms.Button btnClearPlainData;
+        private System.Windows.Forms.TableLayoutPanel panelSignatureActions;
+        private System.Windows.Forms.Label labelSignatureActionsTitle;
+        private System.Windows.Forms.Button btnCopySignatureData;
+        private System.Windows.Forms.Button btnPasteSignatureData;
+        private System.Windows.Forms.Button btnClearSignatureData;
         private System.Windows.Forms.GroupBox groupSignActions;
         private System.Windows.Forms.TableLayoutPanel panelSignActions;
         private System.Windows.Forms.Label labelHashAlgorithm;
