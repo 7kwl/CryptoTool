@@ -120,7 +120,7 @@ namespace CryptoTool.Win
                 textAppAuthor.Text = "CryptoTool";
                 textAppDescription.Text = "一个功能强大的加解密工具，支持RSA、SM2、SM3、SM4等多种加解密算法，" +
                                         "以及医保接口的签名验签和加解密功能。提供直观的图形界面，方便用户进行各种加解密操作。";
-                linkAppRepository.Text = "https://github.com/jinjupeng/CryptoTool";
+                linkAppRepository.Text = "https://github.com/7kwl/CryptoTool";
                 textAppLicense.Text = "MIT License";
 
                 // 当前版本信息
