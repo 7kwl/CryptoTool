@@ -6,10 +6,35 @@ using CryptoTool.Win.Helpers;
 
 namespace CryptoTool.Win
 {
+    /// <summary>
+    /// =================================================================================
+    /// ECDSA 椭圆曲线数字签名 Tab 页 - 设计器自动生成代码
+    /// =================================================================================
+    /// 
+    /// 此文件由 Windows 窗体设计器生成，包含所有控件的声明和属性初始化。
+    /// 请勿手动修改此文件中的代码（在 InitializeComponent 方法外部的字段声明区除外）。
+    /// 
+    /// <para>整体布局结构 (mainTableLayout 左右两栏):</para>
+    /// <list type="bullet">
+    ///   <item><b>左栏 50%:</b> 密钥管理(groupKey) | 签名验签(groupSign) | 加解密(groupEncrypt) | 文件操作(groupFile) | ECDH密钥协商(groupEcdh)</item>
+    ///   <item><b>右栏 50%:</b> 运行结果(groupRunResult) / 计算结果(groupComputeResult)</item>
+    /// </list>
+    /// 
+    /// <para>视图切换机制:</para>
+    /// <list type="bullet">
+    ///   <item>panelViewBar → 签名视图 / 加解密视图 / 文件视图 / ECDH视图 (按钮组)</item>
+    ///   <item>panelViewContent → 根据当前选中视图显示对应的操作面板</item>
+    /// </list>
+    /// </summary>
     partial class EcdsaTabControl
     {
+        /// <summary>设计器组件容器，用于管理所有控件的生命周期。</summary>
         private System.ComponentModel.IContainer components = null;
 
+        /// <summary>
+        /// 释放 Tab 页所使用的所有资源。
+        /// </summary>
+        /// <param name="disposing">true 表示同时释放托管资源和非托管资源；false 表示仅释放非托管资源。</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -19,6 +44,22 @@ namespace CryptoTool.Win
 
         #region 组件设计器生成的代码
 
+        /// <summary>
+        /// 初始化本 Tab 页上的所有控件及其布局属性。
+        /// 此方法由设计器自动生成，按以下板块组织:
+        /// <list type="number">
+        ///   <item><b>主布局</b> - mainTableLayout 左右两栏</item>
+        ///   <item><b>顶层窗体</b> - AutoScaleDimensions, Size 等</item>
+        ///   <item><b>视图切换栏</b> - panelViewBar + 4个视图按钮</item>
+        ///   <item><b>密钥管理区</b> - 曲线选择、公私钥输入、生成/加载按钮</item>
+        ///   <item><b>签名验签区</b> - Hash算法选择、消息输入、签名/验签按钮</item>
+        ///   <item><b>加解密区</b> - 明文/密文输入框、加密/解密按钮</item>
+        ///   <item><b>文件操作区</b> - 文件签名/验签、文件路径选择</item>
+        ///   <item><b>ECDH密钥协商区</b> - Alice/Bob密钥对、共享密钥、加解密</item>
+        ///   <item><b>运行结果区</b> - labelValidationResult + textKeyResult 输出框</item>
+        ///   <item><b>面板收起/展开</b> - 各 GroupBox 的折叠控件</item>
+        /// </list>
+        /// </summary>
         private void InitializeComponent()
         {
             mainTableLayout = new TableLayoutPanel();
@@ -1883,9 +1924,11 @@ namespace CryptoTool.Win
         #endregion
 
         // ==========================================
-        // 字段声明（全部补全，避免编译错误）
+        // 字段声明 - 所有控件的字段声明按板块分组
         // ==========================================
+        // [主布局]
         private System.Windows.Forms.TableLayoutPanel mainTableLayout;
+        // [密钥管理区 - groupKey]
         private System.Windows.Forms.GroupBox groupKey;
         private System.Windows.Forms.TableLayoutPanel tableLayoutKey;
         private System.Windows.Forms.Panel panelPrivateKeyBox;
@@ -1908,6 +1951,7 @@ namespace CryptoTool.Win
         private System.Windows.Forms.Button btnImportPublicKey;
         private System.Windows.Forms.Button btnSavePublicKey;
         private System.Windows.Forms.Button btnClearPublicKey;
+        // [右侧设置面板 - panelActionButtons]
         private System.Windows.Forms.Panel panelActionButtons;
         private System.Windows.Forms.TableLayoutPanel tableActionButtons;
         private System.Windows.Forms.Panel panelButtonArea;
@@ -1925,6 +1969,7 @@ namespace CryptoTool.Win
         private System.Windows.Forms.Panel panelKeyControlsContainer;
         private System.Windows.Forms.FlowLayoutPanel panelRightSettings;
         private System.Windows.Forms.FlowLayoutPanel panelKeyControls;
+        // [密钥操作按钮 - groupKeyActions]
         private System.Windows.Forms.Button btnGenerateKeyPair;
         private System.Windows.Forms.Button btnValidateKeyPair;
         private System.Windows.Forms.Button btnGetPublicKeyFromPrivate;
@@ -1936,6 +1981,7 @@ namespace CryptoTool.Win
         private System.Windows.Forms.ComboBox comboCategory;
         private System.Windows.Forms.Label lblArrow;
         private System.Windows.Forms.ComboBox comboCurve;
+        // [签名验签区 - groupSign]
         private System.Windows.Forms.SplitContainer splitSignEncrypt;
         private System.Windows.Forms.Panel groupSign;
         private System.Windows.Forms.TableLayoutPanel tableLayoutSign;
@@ -1966,6 +2012,7 @@ namespace CryptoTool.Win
         private System.Windows.Forms.Button btnSign;
         private System.Windows.Forms.Button btnVerify;
         private System.Windows.Forms.Button btnCopySignature;
+        // [加解密区 - groupEncrypt]
         private System.Windows.Forms.GroupBox groupEncrypt;
         private System.Windows.Forms.TableLayoutPanel tableLayoutEncrypt;
         private System.Windows.Forms.Label labelEncMode;
@@ -1988,6 +2035,7 @@ namespace CryptoTool.Win
         private System.Windows.Forms.Button btnEncClear;
         private System.Windows.Forms.Button btnEncCopy;
         private System.Windows.Forms.Button btnEncPaste;
+        // [文件操作区 - groupFile + groupEncFile]
         private System.Windows.Forms.GroupBox groupEncFile;
         private System.Windows.Forms.FlowLayoutPanel panelEncFileBtns;
         private System.Windows.Forms.Button btnEncryptFile;
@@ -1998,12 +2046,14 @@ namespace CryptoTool.Win
         private System.Windows.Forms.FlowLayoutPanel panelFileControls;
         private System.Windows.Forms.Button btnSignFile;
         private System.Windows.Forms.Button btnVerifyFile;
+        // [运行结果区]
         private System.Windows.Forms.GroupBox groupRunResult;
         private System.Windows.Forms.GroupBox groupKeyActions;
         private System.Windows.Forms.GroupBox groupComputeResult;
         private System.Windows.Forms.TableLayoutPanel tableKeyActions;
         private System.Windows.Forms.RichTextBox textKeyResult;
         private System.Windows.Forms.RichTextBox labelValidationResult;
+        // [视图切换栏]
         private System.Windows.Forms.FlowLayoutPanel panelViewBar;
         private System.Windows.Forms.Button btnViewSign;
         private System.Windows.Forms.Button btnViewEncrypt;
@@ -2012,7 +2062,7 @@ namespace CryptoTool.Win
         private System.Windows.Forms.Panel panelViewContent;
         private System.Windows.Forms.Panel groupEcdh;
 
-        // ECDH 视图控件
+        // [ECDH 密钥协商区 - 动态创建的控件]
         private System.Windows.Forms.ComboBox comboEcdhCategory;
         private System.Windows.Forms.ComboBox comboEcdhCurve;
         private System.Windows.Forms.ComboBox comboEcdhMode;

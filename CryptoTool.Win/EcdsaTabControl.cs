@@ -38,6 +38,7 @@ namespace CryptoTool.Win
             InitializeComponent();
             InitializeEncryptLayout();
             InitializeViewSwitcher();
+            InitializeSignLayoutLabels();
             InitializeEcdhLayout();
             InitializeDefaults();
             InitializeResizeTimer();
