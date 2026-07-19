@@ -84,20 +84,26 @@ namespace CryptoTool.Win
             btnViewEncrypt = new Button();
             btnViewFile = new Button();
             panelViewContent = new Panel();
-            groupSign = new GroupBox();
+            groupSign = new Panel();
             tableLayoutSign = new TableLayoutPanel();
+            groupSignInput = new GroupBox();
+            panelSignInput = new TableLayoutPanel();
+            panelPlainDataBox = new Panel();
             labelPlainData = new Label();
-            panelSignActions = new FlowLayoutPanel();
+            textPlainData = new TextBox();
+            panelSignatureBox = new Panel();
+            labelSignature = new Label();
+            textSignature = new TextBox();
+            groupSignActions = new GroupBox();
+            panelSignActions = new TableLayoutPanel();
+            btnSign = new Button();
+            btnVerify = new Button();
+            btnCopySignature = new Button();
+            panelSignOptions = new TableLayoutPanel();
             labelHashAlgorithm = new Label();
             comboHashAlgorithm = new ComboBox();
             labelSignatureFormat = new Label();
             comboSignatureFormat = new ComboBox();
-            btnSign = new Button();
-            btnVerify = new Button();
-            btnCopySignature = new Button();
-            textPlainData = new TextBox();
-            labelSignature = new Label();
-            textSignature = new TextBox();
             groupEncrypt = new GroupBox();
             tableLayoutEncrypt = new TableLayoutPanel();
             labelEncMode = new Label();
@@ -160,7 +166,13 @@ namespace CryptoTool.Win
             panelViewContent.SuspendLayout();
             groupSign.SuspendLayout();
             tableLayoutSign.SuspendLayout();
+            groupSignInput.SuspendLayout();
+            panelSignInput.SuspendLayout();
+            panelPlainDataBox.SuspendLayout();
+            panelSignatureBox.SuspendLayout();
+            groupSignActions.SuspendLayout();
             panelSignActions.SuspendLayout();
+            panelSignOptions.SuspendLayout();
             groupEncrypt.SuspendLayout();
             tableLayoutEncrypt.SuspendLayout();
             panelEncBtns.SuspendLayout();
@@ -981,114 +993,155 @@ namespace CryptoTool.Win
             groupSign.Dock = DockStyle.Fill;
             groupSign.Location = new Point(0, 0);
             groupSign.Name = "groupSign";
-            groupSign.Padding = new Padding(8);
+            groupSign.Padding = new Padding(4);
             groupSign.Size = new Size(3265, 841);
             groupSign.TabIndex = 0;
-            groupSign.TabStop = false;
             // 
             // tableLayoutSign
             // 
             tableLayoutSign.ColumnCount = 2;
             tableLayoutSign.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableLayoutSign.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableLayoutSign.Controls.Add(labelPlainData, 0, 0);
-            tableLayoutSign.Controls.Add(panelSignActions, 1, 0);
-            tableLayoutSign.Controls.Add(textPlainData, 0, 1);
-            tableLayoutSign.Controls.Add(labelSignature, 0, 2);
-            tableLayoutSign.Controls.Add(textSignature, 0, 3);
+            tableLayoutSign.Controls.Add(groupSignInput, 0, 0);
+            tableLayoutSign.Controls.Add(groupSignActions, 1, 0);
             tableLayoutSign.Dock = DockStyle.Fill;
-            tableLayoutSign.Location = new Point(8, 31);
+            tableLayoutSign.Location = new Point(4, 4);
             tableLayoutSign.Name = "tableLayoutSign";
-            tableLayoutSign.RowCount = 4;
-            tableLayoutSign.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
-            tableLayoutSign.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutSign.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
-            tableLayoutSign.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutSign.Size = new Size(3249, 802);
+            tableLayoutSign.RowCount = 1;
+            tableLayoutSign.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutSign.Size = new Size(3257, 833);
             tableLayoutSign.TabIndex = 0;
+            // 
+            // groupSignInput
+            // 
+            groupSignInput.Controls.Add(panelSignInput);
+            groupSignInput.Dock = DockStyle.Fill;
+            groupSignInput.Location = new Point(3, 3);
+            groupSignInput.Name = "groupSignInput";
+            groupSignInput.Padding = new Padding(8);
+            groupSignInput.Size = new Size(1622, 827);
+            groupSignInput.TabIndex = 0;
+            groupSignInput.TabStop = false;
+            groupSignInput.Text = "签名验签";
+            // 
+            // panelSignInput
+            // 
+            panelSignInput.ColumnCount = 1;
+            panelSignInput.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            panelSignInput.Controls.Add(panelPlainDataBox, 0, 0);
+            panelSignInput.Controls.Add(panelSignatureBox, 0, 1);
+            panelSignInput.Dock = DockStyle.Fill;
+            panelSignInput.Location = new Point(8, 31);
+            panelSignInput.Name = "panelSignInput";
+            panelSignInput.RowCount = 2;
+            panelSignInput.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            panelSignInput.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            panelSignInput.Size = new Size(1606, 788);
+            panelSignInput.TabIndex = 0;
+            // 
+            // panelPlainDataBox
+            // 
+            panelPlainDataBox.Controls.Add(labelPlainData);
+            panelPlainDataBox.Controls.Add(textPlainData);
+            panelPlainDataBox.Dock = DockStyle.Fill;
+            panelPlainDataBox.Location = new Point(3, 3);
+            panelPlainDataBox.Name = "panelPlainDataBox";
+            panelPlainDataBox.Size = new Size(1600, 388);
+            panelPlainDataBox.TabIndex = 0;
             // 
             // labelPlainData
             // 
-            labelPlainData.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            labelPlainData.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             labelPlainData.AutoSize = true;
-            labelPlainData.Location = new Point(4, 4);
+            labelPlainData.BackColor = Color.Transparent;
+            labelPlainData.Location = new Point(1488, 4);
             labelPlainData.Margin = new Padding(4, 4, 4, 2);
             labelPlainData.Name = "labelPlainData";
             labelPlainData.Padding = new Padding(4, 0, 4, 0);
-            labelPlainData.Size = new Size(108, 22);
+            labelPlainData.Size = new Size(108, 24);
             labelPlainData.TabIndex = 0;
             labelPlainData.Text = "原始数据：";
             // 
+            // textPlainData
+            // 
+            textPlainData.Dock = DockStyle.Fill;
+            textPlainData.Location = new Point(0, 0);
+            textPlainData.Multiline = true;
+            textPlainData.Name = "textPlainData";
+            textPlainData.ScrollBars = ScrollBars.Vertical;
+            textPlainData.Size = new Size(1600, 388);
+            textPlainData.TabIndex = 2;
+            // 
+            // panelSignatureBox
+            // 
+            panelSignatureBox.Controls.Add(labelSignature);
+            panelSignatureBox.Controls.Add(textSignature);
+            panelSignatureBox.Dock = DockStyle.Fill;
+            panelSignatureBox.Location = new Point(3, 397);
+            panelSignatureBox.Name = "panelSignatureBox";
+            panelSignatureBox.Size = new Size(1600, 388);
+            panelSignatureBox.TabIndex = 1;
+            // 
+            // labelSignature
+            // 
+            labelSignature.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            labelSignature.AutoSize = true;
+            labelSignature.BackColor = Color.Transparent;
+            labelSignature.Location = new Point(1524, 4);
+            labelSignature.Margin = new Padding(4, 4, 4, 2);
+            labelSignature.Name = "labelSignature";
+            labelSignature.Padding = new Padding(4, 0, 4, 0);
+            labelSignature.Size = new Size(72, 24);
+            labelSignature.TabIndex = 3;
+            labelSignature.Text = "签名：";
+            // 
+            // textSignature
+            // 
+            textSignature.Dock = DockStyle.Fill;
+            textSignature.Location = new Point(0, 0);
+            textSignature.Multiline = true;
+            textSignature.Name = "textSignature";
+            textSignature.ScrollBars = ScrollBars.Vertical;
+            textSignature.Size = new Size(1600, 388);
+            textSignature.TabIndex = 4;
+            // 
+            // groupSignActions
+            // 
+            groupSignActions.Controls.Add(panelSignActions);
+            groupSignActions.Dock = DockStyle.Fill;
+            groupSignActions.Location = new Point(1631, 3);
+            groupSignActions.Name = "groupSignActions";
+            groupSignActions.Padding = new Padding(8);
+            groupSignActions.Size = new Size(1623, 827);
+            groupSignActions.TabIndex = 1;
+            groupSignActions.TabStop = false;
+            groupSignActions.Text = "操作按钮";
+            // 
             // panelSignActions
             // 
-            panelSignActions.Controls.Add(labelHashAlgorithm);
-            panelSignActions.Controls.Add(comboHashAlgorithm);
-            panelSignActions.Controls.Add(labelSignatureFormat);
-            panelSignActions.Controls.Add(comboSignatureFormat);
-            panelSignActions.Controls.Add(btnSign);
-            panelSignActions.Controls.Add(btnVerify);
-            panelSignActions.Controls.Add(btnCopySignature);
+            panelSignActions.ColumnCount = 2;
+            panelSignActions.ColumnStyles.Add(new ColumnStyle());
+            panelSignActions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            panelSignActions.Controls.Add(btnSign, 0, 0);
+            panelSignActions.Controls.Add(btnVerify, 0, 1);
+            panelSignActions.Controls.Add(btnCopySignature, 0, 2);
+            panelSignActions.Controls.Add(panelSignOptions, 1, 0);
             panelSignActions.Dock = DockStyle.Fill;
-            panelSignActions.FlowDirection = FlowDirection.TopDown;
-            panelSignActions.Location = new Point(1627, 3);
+            panelSignActions.Location = new Point(8, 31);
             panelSignActions.Name = "panelSignActions";
             panelSignActions.Padding = new Padding(8, 4, 8, 4);
-            tableLayoutSign.SetRowSpan(panelSignActions, 4);
-            panelSignActions.Size = new Size(1619, 796);
+            panelSignActions.RowCount = 3;
+            panelSignActions.RowStyles.Add(new RowStyle(SizeType.Percent, 33.3333F));
+            panelSignActions.RowStyles.Add(new RowStyle(SizeType.Percent, 33.3333F));
+            panelSignActions.RowStyles.Add(new RowStyle(SizeType.Percent, 33.3334F));
+            panelSignActions.Size = new Size(1607, 788);
             panelSignActions.TabIndex = 1;
-            panelSignActions.WrapContents = false;
-            // 
-            // labelHashAlgorithm
-            // 
-            labelHashAlgorithm.AutoSize = true;
-            labelHashAlgorithm.Dock = DockStyle.Top;
-            labelHashAlgorithm.Location = new Point(8, 4);
-            labelHashAlgorithm.Margin = new Padding(0, 0, 0, 2);
-            labelHashAlgorithm.Name = "labelHashAlgorithm";
-            labelHashAlgorithm.Size = new Size(120, 24);
-            labelHashAlgorithm.TabIndex = 0;
-            labelHashAlgorithm.Text = "Hash算法：";
-            // 
-            // comboHashAlgorithm
-            // 
-            comboHashAlgorithm.Dock = DockStyle.Top;
-            comboHashAlgorithm.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboHashAlgorithm.FormattingEnabled = true;
-            comboHashAlgorithm.Items.AddRange(new object[] { "SHA256", "SHA384", "SHA512" });
-            comboHashAlgorithm.Location = new Point(8, 30);
-            comboHashAlgorithm.Margin = new Padding(0, 0, 0, 6);
-            comboHashAlgorithm.Name = "comboHashAlgorithm";
-            comboHashAlgorithm.Size = new Size(120, 32);
-            comboHashAlgorithm.TabIndex = 1;
-            // 
-            // labelSignatureFormat
-            // 
-            labelSignatureFormat.AutoSize = true;
-            labelSignatureFormat.Dock = DockStyle.Top;
-            labelSignatureFormat.Location = new Point(8, 72);
-            labelSignatureFormat.Margin = new Padding(0, 4, 0, 2);
-            labelSignatureFormat.Name = "labelSignatureFormat";
-            labelSignatureFormat.Size = new Size(120, 24);
-            labelSignatureFormat.TabIndex = 2;
-            labelSignatureFormat.Text = "签名格式：";
-            // 
-            // comboSignatureFormat
-            // 
-            comboSignatureFormat.Dock = DockStyle.Top;
-            comboSignatureFormat.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboSignatureFormat.FormattingEnabled = true;
-            comboSignatureFormat.Items.AddRange(new object[] { "Base64", "Hex" });
-            comboSignatureFormat.Location = new Point(8, 98);
-            comboSignatureFormat.Margin = new Padding(0, 0, 0, 8);
-            comboSignatureFormat.Name = "comboSignatureFormat";
-            comboSignatureFormat.Size = new Size(120, 32);
-            comboSignatureFormat.TabIndex = 3;
             // 
             // btnSign
             // 
             btnSign.AutoSize = true;
             btnSign.Dock = DockStyle.Top;
-            btnSign.Location = new Point(8, 138);
+            btnSign.Location = new Point(8, 4);
             btnSign.Margin = new Padding(0, 0, 0, 4);
             btnSign.MinimumSize = new Size(120, 30);
             btnSign.Name = "btnSign";
@@ -1101,7 +1154,7 @@ namespace CryptoTool.Win
             // 
             btnVerify.AutoSize = true;
             btnVerify.Dock = DockStyle.Top;
-            btnVerify.Location = new Point(8, 182);
+            btnVerify.Location = new Point(8, 263);
             btnVerify.Margin = new Padding(0, 0, 0, 4);
             btnVerify.MinimumSize = new Size(120, 30);
             btnVerify.Name = "btnVerify";
@@ -1114,7 +1167,7 @@ namespace CryptoTool.Win
             // 
             btnCopySignature.AutoSize = true;
             btnCopySignature.Dock = DockStyle.Top;
-            btnCopySignature.Location = new Point(8, 226);
+            btnCopySignature.Location = new Point(8, 522);
             btnCopySignature.Margin = new Padding(0);
             btnCopySignature.MinimumSize = new Size(120, 30);
             btnCopySignature.Name = "btnCopySignature";
@@ -1123,37 +1176,70 @@ namespace CryptoTool.Win
             btnCopySignature.Text = "复制签名";
             btnCopySignature.Click += BtnCopySignature_Click;
             // 
-            // textPlainData
+            // panelSignOptions
             // 
-            textPlainData.Dock = DockStyle.Fill;
-            textPlainData.Location = new Point(3, 31);
-            textPlainData.Multiline = true;
-            textPlainData.Name = "textPlainData";
-            textPlainData.ScrollBars = ScrollBars.Vertical;
-            textPlainData.Size = new Size(1618, 367);
-            textPlainData.TabIndex = 2;
+            panelSignOptions.ColumnCount = 2;
+            panelSignOptions.ColumnStyles.Add(new ColumnStyle());
+            panelSignOptions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            panelSignOptions.Controls.Add(labelHashAlgorithm, 0, 0);
+            panelSignOptions.Controls.Add(comboHashAlgorithm, 1, 0);
+            panelSignOptions.Controls.Add(labelSignatureFormat, 0, 1);
+            panelSignOptions.Controls.Add(comboSignatureFormat, 1, 1);
+            panelSignOptions.Dock = DockStyle.Fill;
+            panelSignOptions.Location = new Point(131, 7);
+            panelSignOptions.Name = "panelSignOptions";
+            panelSignOptions.RowCount = 2;
+            panelSignActions.SetRowSpan(panelSignOptions, 3);
+            panelSignOptions.RowStyles.Add(new RowStyle());
+            panelSignOptions.RowStyles.Add(new RowStyle());
+            panelSignOptions.Size = new Size(1465, 774);
+            panelSignOptions.TabIndex = 7;
             // 
-            // labelSignature
+            // labelHashAlgorithm
             // 
-            labelSignature.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            labelSignature.AutoSize = true;
-            labelSignature.Location = new Point(4, 405);
-            labelSignature.Margin = new Padding(4, 4, 4, 2);
-            labelSignature.Name = "labelSignature";
-            labelSignature.Padding = new Padding(4, 0, 4, 0);
-            labelSignature.Size = new Size(72, 22);
-            labelSignature.TabIndex = 3;
-            labelSignature.Text = "签名：";
+            labelHashAlgorithm.AutoSize = true;
+            labelHashAlgorithm.Location = new Point(0, 4);
+            labelHashAlgorithm.Margin = new Padding(0, 4, 4, 0);
+            labelHashAlgorithm.Name = "labelHashAlgorithm";
+            labelHashAlgorithm.Size = new Size(107, 24);
+            labelHashAlgorithm.TabIndex = 0;
+            labelHashAlgorithm.Text = "Hash算法：";
+            labelHashAlgorithm.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // textSignature
+            // comboHashAlgorithm
             // 
-            textSignature.Dock = DockStyle.Fill;
-            textSignature.Location = new Point(3, 432);
-            textSignature.Multiline = true;
-            textSignature.Name = "textSignature";
-            textSignature.ScrollBars = ScrollBars.Vertical;
-            textSignature.Size = new Size(1618, 367);
-            textSignature.TabIndex = 4;
+            comboHashAlgorithm.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            comboHashAlgorithm.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboHashAlgorithm.FormattingEnabled = true;
+            comboHashAlgorithm.Items.AddRange(new object[] { "SHA-224", "SHA-256", "SHA-384", "SHA-512", "SHA3-224", "SHA3-256", "SHA3-384", "SHA3-512" });
+            comboHashAlgorithm.Location = new Point(111, 0);
+            comboHashAlgorithm.Margin = new Padding(0, 0, 16, 0);
+            comboHashAlgorithm.Name = "comboHashAlgorithm";
+            comboHashAlgorithm.Size = new Size(1338, 32);
+            comboHashAlgorithm.TabIndex = 1;
+            // 
+            // labelSignatureFormat
+            // 
+            labelSignatureFormat.AutoSize = true;
+            labelSignatureFormat.Location = new Point(0, 36);
+            labelSignatureFormat.Margin = new Padding(0, 4, 4, 0);
+            labelSignatureFormat.Name = "labelSignatureFormat";
+            labelSignatureFormat.Size = new Size(100, 24);
+            labelSignatureFormat.TabIndex = 2;
+            labelSignatureFormat.Text = "签名格式：";
+            labelSignatureFormat.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // comboSignatureFormat
+            // 
+            comboSignatureFormat.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            comboSignatureFormat.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboSignatureFormat.FormattingEnabled = true;
+            comboSignatureFormat.Items.AddRange(new object[] { "Base64", "Hex" });
+            comboSignatureFormat.Location = new Point(111, 32);
+            comboSignatureFormat.Margin = new Padding(0);
+            comboSignatureFormat.Name = "comboSignatureFormat";
+            comboSignatureFormat.Size = new Size(1354, 32);
+            comboSignatureFormat.TabIndex = 3;
             // 
             // groupEncrypt
             // 
@@ -1603,9 +1689,17 @@ namespace CryptoTool.Win
             panelViewContent.ResumeLayout(false);
             groupSign.ResumeLayout(false);
             tableLayoutSign.ResumeLayout(false);
-            tableLayoutSign.PerformLayout();
+            groupSignInput.ResumeLayout(false);
+            panelSignInput.ResumeLayout(false);
+            panelPlainDataBox.ResumeLayout(false);
+            panelPlainDataBox.PerformLayout();
+            panelSignatureBox.ResumeLayout(false);
+            panelSignatureBox.PerformLayout();
+            groupSignActions.ResumeLayout(false);
             panelSignActions.ResumeLayout(false);
             panelSignActions.PerformLayout();
+            panelSignOptions.ResumeLayout(false);
+            panelSignOptions.PerformLayout();
             groupEncrypt.ResumeLayout(false);
             tableLayoutEncrypt.ResumeLayout(false);
             tableLayoutEncrypt.PerformLayout();
@@ -1681,13 +1775,18 @@ namespace CryptoTool.Win
         private System.Windows.Forms.Label lblArrow;
         private System.Windows.Forms.ComboBox comboCurve;
         private System.Windows.Forms.SplitContainer splitSignEncrypt;
-        private System.Windows.Forms.GroupBox groupSign;
+        private System.Windows.Forms.Panel groupSign;
         private System.Windows.Forms.TableLayoutPanel tableLayoutSign;
+        private System.Windows.Forms.GroupBox groupSignInput;
+        private System.Windows.Forms.TableLayoutPanel panelSignInput;
+        private System.Windows.Forms.Panel panelPlainDataBox;
         private System.Windows.Forms.Label labelPlainData;
         private System.Windows.Forms.TextBox textPlainData;
+        private System.Windows.Forms.Panel panelSignatureBox;
         private System.Windows.Forms.Label labelSignature;
         private System.Windows.Forms.TextBox textSignature;
-        private System.Windows.Forms.FlowLayoutPanel panelSignActions;
+        private System.Windows.Forms.GroupBox groupSignActions;
+        private System.Windows.Forms.TableLayoutPanel panelSignActions;
         private System.Windows.Forms.Label labelHashAlgorithm;
         private System.Windows.Forms.ComboBox comboHashAlgorithm;
         private System.Windows.Forms.Label labelSignatureFormat;
@@ -1761,6 +1860,7 @@ namespace CryptoTool.Win
         private System.Windows.Forms.Button btnEcdhCopyResult;
         private System.Windows.Forms.Button btnEcdhPasteInput;
         private System.Windows.Forms.Button btnEcdhClear;
+        private TableLayoutPanel panelSignOptions;
     }
 }
 
