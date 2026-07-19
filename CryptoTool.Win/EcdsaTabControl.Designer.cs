@@ -989,8 +989,8 @@ namespace CryptoTool.Win
             // tableLayoutSign
             // 
             tableLayoutSign.ColumnCount = 2;
-            tableLayoutSign.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutSign.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 200F));
+            tableLayoutSign.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutSign.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableLayoutSign.Controls.Add(labelPlainData, 0, 0);
             tableLayoutSign.Controls.Add(panelSignActions, 1, 0);
             tableLayoutSign.Controls.Add(textPlainData, 0, 1);
