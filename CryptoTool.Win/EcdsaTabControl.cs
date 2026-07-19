@@ -45,30 +45,6 @@ namespace CryptoTool.Win
             InitializeResizeTimer();
             EnableDoubleBuffering();
 
-            // ECIES 模式切换：显示/隐藏 Bob 公钥和曲线参数
-            comboEncMode.SelectedIndexChanged += (_, _) =>
-            {
-                bool isEcies = GetEncMode() == "ECIES (ECDH+AES-GCM)";
-                labelEncBobPublic.Visible = isEcies; textEncBobPublic.Visible = isEcies;
-                labelEncCurve.Visible = isEcies; comboEncCurve.Visible = isEcies;
-                // ECIES 模式下对称密钥由 ECDH 自动派生，变为只读显示
-                if (isEcies)
-                {
-                    textEncKey.PlaceholderText = "ECIES 模式下由 ECDH 自动派生共享密钥";
-                }
-                else
-                {
-                    textEncKey.PlaceholderText = "从ECDSA私钥自动派生（HKDF-SHA256）";
-                }
-            };
-            // 初始化时根据当前选择同步 ECIES 控件可见性
-            if (GetEncMode() == "ECIES (ECDH+AES-GCM)")
-            {
-                labelEncBobPublic.Visible = true; textEncBobPublic.Visible = true;
-                labelEncCurve.Visible = true; comboEncCurve.Visible = true;
-                textEncKey.PlaceholderText = "ECIES 模式下由 ECDH 自动派生共享密钥";
-            }
-
             this.Load += (_, __) => ApplySplitterRatios();
             this.SizeChanged += OnResizeTimerRestart;
         }
@@ -392,14 +368,6 @@ namespace CryptoTool.Win
             comboSignatureFormat.Items.Clear();
             comboSignatureFormat.Items.AddRange(["Base64", "Hex"]);
             comboSignatureFormat.SelectedIndex = 0;
-
-            // ECIES 默认使用推荐标准曲线 P-256
-            comboEncCurve.SelectedIndex = 0;
-
-            // 加密模式、输入格式、输出格式默认选择第一项
-            comboEncMode.SelectedIndex = 0;
-            comboEncInputFormat.SelectedIndex = 0;
-            comboEncOutputFormat.SelectedIndex = 0;
 
             radioPrivateKey.Checked = true;
             ResetValidationResult("未验证", Color.Gray);
@@ -1066,9 +1034,6 @@ namespace CryptoTool.Win
             }
         }
 
-        /// <summary>获取当前选择的加密模式。</summary>
-        private string GetEncMode() => comboEncMode.SelectedItem?.ToString() ?? "AES-256-GCM";
-
         private byte[] GetEncKey()
         {
             if (!string.IsNullOrWhiteSpace(textEncKey.Text))
@@ -1093,7 +1058,7 @@ namespace CryptoTool.Win
             return derivedKey;
         }
 
-        private byte[] GetEncIV(string mode, bool forEncryption)
+        private byte[] GetEncIV(string mode)
         {
             int ivLen = mode switch
             {
@@ -1101,30 +1066,20 @@ namespace CryptoTool.Win
                 _ => 12
             };
 
-            if (forEncryption)
+            // 如果 IV 框内容非空，且与上次自动生成的 IV 不同，则视为用户手动指定
+            if (!string.IsNullOrWhiteSpace(textEncIV.Text))
             {
-                // 加密：如果 IV 框内容是用户手动指定的，则使用；否则随机生成
-                if (!string.IsNullOrWhiteSpace(textEncIV.Text))
+                string currentHex = textEncIV.Text.Trim().ToLowerInvariant();
+                string lastHex = _lastEncIV != null ? Convert.ToHexString(_lastEncIV).ToLowerInvariant() : string.Empty;
+                if (currentHex != lastHex)
                 {
-                    string currentHex = textEncIV.Text.Trim().ToLowerInvariant();
-                    string lastHex = _lastEncIV != null ? Convert.ToHexString(_lastEncIV).ToLowerInvariant() : string.Empty;
-                    if (currentHex != lastHex)
-                    {
-                        return Convert.FromHexString(currentHex);
-                    }
+                    return Convert.FromHexString(currentHex);
                 }
+            }
 
-                byte[] iv = RandomNumberGenerator.GetBytes(ivLen);
-                _lastEncIV = iv;
-                return iv;
-            }
-            else
-            {
-                // 解密：必须提供 IV，不允许随机生成
-                if (string.IsNullOrWhiteSpace(textEncIV.Text))
-                    throw new InvalidOperationException("解密需要 IV/Nonce，请先从加密结果获取或手动输入");
-                return Convert.FromHexString(textEncIV.Text.Trim());
-            }
+            byte[] iv = RandomNumberGenerator.GetBytes(ivLen);
+            _lastEncIV = iv;
+            return iv;
         }
         #endregion
 
@@ -1195,106 +1150,6 @@ namespace CryptoTool.Win
             chacha.Decrypt(nonce, cipher, tag, plain);
             return plain;
         }
-
-        /// <summary>
-        /// ECIES 加密（真正的临时 ECDH + AES-256-GCM）。
-        /// 流程：生成临时密钥对 → ECDH 协商 → HKDF 派生 → AES-GCM 加密。
-        /// 输出格式：Base64(R || IV || Cipher+Tag)
-        /// </summary>
-        private void PerformEciesEncrypt(byte[] plain, string mode)
-        {
-            // 1. 获取接收方公钥
-            string bobPubPem = string.IsNullOrWhiteSpace(textEncBobPublic.Text)
-                ? textPublicKey.Text.Trim()
-                : textEncBobPublic.Text.Trim();
-            if (string.IsNullOrWhiteSpace(bobPubPem))
-            {
-                MessageBox.Show("请先输入 Bob 公钥（接收方）", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            var bobPub = EcdsaKeyHelper.ImportPublicKeyPem(bobPubPem);
-            string curve = comboEncCurve.SelectedItem?.ToString() ?? "P-256";
-
-            // 2. 可选用户 IV
-            byte[]? userIv = null;
-            if (!string.IsNullOrWhiteSpace(textEncIV.Text))
-            {
-                try { userIv = Convert.FromHexString(textEncIV.Text.Trim()); }
-                catch (FormatException)
-                {
-                    MessageBox.Show("IV 格式无效，请输入 12 字节 Hex 字符串", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-            }
-
-            // 3. 执行 ECIES 加密
-            byte[] combined = EcdhAlgorithm.EciesEncrypt(
-                plain, bobPub, curve, EcdhMode.CryptoTool,
-                out byte[] sharedSecret, out byte[] iv, userIv);
-
-            // 4. 显示结果
-            textEncKey.Text = Convert.ToHexString(sharedSecret).ToLowerInvariant();
-            textEncIV.Text = Convert.ToHexString(iv).ToLowerInvariant();
-            _lastEncIV = iv;
-            textEncOutput.Text = Convert.ToBase64String(combined);
-
-            AppendValidationResult(
-                $"✅ ECIES 加密成功\r\n算法: {mode}\r\n曲线: {curve}\r\n" +
-                $"共享密钥: {Convert.ToHexString(sharedSecret).ToLowerInvariant()[..8]}...\r\n" +
-                $"IV: {Convert.ToHexString(iv).ToLowerInvariant()}\r\n" +
-                $"密文长度: {combined.Length} 字节 (Base64 后 {textEncOutput.Text.Length} 字符)",
-                Color.Green);
-            SetStatus("ECIES 加密完成");
-        }
-
-        /// <summary>
-        /// ECIES 解密（真正的临时 ECDH + AES-256-GCM）。
-        /// 需要 Bob 私钥（接收方），默认使用当前 ECDSA 私钥。
-        /// </summary>
-        private void PerformEciesDecrypt(string cipherSource, string mode)
-        {
-            if (string.IsNullOrWhiteSpace(_privateKeyPem))
-            {
-                MessageBox.Show("解密需要 Bob 私钥（接收方），请先在密钥管理区生成或导入 ECDSA 私钥。\n\n" +
-                                "提示：ECIES 使用 ECDH 临时密钥协商，解密方需要自己的私钥。",
-                                "缺少私钥", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            try
-            {
-                var bobPriv = EcdsaKeyHelper.ImportPrivateKeyPem(_privateKeyPem);
-                string curve = comboEncCurve.SelectedItem?.ToString() ?? "P-256";
-                byte[] combined = Convert.FromBase64String(cipherSource);
-
-                byte[] plain = EcdhAlgorithm.EciesDecrypt(
-                    combined, bobPriv, curve, EcdhMode.CryptoTool,
-                    out byte[] sharedSecret, out byte[] iv);
-
-                textEncInput.Text = Encoding.UTF8.GetString(plain);
-                textEncKey.Text = Convert.ToHexString(sharedSecret).ToLowerInvariant();
-                textEncIV.Text = Convert.ToHexString(iv).ToLowerInvariant();
-                _lastEncIV = iv;
-
-                AppendValidationResult(
-                    $"✅ ECIES 解密成功\r\n算法: {mode}\r\n曲线: {curve}\r\n" +
-                    $"共享密钥: {Convert.ToHexString(sharedSecret).ToLowerInvariant()[..8]}...\r\n" +
-                    $"明文长度: {plain.Length} 字节",
-                    Color.Green);
-                SetStatus("ECIES 解密完成");
-            }
-            catch (FormatException)
-            {
-                AppendValidationResult("❌ 密文格式无效: 请输入 Base64 编码的 ECIES 密文", Color.Red);
-                SetStatus("ECIES 解密失败");
-            }
-            catch (Org.BouncyCastle.Crypto.InvalidCipherTextException)
-            {
-                AppendValidationResult("❌ ECIES 解密失败: MAC 校验不通过，密钥或密文不匹配", Color.Red);
-                SetStatus("ECIES 解密失败");
-            }
-        }
         #endregion
 
         #region 按钮事件：加密/解密/清空/复制/粘贴
@@ -1309,17 +1164,10 @@ namespace CryptoTool.Win
                     return;
                 }
 
-                string mode = GetEncMode();
+                string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM)";
                 byte[] plain = GetEncInputBytes();
-
-                if (mode == "ECIES (ECDH+AES-GCM)")
-                {
-                    PerformEciesEncrypt(plain, mode);
-                    return;
-                }
-
                 byte[] key = GetEncKey();
-                byte[] iv = GetEncIV(mode, true);
+                byte[] iv = GetEncIV(mode);
 
                 byte[] cipher = mode switch
                 {
@@ -1360,17 +1208,10 @@ namespace CryptoTool.Win
                     return;
                 }
 
-                string mode = GetEncMode();
-
-                if (mode == "ECIES (ECDH+AES-GCM)")
-                {
-                    PerformEciesDecrypt(cipherSource, mode);
-                    return;
-                }
-
+                string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM)";
                 byte[] cipher = GetCipherBytes(cipherSource, mode);
                 byte[] key = GetEncKey();
-                byte[] iv = GetEncIV(mode, false);
+                byte[] iv = GetEncIV(mode);
 
                 byte[] plain = mode switch
                 {
@@ -1381,8 +1222,6 @@ namespace CryptoTool.Win
                 };
 
                 textEncInput.Text = Encoding.UTF8.GetString(plain);
-                textEncIV.Text = Convert.ToHexString(iv).ToLowerInvariant();
-                _lastEncIV = iv;
                 AppendValidationResult($"✅ 解密成功\r\n算法: {mode}\r\n明文长度: {plain.Length}字节", Color.Green);
                 SetStatus("解密完成");
             }
