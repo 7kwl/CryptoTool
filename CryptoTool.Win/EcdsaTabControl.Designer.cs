@@ -155,7 +155,7 @@ namespace CryptoTool.Win
             comboHashAlgorithm = new ComboBox();
             labelSignatureFormat = new Label();
             comboSignatureFormat = new ComboBox();
-            groupEncrypt = new GroupBox();
+            groupEncrypt = new Panel();
             tableLayoutEncrypt = new TableLayoutPanel();
             labelEncMode = new Label();
             comboEncMode = new ComboBox();
@@ -170,6 +170,8 @@ namespace CryptoTool.Win
             labelEncBobPublic = new Label();
             textEncBobPublic = new TextBox();
             labelEncCurve = new Label();
+            comboEncCurveCategory = new ComboBox();
+            labelEncCurveArrow = new Label();
             comboEncCurve = new ComboBox();
             labelEncInput = new Label();
             textEncInput = new TextBox();
@@ -989,7 +991,7 @@ namespace CryptoTool.Win
             btnViewEcdh.Padding = new Padding(12, 4, 12, 4);
             btnViewEcdh.Size = new Size(191, 44);
             btnViewEcdh.TabIndex = 0;
-            btnViewEcdh.Text = "ECDH 协商加解密";
+            btnViewEcdh.Text = "ECDH 加密解密";
             btnViewEcdh.UseVisualStyleBackColor = true;
             // 
             // btnViewSign
@@ -1002,7 +1004,7 @@ namespace CryptoTool.Win
             btnViewSign.Padding = new Padding(12, 4, 12, 4);
             btnViewSign.Size = new Size(126, 44);
             btnViewSign.TabIndex = 1;
-            btnViewSign.Text = "签名/验签";
+            btnViewSign.Text = "ECIES签名验签";
             btnViewSign.UseVisualStyleBackColor = true;
             // 
             // btnViewEncrypt
@@ -1446,6 +1448,7 @@ namespace CryptoTool.Win
             // 
             // groupEncrypt
             // 
+            groupEncrypt.BorderStyle = BorderStyle.None;
             groupEncrypt.Controls.Add(tableLayoutEncrypt);
             groupEncrypt.Dock = DockStyle.Fill;
             groupEncrypt.Location = new Point(0, 0);
@@ -1453,7 +1456,6 @@ namespace CryptoTool.Win
             groupEncrypt.Padding = new Padding(8);
             groupEncrypt.Size = new Size(3265, 841);
             groupEncrypt.TabIndex = 0;
-            groupEncrypt.TabStop = false;
             // 
             // tableLayoutEncrypt
             // 
@@ -1638,16 +1640,35 @@ namespace CryptoTool.Win
             labelEncCurve.TabIndex = 17;
             labelEncCurve.Text = "曲线：";
             // 
+            // comboEncCurveCategory
+            // 
+            comboEncCurveCategory.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboEncCurveCategory.FormattingEnabled = true;
+            comboEncCurveCategory.Location = new Point(0, 579);
+            comboEncCurveCategory.Margin = new Padding(0, 3, 2, 3);
+            comboEncCurveCategory.Name = "comboEncCurveCategory";
+            comboEncCurveCategory.Size = new Size(160, 32);
+            comboEncCurveCategory.TabIndex = 18;
+            // 
+            // labelEncCurveArrow
+            // 
+            labelEncCurveArrow.AutoSize = true;
+            labelEncCurveArrow.Location = new Point(166, 583);
+            labelEncCurveArrow.Margin = new Padding(2, 7, 2, 0);
+            labelEncCurveArrow.Name = "labelEncCurveArrow";
+            labelEncCurveArrow.Size = new Size(22, 24);
+            labelEncCurveArrow.TabIndex = 19;
+            labelEncCurveArrow.Text = "→";
+            // 
             // comboEncCurve
             // 
             comboEncCurve.DropDownStyle = ComboBoxStyle.DropDownList;
             comboEncCurve.FormattingEnabled = true;
-            comboEncCurve.Items.AddRange(new object[] { "P-256", "P-384", "P-521" });
-            comboEncCurve.Location = new Point(0, 579);
+            comboEncCurve.Location = new Point(192, 579);
             comboEncCurve.Margin = new Padding(0, 3, 4, 3);
             comboEncCurve.Name = "comboEncCurve";
-            comboEncCurve.Size = new Size(192, 32);
-            comboEncCurve.TabIndex = 18;
+            comboEncCurve.Size = new Size(260, 32);
+            comboEncCurve.TabIndex = 20;
             // 
             // labelEncInput
             // 
@@ -2064,7 +2085,7 @@ namespace CryptoTool.Win
         private System.Windows.Forms.Button btnVerify;
         private System.Windows.Forms.Button btnCopySignature;
         // [加解密区 - groupEncrypt]
-        private System.Windows.Forms.GroupBox groupEncrypt;
+        private System.Windows.Forms.Panel groupEncrypt;
         private System.Windows.Forms.TableLayoutPanel tableLayoutEncrypt;
         private System.Windows.Forms.Label labelEncMode;
         private System.Windows.Forms.ComboBox comboEncMode;
@@ -2079,6 +2100,8 @@ namespace CryptoTool.Win
         private System.Windows.Forms.Label labelEncBobPublic;
         private System.Windows.Forms.TextBox textEncBobPublic;
         private System.Windows.Forms.Label labelEncCurve;
+        private System.Windows.Forms.ComboBox comboEncCurveCategory;
+        private System.Windows.Forms.Label labelEncCurveArrow;
         private System.Windows.Forms.ComboBox comboEncCurve;
         private System.Windows.Forms.Label labelEncInput;
         private System.Windows.Forms.TextBox textEncInput;

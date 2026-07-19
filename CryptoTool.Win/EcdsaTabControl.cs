@@ -393,6 +393,14 @@ namespace CryptoTool.Win
             comboSignatureFormat.Items.AddRange(["Base64", "Hex"]);
             comboSignatureFormat.SelectedIndex = 0;
 
+            // ECIES 默认使用推荐标准曲线 P-256
+            comboEncCurve.SelectedIndex = 0;
+
+            // 加密模式、输入格式、输出格式默认选择第一项
+            comboEncMode.SelectedIndex = 0;
+            comboEncInputFormat.SelectedIndex = 0;
+            comboEncOutputFormat.SelectedIndex = 0;
+
             radioPrivateKey.Checked = true;
             ResetValidationResult("未验证", Color.Gray);
             textKeyResult.Text = "从私钥提取/曲线检测：\n等待操作...";

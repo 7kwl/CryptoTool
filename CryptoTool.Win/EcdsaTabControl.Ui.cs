@@ -145,7 +145,7 @@ namespace CryptoTool.Win
         }
 
         // ═══════════════════════════════════════════════════════════════════
-        // [板块 3] 加解密视图布局 - groupEncrypt 面板
+        // [板块 3] 加解密视图布局 - groupEncrypt 面板 (已改为无边框 Panel)
         //   构建三栏布局:
         //     左栏(45%): 加密/解密输入输出区 (明文/密文输入框)
         //     中栏(15%): 设置区 (加密模式, 编码格式, 密钥, IV)
@@ -172,10 +172,10 @@ namespace CryptoTool.Win
                 tableLayoutEncrypt.ColumnStyles.Clear();
                 tableLayoutEncrypt.RowStyles.Clear();
 
-                // 设置三栏比例: 左45% | 中15% | 右40%
+                // 设置三栏比例: 左30% | 中30% | 右40%
                 tableLayoutEncrypt.ColumnCount = 3;
-                tableLayoutEncrypt.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 45F));
-                tableLayoutEncrypt.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 15F));
+                tableLayoutEncrypt.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30F));
+                tableLayoutEncrypt.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30F));
                 tableLayoutEncrypt.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F));
                 tableLayoutEncrypt.RowCount = 1;
                 tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
@@ -195,29 +195,85 @@ namespace CryptoTool.Win
                 {
                     Dock = DockStyle.Fill,
                     ColumnCount = 1,
-                    RowCount = 4,
+                    RowCount = 2,
                     Margin = new Padding(0),
                     Padding = new Padding(0)
                 };
-                leftLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 22F));
                 leftLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-                leftLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 22F));
                 leftLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
 
-                labelEncInput.Dock = DockStyle.Fill;
-                labelEncInput.TextAlign = ContentAlignment.MiddleLeft;
-                leftLayout.Controls.Add(labelEncInput, 0, 0);
-                leftLayout.Controls.Add(textEncInput, 0, 1);
+                // 输入框容器，标签与粘贴按钮悬浮在文本框内部右侧
+                var inputPanel = new Panel
+                {
+                    Dock = DockStyle.Fill,
+                    Margin = new Padding(0),
+                    Padding = new Padding(0)
+                };
+                textEncInput.Dock = DockStyle.Fill;
+                inputPanel.Controls.Add(textEncInput);
 
-                labelEncOutputLabel.Dock = DockStyle.Fill;
-                labelEncOutputLabel.TextAlign = ContentAlignment.MiddleLeft;
-                leftLayout.Controls.Add(labelEncOutputLabel, 0, 2);
-                leftLayout.Controls.Add(textEncOutput, 0, 3);
+                // 输入框标签
+                labelEncInput.Dock = DockStyle.None;
+                labelEncInput.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+                labelEncInput.AutoSize = true;
+                labelEncInput.BackColor = Color.Transparent;
+                labelEncInput.Location = new Point(0, 0);
+                labelEncInput.Margin = new Padding(0);
+                labelEncInput.Padding = new Padding(4, 0, 4, 0);
+                labelEncInput.TextAlign = ContentAlignment.MiddleRight;
+                inputPanel.Controls.Add(labelEncInput);
+                labelEncInput.BringToFront();
+
+                // 粘贴按钮
+                btnEncPaste.Dock = DockStyle.None;
+                btnEncPaste.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+                btnEncPaste.Size = new Size(50, 22);
+                btnEncPaste.Location = new Point(0, labelEncInput.Height);
+                btnEncPaste.Margin = new Padding(0);
+                btnEncPaste.Text = "粘贴";
+                btnEncPaste.AutoSize = false;
+                inputPanel.Controls.Add(btnEncPaste);
+                btnEncPaste.BringToFront();
+                leftLayout.Controls.Add(inputPanel, 0, 0);
+
+                // 输出框容器，标签与复制按钮悬浮在文本框内部右侧
+                var outputPanel = new Panel
+                {
+                    Dock = DockStyle.Fill,
+                    Margin = new Padding(0),
+                    Padding = new Padding(0)
+                };
+                textEncOutput.Dock = DockStyle.Fill;
+                outputPanel.Controls.Add(textEncOutput);
+
+                // 输出框标签
+                labelEncOutputLabel.Dock = DockStyle.None;
+                labelEncOutputLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+                labelEncOutputLabel.AutoSize = true;
+                labelEncOutputLabel.BackColor = Color.Transparent;
+                labelEncOutputLabel.Location = new Point(0, 0);
+                labelEncOutputLabel.Margin = new Padding(0);
+                labelEncOutputLabel.Padding = new Padding(4, 0, 4, 0);
+                labelEncOutputLabel.TextAlign = ContentAlignment.MiddleRight;
+                outputPanel.Controls.Add(labelEncOutputLabel);
+                labelEncOutputLabel.BringToFront();
+
+                // 复制按钮
+                btnEncCopy.Dock = DockStyle.None;
+                btnEncCopy.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+                btnEncCopy.Size = new Size(50, 22);
+                btnEncCopy.Location = new Point(0, labelEncOutputLabel.Height);
+                btnEncCopy.Margin = new Padding(0);
+                btnEncCopy.Text = "复制";
+                btnEncCopy.AutoSize = false;
+                outputPanel.Controls.Add(btnEncCopy);
+                btnEncCopy.BringToFront();
+                leftLayout.Controls.Add(outputPanel, 0, 1);
 
                 leftGroup.Controls.Add(leftLayout);
 
-                // --------------------- 中栏: 操作按钮区 ---------------------
-                // 纵向排列5个按钮: 加密 | 解密 | 清除 | 复制 | 粘贴
+                // --------------------- 右栏: 操作与配置区 ---------------------
+                // 纵向排列3个操作按钮，再把加密模式、输入/输出格式、曲线移到本列
                 var middleGroup = new GroupBox
                 {
                     Text = "操作",
@@ -232,25 +288,83 @@ namespace CryptoTool.Win
                     Margin = new Padding(0),
                     Padding = new Padding(0)
                 };
-                middleLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-                middleLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-                middleLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-                middleLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-                middleLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+                // 前3行按按钮自身高度排列，第4行合并加密模式/输入输出格式/曲线，最后一行弹簧把内容顶到上方
+                middleLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+                middleLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+                middleLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+                middleLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+                middleLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
 
-                Button[] buttons = [btnEncrypt, btnDecrypt, btnEncClear, btnEncCopy, btnEncPaste];
+                Button[] buttons = [btnEncrypt, btnDecrypt, btnEncClear];
                 for (int i = 0; i < buttons.Length; i++)
                 {
-                    buttons[i].Dock = DockStyle.Fill;
-                    buttons[i].Margin = new Padding(0, 4, 0, 4);
+                    buttons[i].Dock = DockStyle.Top;
+                    buttons[i].Height = 28;
+                    buttons[i].Margin = new Padding(0, 2, 0, 2);
                     buttons[i].AutoSize = false;
                     middleLayout.Controls.Add(buttons[i], 0, i);
                 }
 
+                // 加密模式、输入/输出格式、曲线对齐到同一行
+                var configRow = new FlowLayoutPanel
+                {
+                    Dock = DockStyle.Fill,
+                    Margin = new Padding(0),
+                    Padding = new Padding(0),
+                    WrapContents = false
+                };
+
+                labelEncMode.AutoSize = true;
+                labelEncMode.Margin = new Padding(0, 0, 2, 0);
+                labelEncMode.TextAlign = ContentAlignment.MiddleLeft;
+                comboEncMode.Margin = new Padding(0, 0, 12, 0);
+                comboEncMode.Width = 110;
+                comboEncMode.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+
+                labelEncInputFormat.AutoSize = true;
+                labelEncInputFormat.Margin = new Padding(0, 0, 2, 0);
+                labelEncInputFormat.TextAlign = ContentAlignment.MiddleLeft;
+                comboEncInputFormat.Margin = new Padding(0, 0, 12, 0);
+                comboEncInputFormat.Width = 90;
+                comboEncInputFormat.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+
+                labelEncOutputFormat.AutoSize = true;
+                labelEncOutputFormat.Margin = new Padding(0, 0, 2, 0);
+                labelEncOutputFormat.TextAlign = ContentAlignment.MiddleLeft;
+                comboEncOutputFormat.Margin = new Padding(0, 0, 12, 0);
+                comboEncOutputFormat.Width = 90;
+                comboEncOutputFormat.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+
+                labelEncCurve.AutoSize = true;
+                labelEncCurve.Margin = new Padding(0, 0, 2, 0);
+                labelEncCurve.TextAlign = ContentAlignment.MiddleLeft;
+                comboEncCurveCategory.Margin = new Padding(0, 0, 2, 0);
+                comboEncCurveCategory.Width = 120;
+                comboEncCurveCategory.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+                labelEncCurveArrow.AutoSize = true;
+                labelEncCurveArrow.Margin = new Padding(0, 5, 2, 0);
+                labelEncCurveArrow.Text = "→";
+                labelEncCurveArrow.TextAlign = ContentAlignment.MiddleCenter;
+                comboEncCurve.Margin = new Padding(0, 0, 12, 0);
+                comboEncCurve.Width = 180;
+                comboEncCurve.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+
+                configRow.Controls.Add(labelEncMode);
+                configRow.Controls.Add(comboEncMode);
+                configRow.Controls.Add(labelEncInputFormat);
+                configRow.Controls.Add(comboEncInputFormat);
+                configRow.Controls.Add(labelEncOutputFormat);
+                configRow.Controls.Add(comboEncOutputFormat);
+                configRow.Controls.Add(labelEncCurve);
+                configRow.Controls.Add(comboEncCurveCategory);
+                configRow.Controls.Add(labelEncCurveArrow);
+                configRow.Controls.Add(comboEncCurve);
+                middleLayout.Controls.Add(configRow, 0, 3);
+
                 middleGroup.Controls.Add(middleLayout);
 
-                // --------------------- 右栏: 参数配置区 ---------------------
-                // 4行设置: 加密模式 | 编码格式(输入+输出) | 密钥 | IV向量
+                // --------------------- 中栏: 参数配置区 ---------------------
+                // 3行设置: 对称密钥 | IV向量 | Bob 公钥
                 var rightGroup = new GroupBox
                 {
                     Text = "参数",
@@ -261,25 +375,18 @@ namespace CryptoTool.Win
                 {
                     Dock = DockStyle.Fill,
                     ColumnCount = 1,
-                    RowCount = 6,
+                    RowCount = 4,
                     Margin = new Padding(0),
                     Padding = new Padding(0)
                 };
                 rightLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
                 rightLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
-                rightLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
-                rightLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
                 rightLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 72F));
-                rightLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
+                rightLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
 
-                rightLayout.Controls.Add(CreateLabelControlRow(labelEncMode, comboEncMode), 0, 0);
-                rightLayout.Controls.Add(CreateFormatRow(
-                    labelEncInputFormat, comboEncInputFormat,
-                    labelEncOutputFormat, comboEncOutputFormat), 0, 1);
-                rightLayout.Controls.Add(CreateLabelControlRow(labelEncKey, textEncKey), 0, 2);
-                rightLayout.Controls.Add(CreateLabelControlRow(labelEncIV, textEncIV), 0, 3);
-                rightLayout.Controls.Add(CreateLabelControlRow(labelEncBobPublic, textEncBobPublic), 0, 4);
-                rightLayout.Controls.Add(CreateLabelControlRow(labelEncCurve, comboEncCurve), 0, 5);
+                rightLayout.Controls.Add(CreateLabelControlRow(labelEncKey, textEncKey), 0, 0);
+                rightLayout.Controls.Add(CreateLabelControlRow(labelEncIV, textEncIV), 0, 1);
+                rightLayout.Controls.Add(CreateLabelControlRow(labelEncBobPublic, textEncBobPublic), 0, 2);
 
                 // 非 ECIES 模式时隐藏 Bob 公钥和曲线
                 labelEncBobPublic.Visible = false; textEncBobPublic.Visible = false;
@@ -287,9 +394,10 @@ namespace CryptoTool.Win
 
                 rightGroup.Controls.Add(rightLayout);
 
+                // 左: 输入输出 | 中: 参数 | 右: 操作
                 tableLayoutEncrypt.Controls.Add(leftGroup, 0, 0);
-                tableLayoutEncrypt.Controls.Add(middleGroup, 1, 0);
-                tableLayoutEncrypt.Controls.Add(rightGroup, 2, 0);
+                tableLayoutEncrypt.Controls.Add(rightGroup, 1, 0);
+                tableLayoutEncrypt.Controls.Add(middleGroup, 2, 0);
 
                 groupEncFile.Visible = false;
                 groupEncFile.Enabled = false;

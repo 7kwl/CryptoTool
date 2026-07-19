@@ -102,7 +102,8 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
         {
             return mode switch
             {
-                EcdhMode.CryptoTool => DeriveAesKey(sharedSecret, null, System.Text.Encoding.UTF8.GetBytes("ECDH-AES-GCM")),
+                // CryptoTool 标准 ECIES：HKDF-SHA256，Info = "ECIES-AES256-GCM"（推荐标准参数）
+                EcdhMode.CryptoTool => DeriveAesKey(sharedSecret, null, System.Text.Encoding.UTF8.GetBytes("ECIES-AES256-GCM")),
                 // 8gwifi.org 直接使用原始 ECDH 共享密钥（X 坐标）作为 AES 密钥，
                 // 长度超过 32 字节时取前 32 字节（兼容 P-384 / P-521）
                 EcdhMode.GwifiOrg => TruncateToAesKey(sharedSecret, 32),
@@ -112,7 +113,7 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
                 EcdhMode.Ieee1363a => X963Kdf(sharedSecret, 32),
                 EcdhMode.Iso180332 => X963Kdf(sharedSecret, 32),
                 EcdhMode.SecgSec1 => X963Kdf(sharedSecret, 32),
-                _ => DeriveAesKey(sharedSecret, null, System.Text.Encoding.UTF8.GetBytes("ECDH-AES-GCM"))
+                _ => DeriveAesKey(sharedSecret, null, System.Text.Encoding.UTF8.GetBytes("ECIES-AES256-GCM"))
             };
         }
 
