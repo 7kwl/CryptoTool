@@ -96,7 +96,7 @@ namespace CryptoTool.Win.Helpers
 
             var friendlyNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
-                { "prime256v1", "prime256v1 (NIST P-256)" },
+                { "prime256v1", "P-256 (prime256v1) - 128 位安全" },
                 { "secp256r1", "P-256 (secp256r1) - 128 位安全" },
                 { "secp384r1", "P-384 (secp384r1) - 192 位安全" },
                 { "secp521r1", "P-521 (secp521r1) - 256 位安全" },

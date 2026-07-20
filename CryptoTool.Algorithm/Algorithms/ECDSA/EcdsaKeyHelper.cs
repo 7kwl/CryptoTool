@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Org.BouncyCastle.Asn1.X9;
@@ -70,6 +71,15 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
             return pubBytes.SequenceEqual(derivedBytes);
         }
 
+        /// <summary>
+        /// BouncyCastle 曲线名称别名 → 规范化名称（用于统一的 GUI 显示）
+        /// </summary>
+        private static readonly Dictionary<string, string> CurveAliasMap = new(StringComparer.OrdinalIgnoreCase)
+        {
+            { "prime256v1", "secp256r1" },
+            { "P-256", "secp256r1" },
+        };
+
         public static string GetCurveName(ECPrivateKeyParameters privateKey)
         {
             foreach (string name in ECNamedCurveTable.Names)
@@ -80,7 +90,7 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
                     && ecParams.G?.Equals(privateKey.Parameters.G) == true
                     && ecParams.N?.Equals(privateKey.Parameters.N) == true)
                 {
-                    return name;
+                    return CurveAliasMap.TryGetValue(name, out var canonical) ? canonical : name;
                 }
             }
             return "未知曲线";

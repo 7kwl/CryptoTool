@@ -22,6 +22,8 @@ namespace CryptoTool.Win
         #region 字段
         private byte[]? _derivedEncKey = null;
         private byte[]? _lastEncIV = null;
+        private System.Windows.Forms.Label labelEncTest = null!;
+        private System.Windows.Forms.TextBox textEncTest = null!;
         #endregion
 
         #region 初始化
@@ -32,6 +34,9 @@ namespace CryptoTool.Win
         /// </summary>
         private void InitializeEncryptControlDefaults()
         {
+            labelEncTest = new Label();
+            textEncTest = new TextBox();
+
             // ---- 标签文本 ----
             labelEncMode.Text = "加密模式：";
             labelEncInputFormat.Text = "输入格式：";
@@ -39,6 +44,7 @@ namespace CryptoTool.Win
             labelEncKey.Text = "对称密钥 (HEX，留空自动派生)：";
             labelEncIV.Text = "IV/Nonce (HEX，留空随机生成)：";
             labelEncBobPublic.Text = "Bob 公钥 (接收方)：";
+            labelEncTest.Text = "测试：";
             labelEncInput.Text = "明文 / 密文输入：";
             labelEncOutputLabel.Text = "加密结果 / 解密输入：";
 
@@ -79,6 +85,11 @@ namespace CryptoTool.Win
             textEncBobPublic.Font = new System.Drawing.Font("Consolas", 9F);
             textEncBobPublic.Multiline = true;
             textEncBobPublic.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+
+            // ---- 新增测试输入框 ----
+            textEncTest.Font = new System.Drawing.Font("Consolas", 9F);
+            textEncTest.Multiline = true;
+            textEncTest.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
 
             // ---- 明文/密文输入框 ----
             textEncInput.Font = new System.Drawing.Font("Consolas", 9F);
@@ -432,18 +443,20 @@ namespace CryptoTool.Win
                 {
                     Dock = DockStyle.Fill,
                     ColumnCount = 1,
-                    RowCount = 4,
+                    RowCount = 5,
                     Margin = new Padding(0),
                     Padding = new Padding(0)
                 };
-                paramLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 30F));
-                paramLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 30F));
-                paramLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 40F));
-                paramLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 0F));
+                paramLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+                paramLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+                paramLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+                paramLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+                paramLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 25F));
 
                 paramLayout.Controls.Add(CreateTextPanelWithLabel(textEncKey, labelEncKey.Text), 0, 0);
                 paramLayout.Controls.Add(CreateTextPanelWithLabel(textEncIV, labelEncIV.Text), 0, 1);
                 paramLayout.Controls.Add(CreateTextPanelWithLabel(textEncBobPublic, labelEncBobPublic.Text), 0, 2);
+                paramLayout.Controls.Add(CreateTextPanelWithLabel(textEncTest, labelEncTest.Text), 0, 3);
 
                 // 非 ECIES 模式时隐藏 Bob 公钥；曲线选择保持与 ECDH 区一致
                 textEncBobPublic.Visible = true;
