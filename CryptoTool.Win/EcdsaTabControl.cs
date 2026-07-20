@@ -471,7 +471,7 @@ namespace CryptoTool.Win
 
                 SetStatus("正在从私钥提取公钥...");
 
-                var priv = EcdsaKeyHelper.ImportPrivateKeyPem(textPrivateKey.Text.Trim());
+                var priv = EcdsaKeyHelper.ImportPrivateKeyPem(ConvertDisplayToPem(textPrivateKey.Text.Trim(), true));
 
                 // 提取公钥前先判断私钥曲线是否可识别
                 string curveName = EcdsaKeyHelper.GetCurveName(priv);
@@ -484,7 +484,7 @@ namespace CryptoTool.Win
 
                 var pub = EcdsaAlgorithm.GetPublicKey(priv);
 
-                _privateKeyPem = textPrivateKey.Text.Trim();
+                _privateKeyPem = EcdsaKeyHelper.ExportPrivateKeyPem(priv);
                 _publicKeyPem = EcdsaKeyHelper.ExportPublicKeyPem(pub);
 
                 RefreshKeyDisplay();
@@ -513,7 +513,7 @@ namespace CryptoTool.Win
 
                 SetStatus("正在检测私钥曲线类型...");
 
-                var priv = EcdsaKeyHelper.ImportPrivateKeyPem(textPrivateKey.Text.Trim());
+                var priv = EcdsaKeyHelper.ImportPrivateKeyPem(ConvertDisplayToPem(textPrivateKey.Text.Trim(), true));
                 string curveName = EcdsaKeyHelper.GetCurveName(priv);
                 string displayName = EcdsaCurveNames.GetDisplayName(curveName);
 
@@ -545,8 +545,8 @@ namespace CryptoTool.Win
                 string testHash = GetSelectedHash();
                 string signerAlg = GetSignerAlgorithm(testHash);
 
-                var priv = EcdsaKeyHelper.ImportPrivateKeyPem(privPem);
-                var pub = EcdsaKeyHelper.ImportPublicKeyPem(pubPem);
+                var priv = EcdsaKeyHelper.ImportPrivateKeyPem(ConvertDisplayToPem(privPem, true));
+                var pub = EcdsaKeyHelper.ImportPublicKeyPem(ConvertDisplayToPem(pubPem, false));
 
                 var testData = Encoding.UTF8.GetBytes("ECDSA_KeyPair_Validation");
                 ISigner signer = SignerUtilities.GetSigner(signerAlg);
@@ -595,8 +595,8 @@ namespace CryptoTool.Win
                 string hashAlg = GetSelectedHash();
                 string signerAlg = GetSignerAlgorithm(hashAlg);
 
-                var priv = EcdsaKeyHelper.ImportPrivateKeyPem(textPrivateKey.Text.Trim());
-                var pub = EcdsaKeyHelper.ImportPublicKeyPem(textPublicKey.Text.Trim());
+                var priv = EcdsaKeyHelper.ImportPrivateKeyPem(ConvertDisplayToPem(textPrivateKey.Text.Trim(), true));
+                var pub = EcdsaKeyHelper.ImportPublicKeyPem(ConvertDisplayToPem(textPublicKey.Text.Trim(), false));
 
                 // 探针验证密钥对匹配
                 byte[] probe = Encoding.UTF8.GetBytes("__ECDSA_INTERNAL_PROBE__");
@@ -640,7 +640,7 @@ namespace CryptoTool.Win
                 string hashAlg = GetSelectedHash();
                 string signerAlg = GetSignerAlgorithm(hashAlg);
 
-                var pub = EcdsaKeyHelper.ImportPublicKeyPem(textPublicKey.Text.Trim());
+                var pub = EcdsaKeyHelper.ImportPublicKeyPem(ConvertDisplayToPem(textPublicKey.Text.Trim(), false));
                 byte[] sig = (comboSignatureFormat.SelectedItem?.ToString() == "Hex")
                     ? Convert.FromHexString(textSignature.Text.Trim())
                     : Convert.FromBase64String(textSignature.Text.Trim());
@@ -769,11 +769,22 @@ namespace CryptoTool.Win
                 using OpenFileDialog d = new() { Title = isPrivate ? "导入私钥文件" : "导入公钥文件", Filter = "密钥文件|*.pem;*.key;*.txt|所有文件|*.*" };
                 if (d.ShowDialog() != DialogResult.OK) return;
                 string c = File.ReadAllText(d.FileName).Trim();
-                if (isPrivate) EcdsaKeyHelper.ImportPrivateKeyPem(c);
-                else EcdsaKeyHelper.ImportPublicKeyPem(c);
+                string pem = ConvertDisplayToPem(c, isPrivate);
+                if (isPrivate) EcdsaKeyHelper.ImportPrivateKeyPem(pem);
+                else EcdsaKeyHelper.ImportPublicKeyPem(pem);
                 UIOutputFormat fmt = GetCurrentOutputFormat();
-                if (isPrivate) { _privateKeyPem = c; textPrivateKey.Text = FormatKeyForDisplay(_privateKeyPem, fmt); }
-                else { _publicKeyPem = c; textPublicKey.Text = FormatKeyForDisplay(_publicKeyPem, fmt); }
+                if (isPrivate)
+                {
+                    var priv = EcdsaKeyHelper.ImportPrivateKeyPem(pem);
+                    _privateKeyPem = EcdsaKeyHelper.ExportPrivateKeyPem(priv);
+                    textPrivateKey.Text = FormatKeyForDisplay(_privateKeyPem, fmt);
+                }
+                else
+                {
+                    var pub = EcdsaKeyHelper.ImportPublicKeyPem(pem);
+                    _publicKeyPem = EcdsaKeyHelper.ExportPublicKeyPem(pub);
+                    textPublicKey.Text = FormatKeyForDisplay(_publicKeyPem, fmt);
+                }
                 AppendValidationResult("新密钥已导入", Color.Gray);
                 SetStatus($"{(isPrivate ? "私钥" : "公钥")}导入完成");
             }
@@ -841,16 +852,44 @@ namespace CryptoTool.Win
 
         private void BtnPastePrivateKey_Click(object? s, EventArgs e)
         {
-            if (Clipboard.ContainsText()) { textPrivateKey.Text = Clipboard.GetText().Trim(); _privateKeyPem = textPrivateKey.Text; SetStatus("私钥已从剪贴板粘贴"); }
-            else MessageBox.Show("剪贴板中没有文本内容！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (!Clipboard.ContainsText()) { MessageBox.Show("剪贴板中没有文本内容！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information); return; }
+            string c = Clipboard.GetText().Trim();
+            try
+            {
+                string pem = ConvertDisplayToPem(c, true);
+                var priv = EcdsaKeyHelper.ImportPrivateKeyPem(pem);
+                _privateKeyPem = EcdsaKeyHelper.ExportPrivateKeyPem(priv);
+                textPrivateKey.Text = FormatKeyForDisplay(_privateKeyPem, GetCurrentOutputFormat());
+                SetStatus("私钥已从剪贴板粘贴");
+            }
+            catch
+            {
+                _privateKeyPem = c;
+                textPrivateKey.Text = c;
+                SetStatus("私钥已从剪贴板粘贴");
+            }
         }
 
         private void BtnClearPrivateKey_Click(object? s, EventArgs e) { textPrivateKey.Clear(); _privateKeyPem = string.Empty; SetStatus("私钥已清空"); }
 
         private void BtnPastePublicKey_Click(object? s, EventArgs e)
         {
-            if (Clipboard.ContainsText()) { textPublicKey.Text = Clipboard.GetText().Trim(); _publicKeyPem = textPublicKey.Text; SetStatus("公钥已从剪贴板粘贴"); }
-            else MessageBox.Show("剪贴板中没有文本内容！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (!Clipboard.ContainsText()) { MessageBox.Show("剪贴板中没有文本内容！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information); return; }
+            string c = Clipboard.GetText().Trim();
+            try
+            {
+                string pem = ConvertDisplayToPem(c, false);
+                var pub = EcdsaKeyHelper.ImportPublicKeyPem(pem);
+                _publicKeyPem = EcdsaKeyHelper.ExportPublicKeyPem(pub);
+                textPublicKey.Text = FormatKeyForDisplay(_publicKeyPem, GetCurrentOutputFormat());
+                SetStatus("公钥已从剪贴板粘贴");
+            }
+            catch
+            {
+                _publicKeyPem = c;
+                textPublicKey.Text = c;
+                SetStatus("公钥已从剪贴板粘贴");
+            }
         }
 
         private void BtnClearPublicKey_Click(object? s, EventArgs e) { textPublicKey.Clear(); _publicKeyPem = string.Empty; SetStatus("公钥已清空"); }
@@ -911,7 +950,23 @@ namespace CryptoTool.Win
         #endregion
 
         #region 控件事件
-        private void ComboOutputFormat_SelectedIndexChanged(object? s, EventArgs e) => RefreshKeyDisplay();
+        private void ComboOutputFormat_SelectedIndexChanged(object? s, EventArgs e)
+        {
+            // 如果文本框当前内容不是 PEM，先反向推导为 PEM 并更新缓存，
+            // 确保切换格式后显示的是正确的规范化内容
+            if (!string.IsNullOrEmpty(textPrivateKey.Text))
+            {
+                try { _privateKeyPem = ConvertDisplayToPem(textPrivateKey.Text.Trim(), true); }
+                catch { }
+            }
+            if (!string.IsNullOrEmpty(textPublicKey.Text))
+            {
+                try { _publicKeyPem = ConvertDisplayToPem(textPublicKey.Text.Trim(), false); }
+                catch { }
+            }
+
+            RefreshKeyDisplay();
+        }
 
         private void TextPrivateKey_TextChanged(object? s, EventArgs e)
         {
@@ -980,6 +1035,19 @@ namespace CryptoTool.Win
         private void RefreshKeyDisplay()
         {
             UIOutputFormat fmt = GetCurrentOutputFormat();
+
+            // 确保缓存的密钥始终是标准 PEM 格式
+            if (!string.IsNullOrEmpty(_privateKeyPem) && !_privateKeyPem.Contains("-----BEGIN"))
+            {
+                try { _privateKeyPem = ConvertDisplayToPem(_privateKeyPem, true); }
+                catch { }
+            }
+            if (!string.IsNullOrEmpty(_publicKeyPem) && !_publicKeyPem.Contains("-----BEGIN"))
+            {
+                try { _publicKeyPem = ConvertDisplayToPem(_publicKeyPem, false); }
+                catch { }
+            }
+
             if (!string.IsNullOrEmpty(_privateKeyPem)) textPrivateKey.Text = FormatKeyForDisplay(_privateKeyPem, fmt);
             if (!string.IsNullOrEmpty(_publicKeyPem)) textPublicKey.Text = FormatKeyForDisplay(_publicKeyPem, fmt);
         }
@@ -1003,6 +1071,53 @@ namespace CryptoTool.Win
 
             string hex = Convert.ToHexString(Convert.FromBase64String(b64));
             return format == UIOutputFormat.HexUpper ? hex : hex.ToLowerInvariant();
+        }
+
+        /// <summary>
+        /// 将文本框中显示的内容（PEM / Base64 / Hex）统一转换为标准 PEM 格式，便于导入操作。
+        /// </summary>
+        private static string ConvertDisplayToPem(string keyText, bool isPrivate)
+        {
+            string t = keyText.Trim();
+            if (t.Contains("-----BEGIN")) return t;
+
+            string stripped = new string(t.Where(c => !char.IsWhiteSpace(c)).ToArray());
+
+            // 尝试 Hex 解码
+            if (stripped.Length % 2 == 0 && stripped.All(c => "0123456789abcdefABCDEF".Contains(c)))
+            {
+                try
+                {
+                    byte[] bytes = Convert.FromHexString(stripped);
+                    string b64 = Convert.ToBase64String(bytes);
+                    return WrapInPem(b64, isPrivate);
+                }
+                catch { }
+            }
+
+            // 尝试 Base64 解码
+            try
+            {
+                Convert.FromBase64String(stripped);
+                return WrapInPem(stripped, isPrivate);
+            }
+            catch { }
+
+            return t;
+        }
+
+        private static string WrapInPem(string base64Content, bool isPrivate)
+        {
+            var sb = new StringBuilder();
+            string header = isPrivate ? "-----BEGIN EC PRIVATE KEY-----" : "-----BEGIN PUBLIC KEY-----";
+            string footer = isPrivate ? "-----END EC PRIVATE KEY-----" : "-----END PUBLIC KEY-----";
+            sb.AppendLine(header);
+            for (int i = 0; i < base64Content.Length; i += 64)
+            {
+                sb.AppendLine(base64Content.Substring(i, Math.Min(64, base64Content.Length - i)));
+            }
+            sb.AppendLine(footer);
+            return sb.ToString();
         }
         #endregion
 

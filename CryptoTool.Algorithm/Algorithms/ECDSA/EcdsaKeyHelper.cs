@@ -74,7 +74,7 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
         /// <summary>
         /// BouncyCastle 曲线名称别名 → 规范化名称（用于统一的 GUI 显示）
         /// </summary>
-        private static readonly Dictionary<string, string> CurveAliasMap = new(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<string, string> CurveAliasMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             { "prime256v1", "secp256r1" },
             { "P-256", "secp256r1" },
