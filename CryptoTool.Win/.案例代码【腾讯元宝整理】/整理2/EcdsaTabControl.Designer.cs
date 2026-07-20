@@ -15,26 +15,19 @@ namespace CryptoTool.Win
     /// 请勿手动修改此文件中的代码（在 InitializeComponent 方法外部的字段声明区除外）。
     /// 
     /// <para>整体布局结构 (mainTableLayout 左右两栏):</para>
-    /// <list type="bullet">
     ///   <item><b>左栏 50%:</b> 密钥管理(groupKey) | 签名验签(groupSign) | 加解密(groupEncrypt) | 文件操作(groupFile) | ECDH密钥协商(groupEcdh)</item>
     ///   <item><b>右栏 50%:</b> 运行结果(groupRunResult) / 计算结果(groupComputeResult)</item>
-    /// </list>
     /// 
     /// <para>视图切换机制:</para>
-    /// <list type="bullet">
     ///   <item>panelViewBar → 签名视图 / 加解密视图 / 文件视图 / ECDH视图 (按钮组)</item>
     ///   <item>panelViewContent → 根据当前选中视图显示对应的操作面板</item>
-    /// </list>
     /// </summary>
     partial class EcdsaTabControl
     {
         /// <summary>设计器组件容器，用于管理所有控件的生命周期。</summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// 释放 Tab 页所使用的所有资源。
-        /// </summary>
-        /// <param name="disposing">true 表示同时释放托管资源和非托管资源；false 表示仅释放非托管资源。</param>
+        /// <summary>释放 Tab 页所使用的所有资源。</summary>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -46,19 +39,6 @@ namespace CryptoTool.Win
 
         /// <summary>
         /// 初始化本 Tab 页上的所有控件及其布局属性。
-        /// 此方法由设计器自动生成，按以下板块组织:
-        /// <list type="number">
-        ///   <item><b>主布局</b> - mainTableLayout 左右两栏</item>
-        ///   <item><b>顶层窗体</b> - AutoScaleDimensions, Size 等</item>
-        ///   <item><b>视图切换栏</b> - panelViewBar + 4个视图按钮</item>
-        ///   <item><b>密钥管理区</b> - 曲线选择、公私钥输入、生成/加载按钮</item>
-        ///   <item><b>签名验签区</b> - Hash算法选择、消息输入、签名/验签按钮</item>
-        ///   <item><b>加解密区</b> - 明文/密文输入框、加密/解密按钮</item>
-        ///   <item><b>文件操作区</b> - 文件签名/验签、文件路径选择</item>
-        ///   <item><b>ECDH密钥协商区</b> - Alice/Bob密钥对、共享密钥、加解密</item>
-        ///   <item><b>运行结果区</b> - labelValidationResult + textKeyResult 输出框</item>
-        ///   <item><b>面板收起/展开</b> - 各 GroupBox 的折叠控件</item>
-        /// </list>
         /// </summary>
         private void InitializeComponent()
         {
@@ -195,6 +175,37 @@ namespace CryptoTool.Win
             btnEncryptFile = new Button();
             btnDecryptFile = new Button();
             splitFileResult = new SplitContainer();
+            // ECDH 视图专属控件
+            comboEcdhMode = new ComboBox();
+            comboEcdhCategory = new ComboBox();
+            comboEcdhCurve = new ComboBox();
+            textEcdhAlicePrivate = new TextBox();
+            textEcdhAlicePublic = new TextBox();
+            textEcdhBobPrivate = new TextBox();
+            textEcdhBobPublic = new TextBox();
+            textEcdhSharedKey = new TextBox();
+            textEcdhIV = new TextBox();
+            textEcdhInput = new TextBox();
+            textEcdhOutput = new TextBox();
+            btnGenerateEcdhKeys = new Button();
+            btnEcdhEncrypt = new Button();
+            btnEcdhDecrypt = new Button();
+            btnEcdhCopyResult = new Button();
+            btnEcdhPasteInput = new Button();
+            btnEcdhClear = new Button();
+            comboEcdhEncoding = new ComboBox();
+            labelEcdhMode = new Label();
+            labelEcdhCategory = new Label();
+            labelEcdhCurve = new Label();
+            labelEcdhAlicePriv = new Label();
+            labelEcdhAlicePub = new Label();
+            labelEcdhBobPriv = new Label();
+            labelEcdhBobPub = new Label();
+            labelEcdhShared = new Label();
+            labelEcdhIV = new Label();
+            labelEcdhInput = new Label();
+            labelEcdhOutput = new Label();
+            labelEcdhEncoding = new Label();
             mainTableLayout.SuspendLayout();
             groupKey.SuspendLayout();
             tableLayoutKey.SuspendLayout();
@@ -243,13 +254,10 @@ namespace CryptoTool.Win
             panelEncFileBtns.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitFileResult).BeginInit();
             splitFileResult.SuspendLayout();
-            SuspendLayout();
+
             // ==================================================
             // 主布局 - 整体页面为2列：左(密钥面板) | 右(操作面板)
             // ==================================================
-            // 
-            // mainTableLayout
-            // 
             mainTableLayout.ColumnCount = 2;
             mainTableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             mainTableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
@@ -267,13 +275,11 @@ namespace CryptoTool.Win
             mainTableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 55F));
             mainTableLayout.Size = new Size(3287, 1616);
             mainTableLayout.TabIndex = 0;
+
             // ==================================================
             // 密钥管理区 - 整个密钥管理 GroupBox（左列上半部分）
-            //   内嵌 tableLayoutKey (1行3列): 私钥列 | 公钥列 | 操作按钮列
+            //   内嵌 tableLayoutKey (2列): 私钥列 | 公钥列 + 操作按钮列
             // ==================================================
-            // 
-            // groupKey
-            // 
             groupKey.Controls.Add(tableLayoutKey);
             groupKey.Dock = DockStyle.Fill;
             groupKey.Location = new Point(11, 11);
@@ -283,9 +289,8 @@ namespace CryptoTool.Win
             groupKey.TabIndex = 0;
             groupKey.TabStop = false;
             groupKey.Text = "密钥生成";
-            // 
-            // tableLayoutKey
-            // 
+
+            // ---- tableLayoutKey: 2列(PEM输入框 | 操作按钮) × 4行(私/间隔/公/间隔) ----
             tableLayoutKey.ColumnCount = 2;
             tableLayoutKey.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tableLayoutKey.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 200F));
@@ -299,18 +304,13 @@ namespace CryptoTool.Win
             tableLayoutKey.Padding = new Padding(6);
             tableLayoutKey.RowCount = 4;
             tableLayoutKey.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutKey.RowStyles.Add(new RowStyle(SizeType.Percent, 0F));
+            tableLayoutKey.RowStyles.Add(new RowStyle(SizeType.Absolute, 0F));
             tableLayoutKey.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutKey.RowStyles.Add(new RowStyle(SizeType.Percent, 0F));
+            tableLayoutKey.RowStyles.Add(new RowStyle(SizeType.Absolute, 0F));
             tableLayoutKey.Size = new Size(1613, 648);
             tableLayoutKey.TabIndex = 0;
-            // --------------------------------------------------
-            // 私钥面板 - tableLayoutKey 第1列
-            //   panelPrivateKeyBox 内含: labelPrivateKey + textPrivateKey
-            // --------------------------------------------------
-            // 
-            // panelPrivateKeyBox
-            // 
+
+            // ---- 私钥面板 (列0行0, 跨2行) ----
             panelPrivateKeyBox.Controls.Add(labelPrivateKey);
             panelPrivateKeyBox.Controls.Add(textPrivateKey);
             panelPrivateKeyBox.Dock = DockStyle.Fill;
@@ -319,9 +319,7 @@ namespace CryptoTool.Win
             tableLayoutKey.SetRowSpan(panelPrivateKeyBox, 2);
             panelPrivateKeyBox.Size = new Size(1395, 312);
             panelPrivateKeyBox.TabIndex = 6;
-            // 
-            // labelPrivateKey
-            // 
+
             labelPrivateKey.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             labelPrivateKey.AutoSize = true;
             labelPrivateKey.BackColor = Color.Transparent;
@@ -332,9 +330,7 @@ namespace CryptoTool.Win
             labelPrivateKey.Size = new Size(128, 24);
             labelPrivateKey.TabIndex = 0;
             labelPrivateKey.Text = "私钥 (PEM)：";
-            // 
-            // textPrivateKey
-            // 
+
             textPrivateKey.Dock = DockStyle.Fill;
             textPrivateKey.Location = new Point(0, 0);
             textPrivateKey.Multiline = true;
@@ -343,13 +339,8 @@ namespace CryptoTool.Win
             textPrivateKey.Size = new Size(1395, 312);
             textPrivateKey.TabIndex = 1;
             textPrivateKey.TextChanged += TextPrivateKey_TextChanged;
-            // --------------------------------------------------
-            // 私钥操作按钮区 - tableLayoutKey 第2列上方
-            //   6行网格: 标题 | 复制私钥 | 粘贴私钥 | 导入私钥 | 保存私钥 | 清空私钥
-            // --------------------------------------------------
-            // 
-            // panelPrivateKeyActions
-            // 
+
+            // ---- 私钥操作按钮列 (列1行0, 跨2行): 6行网格 ----
             panelPrivateKeyActions.ColumnCount = 1;
             panelPrivateKeyActions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             panelPrivateKeyActions.Controls.Add(labelPrivateActionsTitle, 0, 0);
@@ -372,9 +363,7 @@ namespace CryptoTool.Win
             panelPrivateKeyActions.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             panelPrivateKeyActions.Size = new Size(194, 312);
             panelPrivateKeyActions.TabIndex = 4;
-            // 
-            // labelPrivateActionsTitle
-            // 
+
             labelPrivateActionsTitle.AutoSize = true;
             labelPrivateActionsTitle.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             labelPrivateActionsTitle.ForeColor = Color.FromArgb(192, 0, 0);
@@ -384,9 +373,7 @@ namespace CryptoTool.Win
             labelPrivateActionsTitle.Size = new Size(123, 25);
             labelPrivateActionsTitle.TabIndex = 0;
             labelPrivateActionsTitle.Text = "🔑 私钥操作";
-            // 
-            // btnCopyPrivateKey
-            // 
+
             btnCopyPrivateKey.Dock = DockStyle.Fill;
             btnCopyPrivateKey.Location = new Point(10, 32);
             btnCopyPrivateKey.Margin = new Padding(2);
@@ -396,9 +383,7 @@ namespace CryptoTool.Win
             btnCopyPrivateKey.TabIndex = 0;
             btnCopyPrivateKey.Text = "复制私钥";
             btnCopyPrivateKey.Click += BtnCopyPrivateKey_Click;
-            // 
-            // btnPastePrivateKey
-            // 
+
             btnPastePrivateKey.Dock = DockStyle.Fill;
             btnPastePrivateKey.Location = new Point(10, 87);
             btnPastePrivateKey.Margin = new Padding(2);
@@ -408,9 +393,7 @@ namespace CryptoTool.Win
             btnPastePrivateKey.TabIndex = 1;
             btnPastePrivateKey.Text = "粘贴私钥";
             btnPastePrivateKey.Click += BtnPastePrivateKey_Click;
-            // 
-            // btnImportPrivateKey
-            // 
+
             btnImportPrivateKey.Dock = DockStyle.Fill;
             btnImportPrivateKey.Location = new Point(10, 142);
             btnImportPrivateKey.Margin = new Padding(2);
@@ -420,9 +403,7 @@ namespace CryptoTool.Win
             btnImportPrivateKey.TabIndex = 2;
             btnImportPrivateKey.Text = "导入私钥";
             btnImportPrivateKey.Click += BtnImportPrivateKey_Click;
-            // 
-            // btnSavePrivateKey
-            // 
+
             btnSavePrivateKey.Dock = DockStyle.Fill;
             btnSavePrivateKey.Location = new Point(10, 197);
             btnSavePrivateKey.Margin = new Padding(2);
@@ -432,9 +413,7 @@ namespace CryptoTool.Win
             btnSavePrivateKey.TabIndex = 3;
             btnSavePrivateKey.Text = "保存私钥";
             btnSavePrivateKey.Click += BtnSavePrivateKey_Click;
-            // 
-            // btnClearPrivateKey
-            // 
+
             btnClearPrivateKey.Dock = DockStyle.Fill;
             btnClearPrivateKey.Location = new Point(10, 252);
             btnClearPrivateKey.Margin = new Padding(2);
@@ -444,13 +423,8 @@ namespace CryptoTool.Win
             btnClearPrivateKey.TabIndex = 4;
             btnClearPrivateKey.Text = "清空私钥";
             btnClearPrivateKey.Click += BtnClearPrivateKey_Click;
-            // --------------------------------------------------
-            // 公钥面板 - tableLayoutKey 第1列下方
-            //   panelPublicKeyBox 内含: labelPublicKey + textPublicKey
-            // --------------------------------------------------
-            // 
-            // panelPublicKeyBox
-            // 
+
+            // ---- 公钥面板 (列0行2, 跨2行) ----
             panelPublicKeyBox.Controls.Add(labelPublicKey);
             panelPublicKeyBox.Controls.Add(textPublicKey);
             panelPublicKeyBox.Dock = DockStyle.Fill;
@@ -459,9 +433,7 @@ namespace CryptoTool.Win
             tableLayoutKey.SetRowSpan(panelPublicKeyBox, 2);
             panelPublicKeyBox.Size = new Size(1395, 312);
             panelPublicKeyBox.TabIndex = 7;
-            // 
-            // labelPublicKey
-            // 
+
             labelPublicKey.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             labelPublicKey.AutoSize = true;
             labelPublicKey.BackColor = Color.Transparent;
@@ -472,9 +444,7 @@ namespace CryptoTool.Win
             labelPublicKey.Size = new Size(128, 24);
             labelPublicKey.TabIndex = 2;
             labelPublicKey.Text = "公钥 (PEM)：";
-            // 
-            // textPublicKey
-            // 
+
             textPublicKey.Dock = DockStyle.Fill;
             textPublicKey.Location = new Point(0, 0);
             textPublicKey.Multiline = true;
@@ -482,13 +452,8 @@ namespace CryptoTool.Win
             textPublicKey.ScrollBars = ScrollBars.Vertical;
             textPublicKey.Size = new Size(1395, 312);
             textPublicKey.TabIndex = 3;
-            // --------------------------------------------------
-            // 公钥操作按钮区 - tableLayoutKey 第2列下方
-            //   6行网格: 标题 | 复制公钥 | 粘贴公钥 | 导入公钥 | 保存公钥 | 清空公钥
-            // --------------------------------------------------
-            // 
-            // panelPublicKeyActions
-            // 
+
+            // ---- 公钥操作按钮列 (列1行2, 跨2行): 6行网格 ----
             panelPublicKeyActions.ColumnCount = 1;
             panelPublicKeyActions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             panelPublicKeyActions.Controls.Add(labelPublicActionsTitle, 0, 0);
@@ -511,9 +476,7 @@ namespace CryptoTool.Win
             panelPublicKeyActions.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             panelPublicKeyActions.Size = new Size(194, 312);
             panelPublicKeyActions.TabIndex = 5;
-            // 
-            // labelPublicActionsTitle
-            // 
+
             labelPublicActionsTitle.AutoSize = true;
             labelPublicActionsTitle.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             labelPublicActionsTitle.ForeColor = Color.FromArgb(0, 100, 180);
@@ -523,9 +486,7 @@ namespace CryptoTool.Win
             labelPublicActionsTitle.Size = new Size(123, 25);
             labelPublicActionsTitle.TabIndex = 0;
             labelPublicActionsTitle.Text = "🔓 公钥操作";
-            // 
-            // btnCopyPublicKey
-            // 
+
             btnCopyPublicKey.Dock = DockStyle.Fill;
             btnCopyPublicKey.Location = new Point(10, 32);
             btnCopyPublicKey.Margin = new Padding(2);
@@ -535,9 +496,7 @@ namespace CryptoTool.Win
             btnCopyPublicKey.TabIndex = 0;
             btnCopyPublicKey.Text = "复制公钥";
             btnCopyPublicKey.Click += BtnCopyPublicKey_Click;
-            // 
-            // btnPastePublicKey
-            // 
+
             btnPastePublicKey.Dock = DockStyle.Fill;
             btnPastePublicKey.Location = new Point(10, 87);
             btnPastePublicKey.Margin = new Padding(2);
@@ -547,9 +506,7 @@ namespace CryptoTool.Win
             btnPastePublicKey.TabIndex = 1;
             btnPastePublicKey.Text = "粘贴公钥";
             btnPastePublicKey.Click += BtnPastePublicKey_Click;
-            // 
-            // btnImportPublicKey
-            // 
+
             btnImportPublicKey.Dock = DockStyle.Fill;
             btnImportPublicKey.Location = new Point(10, 142);
             btnImportPublicKey.Margin = new Padding(2);
@@ -559,9 +516,7 @@ namespace CryptoTool.Win
             btnImportPublicKey.TabIndex = 2;
             btnImportPublicKey.Text = "导入公钥";
             btnImportPublicKey.Click += BtnImportPublicKey_Click;
-            // 
-            // btnSavePublicKey
-            // 
+
             btnSavePublicKey.Dock = DockStyle.Fill;
             btnSavePublicKey.Location = new Point(10, 197);
             btnSavePublicKey.Margin = new Padding(2);
@@ -571,9 +526,7 @@ namespace CryptoTool.Win
             btnSavePublicKey.TabIndex = 3;
             btnSavePublicKey.Text = "保存公钥";
             btnSavePublicKey.Click += BtnSavePublicKey_Click;
-            // 
-            // btnClearPublicKey
-            // 
+
             btnClearPublicKey.Dock = DockStyle.Fill;
             btnClearPublicKey.Location = new Point(10, 252);
             btnClearPublicKey.Margin = new Padding(2);
@@ -583,13 +536,11 @@ namespace CryptoTool.Win
             btnClearPublicKey.TabIndex = 4;
             btnClearPublicKey.Text = "清空公钥";
             btnClearPublicKey.Click += BtnClearPublicKey_Click;
+
             // ==================================================
             // 密钥操作面板区 - mainTableLayout 右侧列
-            //   panelActionButtons > tableActionButtons(2列) > groupKeyActions + right side
+            //   panelActionButtons > tableActionButtons(2列) > groupKeyActions + 结果区
             // ==================================================
-            // 
-            // panelActionButtons
-            // 
             panelActionButtons.Controls.Add(tableActionButtons);
             panelActionButtons.Dock = DockStyle.Fill;
             panelActionButtons.Location = new Point(1643, 8);
@@ -597,9 +548,8 @@ namespace CryptoTool.Win
             panelActionButtons.Name = "panelActionButtons";
             panelActionButtons.Size = new Size(1636, 693);
             panelActionButtons.TabIndex = 1;
-            // 
-            // tableActionButtons
-            // 
+
+            // ---- tableActionButtons: 2列 × 1行, 左右平分 ----
             tableActionButtons.ColumnCount = 2;
             tableActionButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableActionButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
@@ -612,14 +562,8 @@ namespace CryptoTool.Win
             tableActionButtons.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableActionButtons.Size = new Size(1636, 693);
             tableActionButtons.TabIndex = 0;
-            // --------------------------------------------------
-            // 密钥操作 GroupBox - 内嵌 tableKeyActions(2行)
-            //   上半部分: panelButtonArea(按钮+设置)
-            //   下半部分: groupComputeResult(左) + groupRunResult(右)
-            // --------------------------------------------------
-            // 
-            // groupKeyActions
-            // 
+
+            // ---- groupKeyActions: 密钥操作按钮区, 跨2列 ----
             tableActionButtons.SetColumnSpan(groupKeyActions, 2);
             groupKeyActions.Controls.Add(tableKeyActions);
             groupKeyActions.Dock = DockStyle.Fill;
@@ -630,9 +574,8 @@ namespace CryptoTool.Win
             groupKeyActions.TabIndex = 1;
             groupKeyActions.TabStop = false;
             groupKeyActions.Text = "密钥操作";
-            // 
-            // tableKeyActions
-            // 
+
+            // ---- tableKeyActions: 2列 × 2行 (上:按钮区 | 下:结果区) ----
             tableKeyActions.ColumnCount = 2;
             tableKeyActions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableKeyActions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
@@ -647,15 +590,8 @@ namespace CryptoTool.Win
             tableKeyActions.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             tableKeyActions.Size = new Size(1614, 648);
             tableKeyActions.TabIndex = 0;
-            // --------------------------------------------------
-            // 密钥操作按钮与设置区 (panelButtonArea)
-            //   tableButtonArea(2列):
-            //     左: panelKeyControlsContainer > panelKeyControls(FlowLayout按钮)
-            //     右: panelRightSettings(输出格式/密钥类型/曲线选择)
-            // --------------------------------------------------
-            // 
-            // panelButtonArea
-            // 
+
+            // ---- panelButtonArea: 按钮区, 跨2列 ----
             tableKeyActions.SetColumnSpan(panelButtonArea, 2);
             panelButtonArea.Controls.Add(tableButtonArea);
             panelButtonArea.Dock = DockStyle.Fill;
@@ -663,9 +599,8 @@ namespace CryptoTool.Win
             panelButtonArea.Name = "panelButtonArea";
             panelButtonArea.Size = new Size(1608, 318);
             panelButtonArea.TabIndex = 1;
-            // 
-            // tableButtonArea
-            // 
+
+            // ---- tableButtonArea: 1列 × 1行, 内含 tableRightActions ----
             tableButtonArea.ColumnCount = 1;
             tableButtonArea.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tableButtonArea.Controls.Add(tableRightActions, 0, 0);
@@ -676,9 +611,8 @@ namespace CryptoTool.Win
             tableButtonArea.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableButtonArea.Size = new Size(1608, 318);
             tableButtonArea.TabIndex = 0;
-            // 
-            // tableRightActions
-            // 
+
+            // ---- tableRightActions: 2列(按钮列180px | 设置区) × 3行 ----
             tableRightActions.ColumnCount = 2;
             tableRightActions.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 180F));
             tableRightActions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
@@ -693,10 +627,8 @@ namespace CryptoTool.Win
             tableRightActions.RowStyles.Add(new RowStyle(SizeType.Absolute, 70F));
             tableRightActions.Size = new Size(1602, 312);
             tableRightActions.TabIndex = 0;
-            // 密钥操作按钮容器 - FlowLayoutPanel 动态排列
-            // 
-            // panelKeyControlsContainer
-            // 
+
+            // ---- 左侧: 密钥操作按钮容器 (FlowLayout 纵向排列, 跨3行) ----
             panelKeyControlsContainer.Controls.Add(panelKeyControls);
             panelKeyControlsContainer.Dock = DockStyle.Fill;
             panelKeyControlsContainer.Location = new Point(3, 3);
@@ -705,9 +637,7 @@ namespace CryptoTool.Win
             tableRightActions.SetRowSpan(panelKeyControlsContainer, 3);
             panelKeyControlsContainer.Size = new Size(174, 306);
             panelKeyControlsContainer.TabIndex = 1;
-            // 
-            // panelKeyControls
-            // 
+
             panelKeyControls.Controls.Add(btnGenerateKeyPair);
             panelKeyControls.Controls.Add(btnValidateKeyPair);
             panelKeyControls.Controls.Add(btnGetPublicKeyFromPrivate);
@@ -720,13 +650,8 @@ namespace CryptoTool.Win
             panelKeyControls.Size = new Size(162, 306);
             panelKeyControls.TabIndex = 1;
             panelKeyControls.WrapContents = false;
-            // ==================================================
-            // 密钥操作核心按钮 (panelKeyControls 内的 FlowLayout 子控件)
-            //   生成密钥对 | 验证密钥对 | 从私钥导出公钥 | 获取曲线类型 | 全部清空
-            // ==================================================
-            // 
-            // btnGenerateKeyPair
-            // 
+
+            // 生成密钥对
             btnGenerateKeyPair.Location = new Point(0, 0);
             btnGenerateKeyPair.Margin = new Padding(0, 0, 6, 0);
             btnGenerateKeyPair.Name = "btnGenerateKeyPair";
@@ -734,9 +659,8 @@ namespace CryptoTool.Win
             btnGenerateKeyPair.TabIndex = 0;
             btnGenerateKeyPair.Text = "生成密钥对";
             btnGenerateKeyPair.Click += BtnGenerateKeyPair_Click;
-            // 
-            // btnValidateKeyPair
-            // 
+
+            // 验证密钥对
             btnValidateKeyPair.Location = new Point(0, 43);
             btnValidateKeyPair.Margin = new Padding(0, 3, 6, 0);
             btnValidateKeyPair.Name = "btnValidateKeyPair";
@@ -744,9 +668,8 @@ namespace CryptoTool.Win
             btnValidateKeyPair.TabIndex = 1;
             btnValidateKeyPair.Text = "验证密钥对";
             btnValidateKeyPair.Click += BtnValidateKeyPair_Click;
-            // 
-            // btnGetPublicKeyFromPrivate
-            // 
+
+            // 从私钥提取公钥
             btnGetPublicKeyFromPrivate.Location = new Point(0, 86);
             btnGetPublicKeyFromPrivate.Margin = new Padding(0, 3, 6, 0);
             btnGetPublicKeyFromPrivate.Name = "btnGetPublicKeyFromPrivate";
@@ -754,9 +677,8 @@ namespace CryptoTool.Win
             btnGetPublicKeyFromPrivate.TabIndex = 2;
             btnGetPublicKeyFromPrivate.Text = "从私钥提取公钥";
             btnGetPublicKeyFromPrivate.Click += BtnGetPublicKeyFromPrivate_Click;
-            // 
-            // btnGetCurveType
-            // 
+
+            // 获取私钥曲线类型
             btnGetCurveType.Location = new Point(0, 129);
             btnGetCurveType.Margin = new Padding(0, 3, 6, 0);
             btnGetCurveType.Name = "btnGetCurveType";
@@ -764,9 +686,8 @@ namespace CryptoTool.Win
             btnGetCurveType.TabIndex = 3;
             btnGetCurveType.Text = "获取私钥曲线类型";
             btnGetCurveType.Click += BtnGetCurveType_Click;
-            // 
-            // btnClearAll
-            // 
+
+            // 清空全部
             btnClearAll.Location = new Point(0, 172);
             btnClearAll.Margin = new Padding(0, 3, 6, 0);
             btnClearAll.Name = "btnClearAll";
@@ -774,13 +695,8 @@ namespace CryptoTool.Win
             btnClearAll.TabIndex = 4;
             btnClearAll.Text = "清空全部";
             btnClearAll.Click += BtnClearAll_Click;
-            // --------------------------------------------------
-            // 右侧设置面板 (panelRightSettings) - 4行网格布局
-            //   输出格式行 | 密钥类型转换行 | 曲线分类行 | 降级曲线行
-            // --------------------------------------------------
-            // 
-            // panelRightSettings
-            // 
+
+            // ---- 右侧: 设置面板 (跨3行, 纵向FlowLayout) ----
             panelRightSettings.AutoSize = true;
             panelRightSettings.Controls.Add(panelFormatRow);
             panelRightSettings.Controls.Add(panelKeyTypeRow);
@@ -793,10 +709,8 @@ namespace CryptoTool.Win
             panelRightSettings.Size = new Size(1416, 134);
             panelRightSettings.TabIndex = 2;
             panelRightSettings.WrapContents = false;
-            // ---- 第1行: 输出格式 (PEM/DER/Base64/Hex) ----
-            // 
-            // panelFormatRow
-            // 
+
+            // ---- 第1行: 输出格式 (PEM/Base64/Hex) ----
             panelFormatRow.AutoSize = true;
             panelFormatRow.Controls.Add(labelOutputFormat);
             panelFormatRow.Controls.Add(comboOutputFormat);
@@ -805,9 +719,7 @@ namespace CryptoTool.Win
             panelFormatRow.Padding = new Padding(6, 0, 6, 0);
             panelFormatRow.Size = new Size(303, 38);
             panelFormatRow.TabIndex = 0;
-            // 
-            // labelOutputFormat
-            // 
+
             labelOutputFormat.Location = new Point(40, 3);
             labelOutputFormat.Margin = new Padding(34, 3, 2, 3);
             labelOutputFormat.Name = "labelOutputFormat";
@@ -815,9 +727,7 @@ namespace CryptoTool.Win
             labelOutputFormat.TabIndex = 2;
             labelOutputFormat.Text = "输出格式：";
             labelOutputFormat.TextAlign = ContentAlignment.MiddleLeft;
-            // 
-            // comboOutputFormat
-            // 
+
             comboOutputFormat.DropDownStyle = ComboBoxStyle.DropDownList;
             comboOutputFormat.FormattingEnabled = true;
             comboOutputFormat.Items.AddRange(new object[] { "PEM", "Base64", "Hex大写", "Hex小写" });
@@ -827,10 +737,8 @@ namespace CryptoTool.Win
             comboOutputFormat.Size = new Size(147, 32);
             comboOutputFormat.TabIndex = 3;
             comboOutputFormat.SelectedIndexChanged += ComboOutputFormat_SelectedIndexChanged;
+
             // ---- 第2行: 密钥类型转换 (私钥↔公钥) ----
-            // 
-            // panelKeyTypeRow
-            // 
             panelKeyTypeRow.AutoSize = true;
             panelKeyTypeRow.Controls.Add(labelKeyType);
             panelKeyTypeRow.Controls.Add(radioPanel);
@@ -840,9 +748,7 @@ namespace CryptoTool.Win
             panelKeyTypeRow.Padding = new Padding(6, 0, 6, 0);
             panelKeyTypeRow.Size = new Size(409, 40);
             panelKeyTypeRow.TabIndex = 1;
-            // 
-            // labelKeyType
-            // 
+
             labelKeyType.Location = new Point(40, 3);
             labelKeyType.Margin = new Padding(34, 3, 2, 3);
             labelKeyType.Name = "labelKeyType";
@@ -850,9 +756,7 @@ namespace CryptoTool.Win
             labelKeyType.TabIndex = 4;
             labelKeyType.Text = "密钥类型：";
             labelKeyType.TextAlign = ContentAlignment.MiddleLeft;
-            // 
-            // radioPanel
-            // 
+
             radioPanel.AutoSize = true;
             radioPanel.Controls.Add(radioPrivateKey);
             radioPanel.Controls.Add(radioPublicKey);
@@ -861,9 +765,7 @@ namespace CryptoTool.Win
             radioPanel.Name = "radioPanel";
             radioPanel.Size = new Size(157, 34);
             radioPanel.TabIndex = 5;
-            // 
-            // radioPrivateKey
-            // 
+
             radioPrivateKey.AutoSize = true;
             radioPrivateKey.Checked = true;
             radioPrivateKey.Location = new Point(3, 3);
@@ -873,18 +775,14 @@ namespace CryptoTool.Win
             radioPrivateKey.TabIndex = 0;
             radioPrivateKey.TabStop = true;
             radioPrivateKey.Text = "私钥";
-            // 
-            // radioPublicKey
-            // 
+
             radioPublicKey.AutoSize = true;
             radioPublicKey.Location = new Point(83, 3);
             radioPublicKey.Name = "radioPublicKey";
             radioPublicKey.Size = new Size(71, 28);
             radioPublicKey.TabIndex = 1;
             radioPublicKey.Text = "公钥";
-            // 
-            // btnConvertKey
-            // 
+
             btnConvertKey.AutoSize = true;
             btnConvertKey.Location = new Point(319, 3);
             btnConvertKey.Margin = new Padding(12, 3, 4, 3);
@@ -894,19 +792,15 @@ namespace CryptoTool.Win
             btnConvertKey.TabIndex = 6;
             btnConvertKey.Text = "转换";
             btnConvertKey.Click += BtnConvertKey_Click;
+
             // ---- 第3行: 椭圆曲线选择 (类别 → 曲线名) ----
-            // 
-            // panelCurveContainer
-            // 
             panelCurveContainer.Controls.Add(panelCurveRow);
             panelCurveContainer.Location = new Point(3, 93);
             panelCurveContainer.Name = "panelCurveContainer";
             panelCurveContainer.Padding = new Padding(6, 0, 6, 0);
             panelCurveContainer.Size = new Size(920, 38);
             panelCurveContainer.TabIndex = 2;
-            // 
-            // panelCurveRow
-            // 
+
             panelCurveRow.Controls.Add(labelCurve);
             panelCurveRow.Controls.Add(comboCategory);
             panelCurveRow.Controls.Add(lblArrow);
@@ -917,9 +811,7 @@ namespace CryptoTool.Win
             panelCurveRow.Size = new Size(900, 38);
             panelCurveRow.TabIndex = 1;
             panelCurveRow.WrapContents = false;
-            // 
-            // labelCurve
-            // 
+
             labelCurve.Location = new Point(34, 5);
             labelCurve.Margin = new Padding(34, 3, 2, 3);
             labelCurve.Name = "labelCurve";
@@ -928,9 +820,7 @@ namespace CryptoTool.Win
             labelCurve.Text = "椭圆曲线：";
             labelCurve.TextAlign = ContentAlignment.MiddleLeft;
             labelCurve.Click += LabelCurve_Click;
-            // 
-            // comboCategory
-            // 
+
             comboCategory.DropDownStyle = ComboBoxStyle.DropDownList;
             comboCategory.FormattingEnabled = true;
             comboCategory.Location = new Point(136, 5);
@@ -939,9 +829,7 @@ namespace CryptoTool.Win
             comboCategory.Size = new Size(183, 32);
             comboCategory.TabIndex = 1;
             comboCategory.SelectedIndexChanged += ComboCategory_SelectedIndexChanged;
-            // 
-            // lblArrow
-            // 
+
             lblArrow.Location = new Point(327, 5);
             lblArrow.Margin = new Padding(4, 3, 4, 3);
             lblArrow.Name = "lblArrow";
@@ -950,9 +838,7 @@ namespace CryptoTool.Win
             lblArrow.TabIndex = 2;
             lblArrow.Text = "→";
             lblArrow.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // comboCurve
-            // 
+
             comboCurve.DisplayMember = "Value";
             comboCurve.DropDownStyle = ComboBoxStyle.DropDownList;
             comboCurve.FormattingEnabled = true;
@@ -962,14 +848,8 @@ namespace CryptoTool.Win
             comboCurve.Size = new Size(520, 32);
             comboCurve.TabIndex = 3;
             comboCurve.ValueMember = "Key";
-            // ==================================================
-            // 结果显示区 - tableKeyActions 第2行
-            //   left (groupComputeResult): 计算结果文本框
-            //   right (groupRunResult): 运行结果文本框
-            // ==================================================
-            // 
-            // groupComputeResult
-            // 
+
+            // ---- groupComputeResult: 计算结果输出框 (行1左) ----
             groupComputeResult.Controls.Add(textKeyResult);
             groupComputeResult.Dock = DockStyle.Fill;
             groupComputeResult.Location = new Point(3, 327);
@@ -979,9 +859,7 @@ namespace CryptoTool.Win
             groupComputeResult.TabIndex = 0;
             groupComputeResult.TabStop = false;
             groupComputeResult.Text = "计算结果";
-            // 
-            // textKeyResult
-            // 
+
             textKeyResult.BackColor = Color.White;
             textKeyResult.BorderStyle = BorderStyle.None;
             textKeyResult.Dock = DockStyle.Fill;
@@ -993,9 +871,8 @@ namespace CryptoTool.Win
             textKeyResult.Size = new Size(785, 279);
             textKeyResult.TabIndex = 1;
             textKeyResult.Text = "从私钥提取/曲线检测：\n等待操作...";
-            // 
-            // groupRunResult
-            // 
+
+            // ---- groupRunResult: 运行结果输出框 (行1右) ----
             groupRunResult.Controls.Add(labelValidationResult);
             groupRunResult.Dock = DockStyle.Fill;
             groupRunResult.Location = new Point(810, 327);
@@ -1005,9 +882,7 @@ namespace CryptoTool.Win
             groupRunResult.TabIndex = 1;
             groupRunResult.TabStop = false;
             groupRunResult.Text = "运行结果";
-            // 
-            // labelValidationResult
-            // 
+
             labelValidationResult.BackColor = Color.White;
             labelValidationResult.BorderStyle = BorderStyle.None;
             labelValidationResult.Dock = DockStyle.Fill;
@@ -1020,13 +895,11 @@ namespace CryptoTool.Win
             labelValidationResult.Size = new Size(785, 279);
             labelValidationResult.TabIndex = 0;
             labelValidationResult.Text = "验证结果: 未验证";
+
             // ==================================================
             // 视图切换栏 (panelViewBar) - 跨mainTableLayout两列
-            //   4个Tab按钮: ECDH | ECIES签名验签 | 加密解密 | 文件操作
+            //   4个Tab按钮: ECDH | 签名验签 | 加密解密 | 文件操作
             // ==================================================
-            // 
-            // panelViewBar
-            // 
             mainTableLayout.SetColumnSpan(panelViewBar, 2);
             panelViewBar.Controls.Add(btnViewEcdh);
             panelViewBar.Controls.Add(btnViewSign);
@@ -1039,10 +912,7 @@ namespace CryptoTool.Win
             panelViewBar.Size = new Size(3265, 54);
             panelViewBar.TabIndex = 10;
             panelViewBar.WrapContents = false;
-            // ---- 4个视图切换Button: ECDH | ECIES签名验签 | ECIES加密解密 | 文件签名/验签 ----
-            // 
-            // btnViewEcdh
-            // 
+
             btnViewEcdh.AutoSize = true;
             btnViewEcdh.FlatStyle = FlatStyle.Flat;
             btnViewEcdh.Location = new Point(6, 6);
@@ -1053,9 +923,7 @@ namespace CryptoTool.Win
             btnViewEcdh.TabIndex = 0;
             btnViewEcdh.Text = "ECDH 加密解密";
             btnViewEcdh.UseVisualStyleBackColor = true;
-            // 
-            // btnViewSign
-            // 
+
             btnViewSign.AutoSize = true;
             btnViewSign.FlatStyle = FlatStyle.Flat;
             btnViewSign.Location = new Point(207, 6);
@@ -1066,9 +934,7 @@ namespace CryptoTool.Win
             btnViewSign.TabIndex = 1;
             btnViewSign.Text = "ECIES签名验签";
             btnViewSign.UseVisualStyleBackColor = true;
-            // 
-            // btnViewEncrypt
-            // 
+
             btnViewEncrypt.AutoSize = true;
             btnViewEncrypt.FlatStyle = FlatStyle.Flat;
             btnViewEncrypt.Location = new Point(343, 6);
@@ -1079,9 +945,7 @@ namespace CryptoTool.Win
             btnViewEncrypt.TabIndex = 2;
             btnViewEncrypt.Text = "ECIES加密解密";
             btnViewEncrypt.UseVisualStyleBackColor = true;
-            // 
-            // btnViewFile
-            // 
+
             btnViewFile.AutoSize = true;
             btnViewFile.FlatStyle = FlatStyle.Flat;
             btnViewFile.Location = new Point(489, 6);
@@ -1092,13 +956,11 @@ namespace CryptoTool.Win
             btnViewFile.TabIndex = 3;
             btnViewFile.Text = "文件签名/验签";
             btnViewFile.UseVisualStyleBackColor = true;
-            // --------------------------------------------------
+
+            // ==================================================
             // 视图内容面板 (panelViewContent) - 包含4个可切换面板
             //   groupSign(签名验签) | groupEncrypt(加密解密) | groupFile(文件操作) | groupEcdh(密钥协商)
-            // --------------------------------------------------
-            // 
-            // panelViewContent
-            // 
+            // ==================================================
             mainTableLayout.SetColumnSpan(panelViewContent, 2);
             panelViewContent.Controls.Add(groupSign);
             panelViewContent.Controls.Add(groupEncrypt);
@@ -1109,13 +971,11 @@ namespace CryptoTool.Win
             panelViewContent.Name = "panelViewContent";
             panelViewContent.Size = new Size(3265, 841);
             panelViewContent.TabIndex = 11;
+
             // ==================================================
             // 签名验签面板 (groupSign) - ECIES签名/验签功能
-            //   内嵌 tableLayoutSign(2列): groupSignInput(左) | groupSignActions(右)
+            //   tableLayoutSign(2列): groupSignInput(左) | groupSignActions(右)
             // ==================================================
-            // 
-            // groupSign
-            // 
             groupSign.Controls.Add(tableLayoutSign);
             groupSign.Dock = DockStyle.Fill;
             groupSign.Location = new Point(0, 0);
@@ -1123,9 +983,8 @@ namespace CryptoTool.Win
             groupSign.Padding = new Padding(4);
             groupSign.Size = new Size(3265, 841);
             groupSign.TabIndex = 0;
-            // 
-            // tableLayoutSign
-            // 
+
+            // ---- tableLayoutSign: 2列 × 1行 ----
             tableLayoutSign.ColumnCount = 2;
             tableLayoutSign.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableLayoutSign.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
@@ -1138,13 +997,8 @@ namespace CryptoTool.Win
             tableLayoutSign.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutSign.Size = new Size(3257, 833);
             tableLayoutSign.TabIndex = 0;
-            // --------------------------------------------------
-            // 签名验签输入区 (groupSignInput) - tableLayoutSign 左列
-            //   panelSignInput (2列4行): 原始数据(上) | 签名数据(下)
-            // --------------------------------------------------
-            // 
-            // groupSignInput
-            // 
+
+            // ---- groupSignInput: 签名输入区 (左列) ----
             groupSignInput.Controls.Add(panelSignInput);
             groupSignInput.Dock = DockStyle.Fill;
             groupSignInput.Location = new Point(3, 3);
@@ -1154,9 +1008,8 @@ namespace CryptoTool.Win
             groupSignInput.TabIndex = 0;
             groupSignInput.TabStop = false;
             groupSignInput.Text = "签名验签";
-            // 
-            // panelSignInput
-            // 
+
+            // ---- panelSignInput: 2列(PEM框|按钮) × 4行(原文/间隔/签名/间隔) ----
             panelSignInput.ColumnCount = 2;
             panelSignInput.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             panelSignInput.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 200F));
@@ -1170,17 +1023,13 @@ namespace CryptoTool.Win
             panelSignInput.Padding = new Padding(6);
             panelSignInput.RowCount = 4;
             panelSignInput.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            panelSignInput.RowStyles.Add(new RowStyle(SizeType.Percent, 0F));
+            panelSignInput.RowStyles.Add(new RowStyle(SizeType.Absolute, 0F));
             panelSignInput.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            panelSignInput.RowStyles.Add(new RowStyle(SizeType.Percent, 0F));
+            panelSignInput.RowStyles.Add(new RowStyle(SizeType.Absolute, 0F));
             panelSignInput.Size = new Size(1606, 788);
             panelSignInput.TabIndex = 0;
-            // ---- 原始数据区 (panelSignInput 第1行) ----
-            //   panelPlainDataBox: labelPlainData(标签) + textPlainData(输入框)
-            //   panelPlainDataActions: 复制|粘贴|清空 操作按钮
-            // 
-            // panelPlainDataBox
-            // 
+
+            // ---- 原始数据区 (列0行0, 跨2行) ----
             panelPlainDataBox.Controls.Add(labelPlainData);
             panelPlainDataBox.Controls.Add(textPlainData);
             panelPlainDataBox.Dock = DockStyle.Fill;
@@ -1189,9 +1038,7 @@ namespace CryptoTool.Win
             panelSignInput.SetRowSpan(panelPlainDataBox, 2);
             panelPlainDataBox.Size = new Size(1388, 382);
             panelPlainDataBox.TabIndex = 0;
-            // 
-            // labelPlainData
-            // 
+
             labelPlainData.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             labelPlainData.AutoSize = true;
             labelPlainData.BackColor = Color.Transparent;
@@ -1202,9 +1049,7 @@ namespace CryptoTool.Win
             labelPlainData.Size = new Size(108, 24);
             labelPlainData.TabIndex = 0;
             labelPlainData.Text = "原始数据：";
-            // 
-            // textPlainData
-            // 
+
             textPlainData.Dock = DockStyle.Fill;
             textPlainData.Location = new Point(0, 0);
             textPlainData.Multiline = true;
@@ -1212,9 +1057,8 @@ namespace CryptoTool.Win
             textPlainData.ScrollBars = ScrollBars.Vertical;
             textPlainData.Size = new Size(1388, 382);
             textPlainData.TabIndex = 2;
-            // 
-            // panelPlainDataActions
-            // 
+
+            // ---- 原始数据操作按钮 (列1行0, 跨2行): 复制|粘贴|清空 ----
             panelPlainDataActions.ColumnCount = 1;
             panelPlainDataActions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             panelPlainDataActions.Controls.Add(labelPlainDataActionsTitle, 0, 0);
@@ -1233,9 +1077,7 @@ namespace CryptoTool.Win
             panelPlainDataActions.RowStyles.Add(new RowStyle(SizeType.Percent, 34F));
             panelPlainDataActions.Size = new Size(194, 382);
             panelPlainDataActions.TabIndex = 4;
-            // 
-            // labelPlainDataActionsTitle
-            // 
+
             labelPlainDataActionsTitle.AutoSize = true;
             labelPlainDataActionsTitle.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             labelPlainDataActionsTitle.ForeColor = Color.FromArgb(192, 0, 0);
@@ -1245,9 +1087,7 @@ namespace CryptoTool.Win
             labelPlainDataActionsTitle.Size = new Size(92, 25);
             labelPlainDataActionsTitle.TabIndex = 0;
             labelPlainDataActionsTitle.Text = "数据操作";
-            // 
-            // btnCopyPlainData
-            // 
+
             btnCopyPlainData.Dock = DockStyle.Fill;
             btnCopyPlainData.Location = new Point(10, 32);
             btnCopyPlainData.Margin = new Padding(2);
@@ -1257,9 +1097,7 @@ namespace CryptoTool.Win
             btnCopyPlainData.TabIndex = 1;
             btnCopyPlainData.Text = "复制数据";
             btnCopyPlainData.Click += BtnCopyPlainData_Click;
-            // 
-            // btnPastePlainData
-            // 
+
             btnPastePlainData.Dock = DockStyle.Fill;
             btnPastePlainData.Location = new Point(10, 146);
             btnPastePlainData.Margin = new Padding(2);
@@ -1269,9 +1107,7 @@ namespace CryptoTool.Win
             btnPastePlainData.TabIndex = 2;
             btnPastePlainData.Text = "粘贴数据";
             btnPastePlainData.Click += BtnPastePlainData_Click;
-            // 
-            // btnClearPlainData
-            // 
+
             btnClearPlainData.Dock = DockStyle.Fill;
             btnClearPlainData.Location = new Point(10, 260);
             btnClearPlainData.Margin = new Padding(2);
@@ -1281,12 +1117,8 @@ namespace CryptoTool.Win
             btnClearPlainData.TabIndex = 3;
             btnClearPlainData.Text = "清空数据";
             btnClearPlainData.Click += BtnClearPlainData_Click;
-            // ---- 签名数据区 (panelSignInput 第3行) ----
-            //   panelSignatureBox: labelSignature(标签) + textSignature(输入框)
-            //   panelSignatureActions: 复制|粘贴|清空 操作按钮
-            // 
-            // panelSignatureBox
-            // 
+
+            // ---- 签名数据区 (列0行2, 跨2行) ----
             panelSignatureBox.Controls.Add(labelSignature);
             panelSignatureBox.Controls.Add(textSignature);
             panelSignatureBox.Dock = DockStyle.Fill;
@@ -1295,9 +1127,7 @@ namespace CryptoTool.Win
             panelSignInput.SetRowSpan(panelSignatureBox, 2);
             panelSignatureBox.Size = new Size(1388, 382);
             panelSignatureBox.TabIndex = 1;
-            // 
-            // labelSignature
-            // 
+
             labelSignature.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             labelSignature.AutoSize = true;
             labelSignature.BackColor = Color.Transparent;
@@ -1308,9 +1138,7 @@ namespace CryptoTool.Win
             labelSignature.Size = new Size(72, 24);
             labelSignature.TabIndex = 3;
             labelSignature.Text = "签名：";
-            // 
-            // textSignature
-            // 
+
             textSignature.Dock = DockStyle.Fill;
             textSignature.Location = new Point(0, 0);
             textSignature.Multiline = true;
@@ -1318,9 +1146,8 @@ namespace CryptoTool.Win
             textSignature.ScrollBars = ScrollBars.Vertical;
             textSignature.Size = new Size(1388, 382);
             textSignature.TabIndex = 4;
-            // 
-            // panelSignatureActions
-            // 
+
+            // ---- 签名操作按钮 (列1行2, 跨2行): 复制|粘贴|清空 ----
             panelSignatureActions.ColumnCount = 1;
             panelSignatureActions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             panelSignatureActions.Controls.Add(labelSignatureActionsTitle, 0, 0);
@@ -1339,9 +1166,7 @@ namespace CryptoTool.Win
             panelSignatureActions.RowStyles.Add(new RowStyle(SizeType.Percent, 34F));
             panelSignatureActions.Size = new Size(194, 382);
             panelSignatureActions.TabIndex = 5;
-            // 
-            // labelSignatureActionsTitle
-            // 
+
             labelSignatureActionsTitle.AutoSize = true;
             labelSignatureActionsTitle.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             labelSignatureActionsTitle.ForeColor = Color.FromArgb(192, 0, 0);
@@ -1351,9 +1176,7 @@ namespace CryptoTool.Win
             labelSignatureActionsTitle.Size = new Size(92, 25);
             labelSignatureActionsTitle.TabIndex = 0;
             labelSignatureActionsTitle.Text = "签名操作";
-            // 
-            // btnCopySignatureData
-            // 
+
             btnCopySignatureData.Dock = DockStyle.Fill;
             btnCopySignatureData.Location = new Point(10, 32);
             btnCopySignatureData.Margin = new Padding(2);
@@ -1363,9 +1186,7 @@ namespace CryptoTool.Win
             btnCopySignatureData.TabIndex = 1;
             btnCopySignatureData.Text = "复制签名";
             btnCopySignatureData.Click += BtnCopySignatureData_Click;
-            // 
-            // btnPasteSignatureData
-            // 
+
             btnPasteSignatureData.Dock = DockStyle.Fill;
             btnPasteSignatureData.Location = new Point(10, 146);
             btnPasteSignatureData.Margin = new Padding(2);
@@ -1375,9 +1196,7 @@ namespace CryptoTool.Win
             btnPasteSignatureData.TabIndex = 2;
             btnPasteSignatureData.Text = "粘贴签名";
             btnPasteSignatureData.Click += BtnPasteSignatureData_Click;
-            // 
-            // btnClearSignatureData
-            // 
+
             btnClearSignatureData.Dock = DockStyle.Fill;
             btnClearSignatureData.Location = new Point(10, 260);
             btnClearSignatureData.Margin = new Padding(2);
@@ -1387,13 +1206,8 @@ namespace CryptoTool.Win
             btnClearSignatureData.TabIndex = 3;
             btnClearSignatureData.Text = "清空签名";
             btnClearSignatureData.Click += BtnClearSignatureData_Click;
-            // 
-            // --------------------------------------------------
-            // 签名验签操作区 (groupSignActions) - tableLayoutSign 右列
-            //   panelSignActions(2列): 操作按钮(签名|验签|复制签名) | 签名选项(哈希算法|格式)
-            // --------------------------------------------------
-            // groupSignActions
-            // 
+
+            // ---- groupSignActions: 签名操作区 (右列) ----
             groupSignActions.Controls.Add(panelSignActions);
             groupSignActions.Dock = DockStyle.Fill;
             groupSignActions.Location = new Point(1631, 3);
@@ -1403,9 +1217,8 @@ namespace CryptoTool.Win
             groupSignActions.TabIndex = 1;
             groupSignActions.TabStop = false;
             groupSignActions.Text = "操作按钮";
-            // 
-            // panelSignActions
-            // 
+
+            // ---- panelSignActions: 2列(按钮|选项) × 3行 ----
             panelSignActions.ColumnCount = 2;
             panelSignActions.ColumnStyles.Add(new ColumnStyle());
             panelSignActions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
@@ -1423,11 +1236,8 @@ namespace CryptoTool.Win
             panelSignActions.RowStyles.Add(new RowStyle(SizeType.Percent, 33.3334F));
             panelSignActions.Size = new Size(1607, 788);
             panelSignActions.TabIndex = 1;
-            // ---- 签名操作按钮 (panelSignActions 左列) ----
-            // btnSign | btnVerify | btnCopySignature (垂直排列)
-            // 
-            // btnSign
-            // 
+
+            // 签名按钮
             btnSign.AutoSize = true;
             btnSign.Dock = DockStyle.Top;
             btnSign.Location = new Point(8, 4);
@@ -1438,9 +1248,8 @@ namespace CryptoTool.Win
             btnSign.TabIndex = 4;
             btnSign.Text = "签名";
             btnSign.Click += BtnSign_Click;
-            // 
-            // btnVerify
-            // 
+
+            // 验签按钮
             btnVerify.AutoSize = true;
             btnVerify.Dock = DockStyle.Top;
             btnVerify.Location = new Point(8, 263);
@@ -1451,9 +1260,8 @@ namespace CryptoTool.Win
             btnVerify.TabIndex = 5;
             btnVerify.Text = "验签";
             btnVerify.Click += BtnVerify_Click;
-            // 
-            // btnCopySignature
-            // 
+
+            // 复制签名按钮
             btnCopySignature.AutoSize = true;
             btnCopySignature.Dock = DockStyle.Top;
             btnCopySignature.Location = new Point(8, 522);
@@ -1464,11 +1272,8 @@ namespace CryptoTool.Win
             btnCopySignature.TabIndex = 6;
             btnCopySignature.Text = "复制签名";
             btnCopySignature.Click += BtnCopySignature_Click;
-            // ---- 签名选项 (panelSignActions 右列) ----
-            //   哈希算法 + 签名格式 选择
-            // 
-            // panelSignOptions
-            // 
+
+            // ---- panelSignOptions: 签名选项 (哈希算法|签名格式) ----
             panelSignOptions.ColumnCount = 2;
             panelSignOptions.ColumnStyles.Add(new ColumnStyle());
             panelSignOptions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
@@ -1485,9 +1290,7 @@ namespace CryptoTool.Win
             panelSignOptions.RowStyles.Add(new RowStyle());
             panelSignOptions.Size = new Size(1465, 774);
             panelSignOptions.TabIndex = 7;
-            // 
-            // labelHashAlgorithm
-            // 
+
             labelHashAlgorithm.AutoSize = true;
             labelHashAlgorithm.Location = new Point(0, 4);
             labelHashAlgorithm.Margin = new Padding(0, 4, 4, 0);
@@ -1496,9 +1299,7 @@ namespace CryptoTool.Win
             labelHashAlgorithm.TabIndex = 0;
             labelHashAlgorithm.Text = "Hash算法：";
             labelHashAlgorithm.TextAlign = ContentAlignment.MiddleLeft;
-            // 
-            // comboHashAlgorithm
-            // 
+
             comboHashAlgorithm.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             comboHashAlgorithm.DropDownStyle = ComboBoxStyle.DropDownList;
             comboHashAlgorithm.FormattingEnabled = true;
@@ -1508,9 +1309,7 @@ namespace CryptoTool.Win
             comboHashAlgorithm.Name = "comboHashAlgorithm";
             comboHashAlgorithm.Size = new Size(1338, 32);
             comboHashAlgorithm.TabIndex = 1;
-            // 
-            // labelSignatureFormat
-            // 
+
             labelSignatureFormat.AutoSize = true;
             labelSignatureFormat.Location = new Point(0, 36);
             labelSignatureFormat.Margin = new Padding(0, 4, 4, 0);
@@ -1519,9 +1318,7 @@ namespace CryptoTool.Win
             labelSignatureFormat.TabIndex = 2;
             labelSignatureFormat.Text = "签名格式：";
             labelSignatureFormat.TextAlign = ContentAlignment.MiddleLeft;
-            // 
-            // comboSignatureFormat
-            // 
+
             comboSignatureFormat.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             comboSignatureFormat.DropDownStyle = ComboBoxStyle.DropDownList;
             comboSignatureFormat.FormattingEnabled = true;
@@ -1531,13 +1328,11 @@ namespace CryptoTool.Win
             comboSignatureFormat.Name = "comboSignatureFormat";
             comboSignatureFormat.Size = new Size(1354, 32);
             comboSignatureFormat.TabIndex = 3;
-            // 
+
             // ==================================================
-            // 加密/解密面板 (groupEncrypt) - ECIES + AES + ChaCha20 模式
-            //   tableLayoutEncrypt(9行): 模式|格式|密钥|IV|公钥|曲线|输入|输出|按钮
+            // 加密/解密面板 (groupEncrypt) - ECIES + AES + ChaCha20
+            //   tableLayoutEncrypt: 单列多行, 从上到下依次为模式/格式/密钥/IV/公钥/曲线/输入/输出/按钮
             // ==================================================
-            // 加密/解密分组容器
-            // 
             groupEncrypt.BorderStyle = BorderStyle.None;
             groupEncrypt.Controls.Add(tableLayoutEncrypt);
             groupEncrypt.Dock = DockStyle.Fill;
@@ -1546,34 +1341,15 @@ namespace CryptoTool.Win
             groupEncrypt.Padding = new Padding(8);
             groupEncrypt.Size = new Size(3265, 841);
             groupEncrypt.TabIndex = 0;
-            // 
-            // 加密/解密表格布局
-            // 
+
+            // ---- tableLayoutEncrypt: 单列 × 多行 ----
             tableLayoutEncrypt.ColumnCount = 1;
             tableLayoutEncrypt.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutEncrypt.Controls.Add(labelEncMode, 0, 0);
-            tableLayoutEncrypt.Controls.Add(comboEncMode, 0, 0);
-            tableLayoutEncrypt.Controls.Add(labelEncInputFormat, 0, 1);
-            tableLayoutEncrypt.Controls.Add(comboEncInputFormat, 0, 1);
-            tableLayoutEncrypt.Controls.Add(labelEncOutputFormat, 0, 1);
-            tableLayoutEncrypt.Controls.Add(comboEncOutputFormat, 0, 1);
-            tableLayoutEncrypt.Controls.Add(labelEncKey, 0, 2);
-            tableLayoutEncrypt.Controls.Add(textEncKey, 0, 2);
-            tableLayoutEncrypt.Controls.Add(labelEncIV, 0, 3);
-            tableLayoutEncrypt.Controls.Add(textEncIV, 0, 3);
-            tableLayoutEncrypt.Controls.Add(labelEncBobPublic, 0, 4);
-            tableLayoutEncrypt.Controls.Add(textEncBobPublic, 0, 4);
-            tableLayoutEncrypt.Controls.Add(labelEncCurve, 0, 5);
-            tableLayoutEncrypt.Controls.Add(comboEncCurve, 0, 5);
-            tableLayoutEncrypt.Controls.Add(labelEncInput, 0, 4);
-            tableLayoutEncrypt.Controls.Add(textEncInput, 0, 5);
-            tableLayoutEncrypt.Controls.Add(textEncOutput, 0, 7);
-            tableLayoutEncrypt.Controls.Add(panelEncBtns, 0, 8);
-            tableLayoutEncrypt.Controls.Add(labelEncOutputLabel, 0, 6);
             tableLayoutEncrypt.Dock = DockStyle.Fill;
             tableLayoutEncrypt.Location = new Point(8, 31);
             tableLayoutEncrypt.Name = "tableLayoutEncrypt";
             tableLayoutEncrypt.RowCount = 9;
+            // 行高: 模式36 | 输入格式36 | 输出格式36 | 密钥36 | IV22 | 曲线35% | 输出标签22 | 输出框35% | 按钮44
             tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
             tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
             tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
@@ -1583,30 +1359,18 @@ namespace CryptoTool.Win
             tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 22F));
             tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Percent, 35F));
             tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 44F));
-            tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             tableLayoutEncrypt.Size = new Size(3249, 802);
             tableLayoutEncrypt.TabIndex = 0;
-            // 
-            // ==================================================
-            // [配置区] 加密模式 / 输入格式 / 输出格式 / 椭圆曲线
-            // ==================================================
-            // 加密模式标签
-            // 
+
+            // ---- 第0行: 加密模式 ----
             labelEncMode.AutoSize = true;
-            labelEncMode.Location = new Point(4, 40);
+            labelEncMode.Location = new Point(4, 4);
             labelEncMode.Margin = new Padding(4, 4, 2, 4);
             labelEncMode.Name = "labelEncMode";
             labelEncMode.Size = new Size(100, 24);
-            labelEncMode.TabIndex = 0;
+            labelEncMode.TabIndex = 1;
             labelEncMode.Text = "加密模式：";
-            // 
-            // 加密模式下拉框
-            // 
+
             comboEncMode.DropDownStyle = ComboBoxStyle.DropDownList;
             comboEncMode.FormattingEnabled = true;
             comboEncMode.Items.AddRange(new object[] { "ECIES (ECDH+AES-GCM)", "AES-256-GCM", "AES-256-CBC", "ChaCha20-Poly1305" });
@@ -1614,224 +1378,188 @@ namespace CryptoTool.Win
             comboEncMode.Margin = new Padding(0, 3, 4, 3);
             comboEncMode.Name = "comboEncMode";
             comboEncMode.Size = new Size(364, 32);
-            comboEncMode.TabIndex = 1;
-            // 
-            // 输入格式标签
-            // 
+            comboEncMode.TabIndex = 2;
+
+            // ---- 第1行: 输入格式 ----
             labelEncInputFormat.AutoSize = true;
-            labelEncInputFormat.Location = new Point(4, 148);
+            labelEncInputFormat.Location = new Point(4, 40);
             labelEncInputFormat.Margin = new Padding(4, 4, 2, 4);
             labelEncInputFormat.Name = "labelEncInputFormat";
             labelEncInputFormat.Size = new Size(100, 14);
-            labelEncInputFormat.TabIndex = 2;
+            labelEncInputFormat.TabIndex = 3;
             labelEncInputFormat.Text = "输入格式：";
-            // 
-            // 输入格式下拉框
-            // 
+
             comboEncInputFormat.DropDownStyle = ComboBoxStyle.DropDownList;
             comboEncInputFormat.FormattingEnabled = true;
             comboEncInputFormat.Items.AddRange(new object[] { "UTF-8文本", "Base64", "Hex" });
-            comboEncInputFormat.Location = new Point(0, 169);
+            comboEncInputFormat.Location = new Point(0, 39);
             comboEncInputFormat.Margin = new Padding(0, 3, 4, 3);
             comboEncInputFormat.Name = "comboEncInputFormat";
             comboEncInputFormat.Size = new Size(120, 32);
-            comboEncInputFormat.TabIndex = 3;
-            // 
-            // 输出格式标签
-            // 
+            comboEncInputFormat.TabIndex = 4;
+
+            // ---- 第1行: 输出格式 (与输入格式同行) ----
             labelEncOutputFormat.AutoSize = true;
-            labelEncOutputFormat.Location = new Point(8, 76);
+            labelEncOutputFormat.Location = new Point(140, 40);
             labelEncOutputFormat.Margin = new Padding(8, 4, 2, 4);
             labelEncOutputFormat.Name = "labelEncOutputFormat";
             labelEncOutputFormat.Size = new Size(100, 24);
-            labelEncOutputFormat.TabIndex = 4;
+            labelEncOutputFormat.TabIndex = 5;
             labelEncOutputFormat.Text = "输出格式：";
-            // 
-            // 输出格式下拉框
-            // 
+
+            // ★ 输出格式下拉框
             comboEncOutputFormat.DropDownStyle = ComboBoxStyle.DropDownList;
             comboEncOutputFormat.FormattingEnabled = true;
             comboEncOutputFormat.Items.AddRange(new object[] { "Base64", "Hex" });
-            comboEncOutputFormat.Location = new Point(0, 111);
+            comboEncOutputFormat.Location = new Point(244, 39);
             comboEncOutputFormat.Margin = new Padding(0, 3, 4, 3);
             comboEncOutputFormat.Name = "comboEncOutputFormat";
             comboEncOutputFormat.Size = new Size(120, 32);
-            comboEncOutputFormat.TabIndex = 5;
-            // 
-            // 椭圆曲线标签
-            // 
-            labelEncCurve.AutoSize = true;
-            labelEncCurve.Location = new Point(4, 555);
-            labelEncCurve.Margin = new Padding(4, 4, 2, 4);
-            labelEncCurve.Name = "labelEncCurve";
-            labelEncCurve.Size = new Size(100, 24);
-            labelEncCurve.TabIndex = 6;
-            labelEncCurve.Text = "曲线：";
-            // 
-            // 曲线类别下拉框
-            // 
-            comboEncCurveCategory.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboEncCurveCategory.FormattingEnabled = true;
-            comboEncCurveCategory.Location = new Point(0, 579);
-            comboEncCurveCategory.Margin = new Padding(0, 3, 2, 3);
-            comboEncCurveCategory.Name = "comboEncCurveCategory";
-            comboEncCurveCategory.Size = new Size(160, 32);
-            comboEncCurveCategory.TabIndex = 7;
-            // 
-            // 曲线分隔箭头
-            // 
-            labelEncCurveArrow.AutoSize = true;
-            labelEncCurveArrow.Location = new Point(166, 583);
-            labelEncCurveArrow.Margin = new Padding(2, 7, 2, 0);
-            labelEncCurveArrow.Name = "labelEncCurveArrow";
-            labelEncCurveArrow.Size = new Size(22, 24);
-            labelEncCurveArrow.TabIndex = 8;
-            labelEncCurveArrow.Text = "→";
-            // 
-            // 具体曲线下拉框
-            // 
-            comboEncCurve.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboEncCurve.FormattingEnabled = true;
-            comboEncCurve.Location = new Point(192, 579);
-            comboEncCurve.Margin = new Padding(0, 3, 4, 3);
-            comboEncCurve.Name = "comboEncCurve";
-            comboEncCurve.Size = new Size(260, 32);
-            comboEncCurve.TabIndex = 9;
-            // 
-            // ==================================================
-            // [参数区] 对称密钥 / IV / Bob 公钥
-            // ==================================================
-            // 对称密钥标签
-            // 
+            comboEncOutputFormat.TabIndex = 6;
+
+            // ---- 第2行: 对称密钥 (HEX, 留空自动从ECDSA私钥HKDF派生) ----
             labelEncKey.AutoSize = true;
-            labelEncKey.Location = new Point(4, 417);
+            labelEncKey.Location = new Point(4, 76);
             labelEncKey.Margin = new Padding(4, 4, 2, 4);
             labelEncKey.Name = "labelEncKey";
             labelEncKey.Size = new Size(279, 24);
-            labelEncKey.TabIndex = 10;
+            labelEncKey.TabIndex = 7;
             labelEncKey.Text = "对称密钥 (HEX，留空自动派生)：";
-            // 
-            // 对称密钥输入框
-            // 
+
             textEncKey.Dock = DockStyle.Fill;
             textEncKey.Font = new Font("Consolas", 9F);
-            textEncKey.Location = new Point(4, 394);
+            textEncKey.Location = new Point(4, 75);
             textEncKey.Margin = new Padding(4, 3, 4, 3);
             textEncKey.Name = "textEncKey";
             textEncKey.PlaceholderText = "从ECDSA私钥自动派生（HKDF-SHA256）";
             textEncKey.Size = new Size(3241, 29);
-            textEncKey.TabIndex = 11;
-            // 
-            // IV/Nonce 标签
-            // 
+            textEncKey.TabIndex = 8;
+
+            // ---- 第3行: IV/Nonce (HEX, 留空随机生成) ----
             labelEncIV.AutoSize = true;
-            labelEncIV.Location = new Point(4, 686);
+            labelEncIV.Location = new Point(4, 112);
             labelEncIV.Margin = new Padding(4, 4, 2, 4);
             labelEncIV.Name = "labelEncIV";
             labelEncIV.Size = new Size(288, 12);
-            labelEncIV.TabIndex = 12;
+            labelEncIV.TabIndex = 9;
             labelEncIV.Text = "IV/Nonce (HEX，留空随机生成)：";
-            // 
-            // IV/Nonce 输入框
-            // 
+
             textEncIV.Dock = DockStyle.Fill;
             textEncIV.Font = new Font("Consolas", 9F);
-            textEncIV.Location = new Point(4, 641);
+            textEncIV.Location = new Point(4, 111);
             textEncIV.Margin = new Padding(4, 3, 4, 3);
             textEncIV.Name = "textEncIV";
             textEncIV.PlaceholderText = "加密时自动生成，解密时需填写";
             textEncIV.Size = new Size(3241, 29);
-            textEncIV.TabIndex = 13;
-            // 
-            // Bob 公钥标签
-            // 
+            textEncIV.TabIndex = 10;
+
+            // ---- 第3行: Bob 公钥 (接收方, ECIES加密时使用) ----
             labelEncBobPublic.AutoSize = true;
-            labelEncBobPublic.Location = new Point(4, 468);
+            labelEncBobPublic.Location = new Point(4, 148);
             labelEncBobPublic.Margin = new Padding(4, 4, 2, 4);
             labelEncBobPublic.Name = "labelEncBobPublic";
             labelEncBobPublic.Size = new Size(288, 24);
-            labelEncBobPublic.TabIndex = 14;
+            labelEncBobPublic.TabIndex = 15;
             labelEncBobPublic.Text = "Bob 公钥 (接收方)：";
-            // 
-            // Bob 公钥输入框
-            // 
+
             textEncBobPublic.Dock = DockStyle.Fill;
             textEncBobPublic.Font = new Font("Consolas", 9F);
-            textEncBobPublic.Location = new Point(4, 445);
+            textEncBobPublic.Location = new Point(4, 147);
             textEncBobPublic.Margin = new Padding(4, 3, 4, 3);
             textEncBobPublic.Name = "textEncBobPublic";
             textEncBobPublic.PlaceholderText = "粘贴 PEM 格式公钥（支持多行）";
-            textEncBobPublic.Size = new Size(3241, 29);
             textEncBobPublic.Multiline = true;
             textEncBobPublic.ScrollBars = ScrollBars.Vertical;
-            textEncBobPublic.TabIndex = 15;
-            // 
-            // ==================================================
-            // [输入输出区] 明文/密文输入 -> 加密结果/解密输入
-            // ==================================================
-            // 明文/密文输入标签
-            // 
+            textEncBobPublic.Size = new Size(3241, 29);
+            textEncBobPublic.TabIndex = 16;
+
+            // ---- 第4行: 椭圆曲线选择 (类别 → 曲线) ----
+            labelEncCurve.AutoSize = true;
+            labelEncCurve.Location = new Point(4, 183);
+            labelEncCurve.Margin = new Padding(4, 4, 2, 4);
+            labelEncCurve.Name = "labelEncCurve";
+            labelEncCurve.Size = new Size(100, 24);
+            labelEncCurve.TabIndex = 17;
+            labelEncCurve.Text = "曲线：";
+
+            comboEncCurveCategory.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboEncCurveCategory.FormattingEnabled = true;
+            comboEncCurveCategory.Location = new Point(0, 182);
+            comboEncCurveCategory.Margin = new Padding(0, 3, 2, 3);
+            comboEncCurveCategory.Name = "comboEncCurveCategory";
+            comboEncCurveCategory.Size = new Size(160, 32);
+            comboEncCurveCategory.TabIndex = 18;
+
+            labelEncCurveArrow.AutoSize = true;
+            labelEncCurveArrow.Location = new Point(166, 186);
+            labelEncCurveArrow.Margin = new Padding(2, 7, 2, 0);
+            labelEncCurveArrow.Name = "labelEncCurveArrow";
+            labelEncCurveArrow.Size = new Size(22, 24);
+            labelEncCurveArrow.TabIndex = 19;
+            labelEncCurveArrow.Text = "→";
+
+            comboEncCurve.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboEncCurve.FormattingEnabled = true;
+            comboEncCurve.Location = new Point(192, 182);
+            comboEncCurve.Margin = new Padding(0, 3, 4, 3);
+            comboEncCurve.Name = "comboEncCurve";
+            comboEncCurve.Size = new Size(260, 32);
+            comboEncCurve.TabIndex = 20;
+
+            // ---- 第5行: 明文/密文输入标签 ----
             labelEncInput.AutoSize = true;
-            labelEncInput.Location = new Point(4, 706);
+            labelEncInput.Location = new Point(4, 220);
             labelEncInput.Margin = new Padding(4, 4, 2, 4);
             labelEncInput.Name = "labelEncInput";
             labelEncInput.Size = new Size(154, 12);
-            labelEncInput.TabIndex = 16;
+            labelEncInput.TabIndex = 11;
             labelEncInput.Text = "明文 / 密文输入：";
-            // 
-            // 明文/密文输入框
-            // 
+
+            // ---- 第6行: 明文/密文输入框 (占35%高度) ----
             textEncInput.Dock = DockStyle.Fill;
             textEncInput.Font = new Font("Consolas", 9F);
-            textEncInput.Location = new Point(4, 725);
+            textEncInput.Location = new Point(4, 235);
             textEncInput.Margin = new Padding(4, 3, 4, 3);
             textEncInput.Multiline = true;
             textEncInput.Name = "textEncInput";
             textEncInput.ScrollBars = ScrollBars.Vertical;
             textEncInput.Size = new Size(3241, 14);
-            textEncInput.TabIndex = 17;
-            // 
-            // 加密结果提示标签
-            // 
+            textEncInput.TabIndex = 12;
+
+            // ---- 第7行: 加密结果/解密输入标签 ----
             labelEncOutputLabel.AutoSize = true;
-            labelEncOutputLabel.Location = new Point(4, 746);
+            labelEncOutputLabel.Location = new Point(4, 256);
             labelEncOutputLabel.Margin = new Padding(4, 4, 2, 4);
             labelEncOutputLabel.Name = "labelEncOutputLabel";
             labelEncOutputLabel.Size = new Size(200, 12);
-            labelEncOutputLabel.TabIndex = 18;
+            labelEncOutputLabel.TabIndex = 13;
             labelEncOutputLabel.Text = "加密结果 / 解密输入：";
-            // 加密结果/解密输入框
-            // 
+
+            // ---- 第8行: 加密结果输出框 (占35%高度) ----
             textEncOutput.Dock = DockStyle.Fill;
             textEncOutput.Font = new Font("Consolas", 9F);
-            textEncOutput.Location = new Point(4, 765);
+            textEncOutput.Location = new Point(4, 271);
             textEncOutput.Margin = new Padding(4, 3, 4, 3);
             textEncOutput.Multiline = true;
             textEncOutput.Name = "textEncOutput";
             textEncOutput.ScrollBars = ScrollBars.Vertical;
             textEncOutput.Size = new Size(3241, 14);
-            textEncOutput.TabIndex = 19;
-            // 
-            // ==================================================
-            // [操作按钮] 加密 / 解密 / 清空 / 复制结果 / 粘贴输入
-            // ==================================================
-            // 加密操作按钮面板
-            // 
+            textEncOutput.TabIndex = 14;
+
+            // ---- 第9行: 加密操作按钮面板 ----
             panelEncBtns.Controls.Add(btnEncrypt);
             panelEncBtns.Controls.Add(btnDecrypt);
             panelEncBtns.Controls.Add(btnEncClear);
             panelEncBtns.Controls.Add(btnEncCopy);
             panelEncBtns.Controls.Add(btnEncPaste);
             panelEncBtns.Dock = DockStyle.Fill;
-            panelEncBtns.Location = new Point(3, 785);
+            panelEncBtns.Location = new Point(3, 290);
             panelEncBtns.Name = "panelEncBtns";
             panelEncBtns.Padding = new Padding(0, 4, 0, 0);
             panelEncBtns.Size = new Size(3243, 14);
-            panelEncBtns.TabIndex = 20;
+            panelEncBtns.TabIndex = 15;
             panelEncBtns.WrapContents = false;
-            // 
-            // 加密按钮
-            // 
+
             btnEncrypt.AutoSize = true;
             btnEncrypt.Location = new Point(3, 7);
             btnEncrypt.Margin = new Padding(3, 3, 4, 3);
@@ -1840,9 +1568,7 @@ namespace CryptoTool.Win
             btnEncrypt.TabIndex = 0;
             btnEncrypt.Text = "加密";
             btnEncrypt.Click += BtnEncrypt_Click;
-            // 
-            // 解密按钮
-            // 
+
             btnDecrypt.AutoSize = true;
             btnDecrypt.Location = new Point(88, 7);
             btnDecrypt.Margin = new Padding(6, 3, 6, 3);
@@ -1851,9 +1577,7 @@ namespace CryptoTool.Win
             btnDecrypt.TabIndex = 1;
             btnDecrypt.Text = "解密";
             btnDecrypt.Click += BtnDecrypt_Click;
-            // 
-            // 清空按钮
-            // 
+
             btnEncClear.AutoSize = true;
             btnEncClear.Location = new Point(175, 7);
             btnEncClear.Margin = new Padding(6, 3, 6, 3);
@@ -1862,9 +1586,7 @@ namespace CryptoTool.Win
             btnEncClear.TabIndex = 2;
             btnEncClear.Text = "清空";
             btnEncClear.Click += BtnEncClear_Click;
-            // 
-            // 复制结果按钮
-            // 
+
             btnEncCopy.AutoSize = true;
             btnEncCopy.Location = new Point(262, 7);
             btnEncCopy.Margin = new Padding(6, 3, 6, 3);
@@ -1873,9 +1595,7 @@ namespace CryptoTool.Win
             btnEncCopy.TabIndex = 3;
             btnEncCopy.Text = "复制结果";
             btnEncCopy.Click += BtnEncCopy_Click;
-            // 
-            // 粘贴输入按钮
-            // 
+
             btnEncPaste.AutoSize = true;
             btnEncPaste.Location = new Point(366, 7);
             btnEncPaste.Margin = new Padding(6, 3, 4, 3);
@@ -1884,14 +1604,10 @@ namespace CryptoTool.Win
             btnEncPaste.TabIndex = 4;
             btnEncPaste.Text = "粘贴输入";
             btnEncPaste.Click += BtnEncPaste_Click;
+
             // ==================================================
             // 文件签名/验签面板 (groupFile)
-            //   panelFileControls: btnSignFile | btnVerifyFile
             // ==================================================
-            // 
-            // 
-            // groupFile
-            // 
             groupFile.Controls.Add(panelFileControls);
             groupFile.Dock = DockStyle.Fill;
             groupFile.Location = new Point(0, 0);
@@ -1900,9 +1616,7 @@ namespace CryptoTool.Win
             groupFile.Size = new Size(3265, 841);
             groupFile.TabIndex = 0;
             groupFile.TabStop = false;
-            // 
-            // panelFileControls
-            // 
+
             panelFileControls.Controls.Add(btnSignFile);
             panelFileControls.Controls.Add(btnVerifyFile);
             panelFileControls.Dock = DockStyle.Fill;
@@ -1912,9 +1626,7 @@ namespace CryptoTool.Win
             panelFileControls.Size = new Size(3249, 802);
             panelFileControls.TabIndex = 0;
             panelFileControls.WrapContents = false;
-            // 
-            // btnSignFile
-            // 
+
             btnSignFile.AutoSize = true;
             btnSignFile.Location = new Point(8, 5);
             btnSignFile.Margin = new Padding(4, 3, 4, 3);
@@ -1923,9 +1635,7 @@ namespace CryptoTool.Win
             btnSignFile.TabIndex = 0;
             btnSignFile.Text = "签名文件";
             btnSignFile.Click += BtnSignFile_Click;
-            // 
-            // btnVerifyFile
-            // 
+
             btnVerifyFile.AutoSize = true;
             btnVerifyFile.Location = new Point(110, 5);
             btnVerifyFile.Margin = new Padding(6, 3, 4, 3);
@@ -1934,22 +1644,260 @@ namespace CryptoTool.Win
             btnVerifyFile.TabIndex = 1;
             btnVerifyFile.Text = "验签文件";
             btnVerifyFile.Click += BtnVerifyFile_Click;
+
             // ==================================================
             // ECDH 密钥协商面板 (groupEcdh)
-            //   内部展示 encResult 等密钥协商结果
             // ==================================================
-            // 
-            // groupEcdh
-            // 
             groupEcdh.Dock = DockStyle.Fill;
             groupEcdh.Location = new Point(0, 0);
             groupEcdh.Name = "groupEcdh";
             groupEcdh.Padding = new Padding(8);
             groupEcdh.Size = new Size(3265, 841);
             groupEcdh.TabIndex = 0;
-            // 
-            // labelEncResult
-            // 
+
+            // ECDH 模式选择
+            labelEcdhMode.AutoSize = true;
+            labelEcdhMode.Location = new Point(8, 8);
+            labelEcdhMode.Name = "labelEcdhMode";
+            labelEcdhMode.Text = "ECDH 模式：";
+            groupEcdh.Controls.Add(labelEcdhMode);
+            groupEcdh.Controls.Add(comboEcdhMode);
+
+            comboEcdhMode.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboEcdhMode.FormattingEnabled = true;
+            comboEcdhMode.Items.AddRange(new object[] { "CryptoTool", "8gwifi.org", "ANSI X9.63", "IEEE 1363a", "ISO/IEC 18033-2", "SECG SEC 1" });
+            comboEcdhMode.Location = new Point(100, 5);
+            comboEcdhMode.Size = new Size(200, 32);
+            comboEcdhMode.TabIndex = 0;
+            comboEcdhMode.SelectedIndexChanged += ComboEcdhMode_SelectedIndexChanged;
+
+            // ECDH 曲线类别 + 曲线
+            labelEcdhCategory.AutoSize = true;
+            labelEcdhCategory.Location = new Point(320, 8);
+            labelEcdhCategory.Name = "labelEcdhCategory";
+            labelEcdhCategory.Text = "曲线：";
+            groupEcdh.Controls.Add(labelEcdhCategory);
+            groupEcdh.Controls.Add(comboEcdhCategory);
+
+            comboEcdhCategory.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboEcdhCategory.FormattingEnabled = true;
+            comboEcdhCategory.Location = new Point(365, 5);
+            comboEcdhCategory.Size = new Size(160, 32);
+            comboEcdhCategory.TabIndex = 1;
+            comboEcdhCategory.SelectedIndexChanged += ComboEcdhCategory_SelectedIndexChanged;
+
+            labelEcdhCurve.AutoSize = true;
+            labelEcdhCurve.Location = new Point(532, 8);
+            labelEcdhCurve.Name = "labelEcdhCurve";
+            labelEcdhCurve.Text = "→";
+            groupEcdh.Controls.Add(labelEcdhCurve);
+            groupEcdh.Controls.Add(comboEcdhCurve);
+
+            comboEcdhCurve.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboEcdhCurve.FormattingEnabled = true;
+            comboEcdhCurve.Location = new Point(555, 5);
+            comboEcdhCurve.Size = new Size(260, 32);
+            comboEcdhCurve.TabIndex = 2;
+
+            // ECDH 编码格式
+            labelEcdhEncoding.AutoSize = true;
+            labelEcdhEncoding.Location = new Point(840, 8);
+            labelEcdhEncoding.Name = "labelEcdhEncoding";
+            labelEcdhEncoding.Text = "编码：";
+            groupEcdh.Controls.Add(labelEcdhEncoding);
+            groupEcdh.Controls.Add(comboEcdhEncoding);
+
+            comboEcdhEncoding.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboEcdhEncoding.FormattingEnabled = true;
+            comboEcdhEncoding.Items.AddRange(new object[] { "UTF-8", "GBK (GB2312)", "Unicode (UTF-16 LE)" });
+            comboEcdhEncoding.Location = new Point(885, 5);
+            comboEcdhEncoding.Size = new Size(140, 32);
+            comboEcdhEncoding.TabIndex = 3;
+
+            // 生成密钥对按钮
+            btnGenerateEcdhKeys.AutoSize = true;
+            btnGenerateEcdhKeys.Location = new Point(1050, 5);
+            btnGenerateEcdhKeys.Size = new Size(120, 34);
+            btnGenerateEcdhKeys.TabIndex = 4;
+            btnGenerateEcdhKeys.Text = "生成密钥对";
+            btnGenerateEcdhKeys.Click += BtnGenerateEcdhKeys_Click;
+            groupEcdh.Controls.Add(btnGenerateEcdhKeys);
+
+            // Alice 私钥
+            labelEcdhAlicePriv.AutoSize = true;
+            labelEcdhAlicePriv.Location = new Point(8, 50);
+            labelEcdhAlicePriv.Name = "labelEcdhAlicePriv";
+            labelEcdhAlicePriv.Text = "Alice 私钥：";
+            groupEcdh.Controls.Add(labelEcdhAlicePriv);
+
+            textEcdhAlicePrivate.Dock = DockStyle.None;
+            textEcdhAlicePrivate.Font = new Font("Consolas", 9F);
+            textEcdhAlicePrivate.Location = new Point(100, 47);
+            textEcdhAlicePrivate.Size = new Size(400, 60);
+            textEcdhAlicePrivate.Multiline = true;
+            textEcdhAlicePrivate.ScrollBars = ScrollBars.Vertical;
+            textEcdhAlicePrivate.Name = "textEcdhAlicePrivate";
+            textEcdhAlicePrivate.TabIndex = 5;
+            groupEcdh.Controls.Add(textEcdhAlicePrivate);
+
+            // Alice 公钥
+            labelEcdhAlicePub.AutoSize = true;
+            labelEcdhAlicePub.Location = new Point(520, 50);
+            labelEcdhAlicePub.Name = "labelEcdhAlicePub";
+            labelEcdhAlicePub.Text = "Alice 公钥：";
+            groupEcdh.Controls.Add(labelEcdhAlicePub);
+
+            textEcdhAlicePublic.Dock = DockStyle.None;
+            textEcdhAlicePublic.Font = new Font("Consolas", 9F);
+            textEcdhAlicePublic.Location = new Point(600, 47);
+            textEcdhAlicePublic.Size = new Size(400, 60);
+            textEcdhAlicePublic.Multiline = true;
+            textEcdhAlicePublic.ScrollBars = ScrollBars.Vertical;
+            textEcdhAlicePublic.Name = "textEcdhAlicePublic";
+            textEcdhAlicePublic.TabIndex = 6;
+            groupEcdh.Controls.Add(textEcdhAlicePublic);
+
+            // Bob 私钥
+            labelEcdhBobPriv.AutoSize = true;
+            labelEcdhBobPriv.Location = new Point(8, 120);
+            labelEcdhBobPriv.Name = "labelEcdhBobPriv";
+            labelEcdhBobPriv.Text = "Bob 私钥：";
+            groupEcdh.Controls.Add(labelEcdhBobPriv);
+
+            textEcdhBobPrivate.Dock = DockStyle.None;
+            textEcdhBobPrivate.Font = new Font("Consolas", 9F);
+            textEcdhBobPrivate.Location = new Point(100, 117);
+            textEcdhBobPrivate.Size = new Size(400, 60);
+            textEcdhBobPrivate.Multiline = true;
+            textEcdhBobPrivate.ScrollBars = ScrollBars.Vertical;
+            textEcdhBobPrivate.Name = "textEcdhBobPrivate";
+            textEcdhBobPrivate.TabIndex = 7;
+            groupEcdh.Controls.Add(textEcdhBobPrivate);
+
+            // Bob 公钥
+            labelEcdhBobPub.AutoSize = true;
+            labelEcdhBobPub.Location = new Point(520, 120);
+            labelEcdhBobPub.Name = "labelEcdhBobPub";
+            labelEcdhBobPub.Text = "Bob 公钥：";
+            groupEcdh.Controls.Add(labelEcdhBobPub);
+
+            textEcdhBobPublic.Dock = DockStyle.None;
+            textEcdhBobPublic.Font = new Font("Consolas", 9F);
+            textEcdhBobPublic.Location = new Point(600, 117);
+            textEcdhBobPublic.Size = new Size(400, 60);
+            textEcdhBobPublic.Multiline = true;
+            textEcdhBobPublic.ScrollBars = ScrollBars.Vertical;
+            textEcdhBobPublic.Name = "textEcdhBobPublic";
+            textEcdhBobPublic.TabIndex = 8;
+            groupEcdh.Controls.Add(textEcdhBobPublic);
+
+            // 共享密钥
+            labelEcdhShared.AutoSize = true;
+            labelEcdhShared.Location = new Point(8, 190);
+            labelEcdhShared.Name = "labelEcdhShared";
+            labelEcdhShared.Text = "共享密钥：";
+            groupEcdh.Controls.Add(labelEcdhShared);
+
+            textEcdhSharedKey.Dock = DockStyle.None;
+            textEcdhSharedKey.Font = new Font("Consolas", 9F);
+            textEcdhSharedKey.Location = new Point(100, 187);
+            textEcdhSharedKey.Size = new Size(400, 29);
+            textEcdhSharedKey.Name = "textEcdhSharedKey";
+            textEcdhSharedKey.ReadOnly = true;
+            textEcdhSharedKey.TabIndex = 9;
+            groupEcdh.Controls.Add(textEcdhSharedKey);
+
+            // IV
+            labelEcdhIV.AutoSize = true;
+            labelEcdhIV.Location = new Point(520, 190);
+            labelEcdhIV.Name = "labelEcdhIV";
+            labelEcdhIV.Text = "IV/Nonce：";
+            groupEcdh.Controls.Add(labelEcdhIV);
+
+            textEcdhIV.Dock = DockStyle.None;
+            textEcdhIV.Font = new Font("Consolas", 9F);
+            textEcdhIV.Location = new Point(590, 187);
+            textEcdhIV.Size = new Size(200, 29);
+            textEcdhIV.Name = "textEcdhIV";
+            textEcdhIV.TabIndex = 10;
+            groupEcdh.Controls.Add(textEcdhIV);
+
+            // 加密/解密按钮
+            btnEcdhEncrypt.AutoSize = true;
+            btnEcdhEncrypt.Location = new Point(8, 230);
+            btnEcdhEncrypt.Size = new Size(75, 34);
+            btnEcdhEncrypt.TabIndex = 11;
+            btnEcdhEncrypt.Text = "加密";
+            btnEcdhEncrypt.Click += BtnEcdhEncrypt_Click;
+            groupEcdh.Controls.Add(btnEcdhEncrypt);
+
+            btnEcdhDecrypt.AutoSize = true;
+            btnEcdhDecrypt.Location = new Point(93, 230);
+            btnEcdhDecrypt.Size = new Size(75, 34);
+            btnEcdhDecrypt.TabIndex = 12;
+            btnEcdhDecrypt.Text = "解密";
+            btnEcdhDecrypt.Click += BtnEcdhDecrypt_Click;
+            groupEcdh.Controls.Add(btnEcdhDecrypt);
+
+            btnEcdhCopyResult.AutoSize = true;
+            btnEcdhCopyResult.Location = new Point(178, 230);
+            btnEcdhCopyResult.Size = new Size(92, 34);
+            btnEcdhCopyResult.TabIndex = 13;
+            btnEcdhCopyResult.Text = "复制结果";
+            btnEcdhCopyResult.Click += BtnEcdhCopyResult_Click;
+            groupEcdh.Controls.Add(btnEcdhCopyResult);
+
+            btnEcdhPasteInput.AutoSize = true;
+            btnEcdhPasteInput.Location = new Point(280, 230);
+            btnEcdhPasteInput.Size = new Size(92, 34);
+            btnEcdhPasteInput.TabIndex = 14;
+            btnEcdhPasteInput.Text = "粘贴输入";
+            btnEcdhPasteInput.Click += BtnEcdhPasteInput_Click;
+            groupEcdh.Controls.Add(btnEcdhPasteInput);
+
+            btnEcdhClear.AutoSize = true;
+            btnEcdhClear.Location = new Point(382, 230);
+            btnEcdhClear.Size = new Size(75, 34);
+            btnEcdhClear.TabIndex = 15;
+            btnEcdhClear.Text = "清空";
+            btnEcdhClear.Click += BtnEcdhClear_Click;
+            groupEcdh.Controls.Add(btnEcdhClear);
+
+            // 明文输入
+            labelEcdhInput.AutoSize = true;
+            labelEcdhInput.Location = new Point(8, 275);
+            labelEcdhInput.Name = "labelEcdhInput";
+            labelEcdhInput.Text = "明文输入：";
+            groupEcdh.Controls.Add(labelEcdhInput);
+
+            textEcdhInput.Dock = DockStyle.None;
+            textEcdhInput.Font = new Font("Consolas", 9F);
+            textEcdhInput.Location = new Point(100, 272);
+            textEcdhInput.Size = new Size(900, 60);
+            textEcdhInput.Multiline = true;
+            textEcdhInput.ScrollBars = ScrollBars.Vertical;
+            textEcdhInput.Name = "textEcdhInput";
+            textEcdhInput.TabIndex = 16;
+            groupEcdh.Controls.Add(textEcdhInput);
+
+            // 密文输出
+            labelEcdhOutput.AutoSize = true;
+            labelEcdhOutput.Location = new Point(8, 345);
+            labelEcdhOutput.Name = "labelEcdhOutput";
+            labelEcdhOutput.Text = "密文输出：";
+            groupEcdh.Controls.Add(labelEcdhOutput);
+
+            textEcdhOutput.Dock = DockStyle.None;
+            textEcdhOutput.Font = new Font("Consolas", 9F);
+            textEcdhOutput.Location = new Point(100, 342);
+            textEcdhOutput.Size = new Size(900, 60);
+            textEcdhOutput.Multiline = true;
+            textEcdhOutput.ScrollBars = ScrollBars.Vertical;
+            textEcdhOutput.Name = "textEcdhOutput";
+            textEcdhOutput.TabIndex = 17;
+            groupEcdh.Controls.Add(textEcdhOutput);
+
+            // 加密结果提示
             labelEncResult.BackColor = Color.White;
             labelEncResult.BorderStyle = BorderStyle.None;
             labelEncResult.Font = new Font("Segoe UI", 9F);
@@ -1962,26 +1910,18 @@ namespace CryptoTool.Win
             labelEncResult.Size = new Size(364, 338);
             labelEncResult.TabIndex = 0;
             labelEncResult.Text = "加密结果:\r\n等待操作...";
+
             // ==================================================
-            // 签名/加密分隔器 (splitSignEncrypt)
-            //   实现签名验签面板与加密解密面板可拖拽调整大小
+            // SplitContainer - 签名/加密分隔器 & 文件结果分隔器
             // ==================================================
-            // 
-            // splitSignEncrypt
-            // 
             splitSignEncrypt.Dock = DockStyle.Fill;
             splitSignEncrypt.Location = new Point(11, 710);
             splitSignEncrypt.Name = "splitSignEncrypt";
             splitSignEncrypt.Size = new Size(3265, 460);
             splitSignEncrypt.SplitterDistance = 1766;
             splitSignEncrypt.TabIndex = 2;
-            // ==================================================
-            // 文件加密/解密面板 (groupEncFile)
-            //   panelEncFileBtns > btnEncryptFile | btnDecryptFile
-            // ==================================================
-            // 
-            // groupEncFile
-            // 
+
+            // 文件加密/解密面板
             groupEncFile.Controls.Add(panelEncFileBtns);
             groupEncFile.Dock = DockStyle.Fill;
             groupEncFile.Location = new Point(1112, 403);
@@ -1991,9 +1931,7 @@ namespace CryptoTool.Win
             groupEncFile.TabIndex = 16;
             groupEncFile.TabStop = false;
             groupEncFile.Text = "文件加密/解密";
-            // 
-            // panelEncFileBtns
-            // 
+
             panelEncFileBtns.Controls.Add(btnEncryptFile);
             panelEncFileBtns.Controls.Add(btnDecryptFile);
             panelEncFileBtns.Dock = DockStyle.Fill;
@@ -2002,9 +1940,7 @@ namespace CryptoTool.Win
             panelEncFileBtns.Size = new Size(348, 0);
             panelEncFileBtns.TabIndex = 0;
             panelEncFileBtns.WrapContents = false;
-            // 
-            // btnEncryptFile
-            // 
+
             btnEncryptFile.AutoSize = true;
             btnEncryptFile.Location = new Point(3, 3);
             btnEncryptFile.Margin = new Padding(3, 3, 4, 3);
@@ -2013,9 +1949,7 @@ namespace CryptoTool.Win
             btnEncryptFile.TabIndex = 0;
             btnEncryptFile.Text = "加密文件";
             btnEncryptFile.Click += BtnEncryptFile_Click;
-            // 
-            // btnDecryptFile
-            // 
+
             btnDecryptFile.AutoSize = true;
             btnDecryptFile.Location = new Point(105, 3);
             btnDecryptFile.Margin = new Padding(6, 3, 4, 3);
@@ -2024,31 +1958,24 @@ namespace CryptoTool.Win
             btnDecryptFile.TabIndex = 1;
             btnDecryptFile.Text = "解密文件";
             btnDecryptFile.Click += BtnDecryptFile_Click;
-            // ==================================================
-            // 文件结果分隔器 (splitFileResult)
-            //   分隔加解密面板与文件操作结果区域
-            // ==================================================
-            // 
-            // splitFileResult
-            // 
+
             splitFileResult.Dock = DockStyle.Fill;
             splitFileResult.Location = new Point(11, 1176);
             splitFileResult.Name = "splitFileResult";
             splitFileResult.Size = new Size(3265, 429);
             splitFileResult.SplitterDistance = 2633;
             splitFileResult.TabIndex = 3;
+
             // ==================================================
-            // 顶层控件 EcdsaTabControl - 画面叶子节点
-            //   使用 mainTableLayout 作为根布局面板
+            // EcdsaTabControl 自身
             // ==================================================
-            // 
-            // EcdsaTabControl
-            // 
             AutoScaleDimensions = new SizeF(11F, 24F);
             AutoScaleMode = AutoScaleMode.Font;
             Controls.Add(mainTableLayout);
             Name = "EcdsaTabControl";
             Size = new Size(3287, 1616);
+
+            // ResumeLayout
             mainTableLayout.ResumeLayout(false);
             groupKey.ResumeLayout(false);
             tableLayoutKey.ResumeLayout(false);
@@ -2121,172 +2048,189 @@ namespace CryptoTool.Win
 
         #endregion
 
-        // ==========================================
-        // 字段声明 - 所有控件的字段声明按板块分组
-        // ==========================================
-        // [主布局]
-        private System.Windows.Forms.TableLayoutPanel mainTableLayout;
-        // [密钥管理区 - groupKey]
-        private System.Windows.Forms.GroupBox groupKey;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutKey;
-        private System.Windows.Forms.Panel panelPrivateKeyBox;
-        private System.Windows.Forms.Panel panelPublicKeyBox;
-        private System.Windows.Forms.Label labelPrivateKey;
-        private System.Windows.Forms.Label labelPrivateActionsTitle;
-        private System.Windows.Forms.TextBox textPrivateKey;
-        private System.Windows.Forms.TableLayoutPanel panelPrivateKeyActions;
-        private System.Windows.Forms.Button btnCopyPrivateKey;
-        private System.Windows.Forms.Button btnPastePrivateKey;
-        private System.Windows.Forms.Button btnImportPrivateKey;
-        private System.Windows.Forms.Button btnSavePrivateKey;
-        private System.Windows.Forms.Button btnClearPrivateKey;
-        private System.Windows.Forms.Label labelPublicKey;
-        private System.Windows.Forms.Label labelPublicActionsTitle;
-        private System.Windows.Forms.TextBox textPublicKey;
-        private System.Windows.Forms.TableLayoutPanel panelPublicKeyActions;
-        private System.Windows.Forms.Button btnCopyPublicKey;
-        private System.Windows.Forms.Button btnPastePublicKey;
-        private System.Windows.Forms.Button btnImportPublicKey;
-        private System.Windows.Forms.Button btnSavePublicKey;
-        private System.Windows.Forms.Button btnClearPublicKey;
-        // [右侧设置面板 - panelActionButtons]
-        private System.Windows.Forms.Panel panelActionButtons;
-        private System.Windows.Forms.TableLayoutPanel tableActionButtons;
-        private System.Windows.Forms.Panel panelButtonArea;
-        private System.Windows.Forms.TableLayoutPanel tableButtonArea;
-        private System.Windows.Forms.TableLayoutPanel tableRightActions;
-        private System.Windows.Forms.FlowLayoutPanel panelFormatRow;
-        private System.Windows.Forms.FlowLayoutPanel panelKeyTypeRow;
-        private System.Windows.Forms.Label labelOutputFormat;
-        private System.Windows.Forms.ComboBox comboOutputFormat;
-        private System.Windows.Forms.Label labelKeyType;
-        private System.Windows.Forms.FlowLayoutPanel radioPanel;
-        private System.Windows.Forms.RadioButton radioPrivateKey;
-        private System.Windows.Forms.RadioButton radioPublicKey;
-        private System.Windows.Forms.Button btnConvertKey;
-        private System.Windows.Forms.Panel panelKeyControlsContainer;
-        private System.Windows.Forms.FlowLayoutPanel panelRightSettings;
-        private System.Windows.Forms.FlowLayoutPanel panelKeyControls;
-        // [密钥操作按钮 - groupKeyActions]
-        private System.Windows.Forms.Button btnGenerateKeyPair;
-        private System.Windows.Forms.Button btnValidateKeyPair;
-        private System.Windows.Forms.Button btnGetPublicKeyFromPrivate;
-        private System.Windows.Forms.Button btnGetCurveType;
-        private System.Windows.Forms.Button btnClearAll;
-        private System.Windows.Forms.Panel panelCurveContainer;
-        private System.Windows.Forms.FlowLayoutPanel panelCurveRow;
-        private System.Windows.Forms.Label labelCurve;
-        private System.Windows.Forms.ComboBox comboCategory;
-        private System.Windows.Forms.Label lblArrow;
-        private System.Windows.Forms.ComboBox comboCurve;
-        // [签名验签区 - groupSign]
-        private System.Windows.Forms.SplitContainer splitSignEncrypt;
-        private System.Windows.Forms.Panel groupSign;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutSign;
-        private System.Windows.Forms.GroupBox groupSignInput;
-        private System.Windows.Forms.TableLayoutPanel panelSignInput;
-        private System.Windows.Forms.Panel panelPlainDataBox;
-        private System.Windows.Forms.Label labelPlainData;
-        private System.Windows.Forms.TextBox textPlainData;
-        private System.Windows.Forms.TableLayoutPanel panelPlainDataActions;
-        private System.Windows.Forms.Label labelPlainDataActionsTitle;
-        private System.Windows.Forms.Button btnCopyPlainData;
-        private System.Windows.Forms.Button btnPastePlainData;
-        private System.Windows.Forms.Button btnClearPlainData;
-        private System.Windows.Forms.Panel panelSignatureBox;
-        private System.Windows.Forms.Label labelSignature;
-        private System.Windows.Forms.TextBox textSignature;
-        private System.Windows.Forms.TableLayoutPanel panelSignatureActions;
-        private System.Windows.Forms.Label labelSignatureActionsTitle;
-        private System.Windows.Forms.Button btnCopySignatureData;
-        private System.Windows.Forms.Button btnPasteSignatureData;
-        private System.Windows.Forms.Button btnClearSignatureData;
-        private System.Windows.Forms.GroupBox groupSignActions;
-        private System.Windows.Forms.TableLayoutPanel panelSignActions;
-        private System.Windows.Forms.Label labelHashAlgorithm;
-        private System.Windows.Forms.ComboBox comboHashAlgorithm;
-        private System.Windows.Forms.Label labelSignatureFormat;
-        private System.Windows.Forms.ComboBox comboSignatureFormat;
-        private System.Windows.Forms.Button btnSign;
-        private System.Windows.Forms.Button btnVerify;
-        private System.Windows.Forms.Button btnCopySignature;
-        // [加解密区 - groupEncrypt]
-        private System.Windows.Forms.Panel groupEncrypt;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutEncrypt;
-        private System.Windows.Forms.Label labelEncMode;
-        private System.Windows.Forms.ComboBox comboEncMode;
-        private System.Windows.Forms.Label labelEncInputFormat;
-        private System.Windows.Forms.ComboBox comboEncInputFormat;
-        private System.Windows.Forms.Label labelEncOutputFormat;
-        private System.Windows.Forms.ComboBox comboEncOutputFormat;
-        private System.Windows.Forms.Label labelEncKey;
-        private System.Windows.Forms.TextBox textEncKey;
-        private System.Windows.Forms.Label labelEncIV;
-        private System.Windows.Forms.TextBox textEncIV;
-        private System.Windows.Forms.Label labelEncBobPublic;
-        private System.Windows.Forms.TextBox textEncBobPublic;
-        private System.Windows.Forms.Label labelEncCurve;
-        private System.Windows.Forms.ComboBox comboEncCurveCategory;
-        private System.Windows.Forms.Label labelEncCurveArrow;
-        private System.Windows.Forms.ComboBox comboEncCurve;
-        private System.Windows.Forms.Label labelEncInput;
-        private System.Windows.Forms.TextBox textEncInput;
-        private System.Windows.Forms.Label labelEncOutputLabel;
-        private System.Windows.Forms.TextBox textEncOutput;
-        private System.Windows.Forms.FlowLayoutPanel panelEncBtns;
-        private System.Windows.Forms.Button btnEncrypt;
-        private System.Windows.Forms.Button btnDecrypt;
-        private System.Windows.Forms.Button btnEncClear;
-        private System.Windows.Forms.Button btnEncCopy;
-        private System.Windows.Forms.Button btnEncPaste;
-        // [文件操作区 - groupFile + groupEncFile]
-        private System.Windows.Forms.GroupBox groupEncFile;
-        private System.Windows.Forms.FlowLayoutPanel panelEncFileBtns;
-        private System.Windows.Forms.Button btnEncryptFile;
-        private System.Windows.Forms.Button btnDecryptFile;
-        private System.Windows.Forms.TextBox labelEncResult;
-        private System.Windows.Forms.SplitContainer splitFileResult;
-        private System.Windows.Forms.GroupBox groupFile;
-        private System.Windows.Forms.FlowLayoutPanel panelFileControls;
-        private System.Windows.Forms.Button btnSignFile;
-        private System.Windows.Forms.Button btnVerifyFile;
-        // [运行结果区]
-        private System.Windows.Forms.GroupBox groupRunResult;
-        private System.Windows.Forms.GroupBox groupKeyActions;
-        private System.Windows.Forms.GroupBox groupComputeResult;
-        private System.Windows.Forms.TableLayoutPanel tableKeyActions;
-        private System.Windows.Forms.RichTextBox textKeyResult;
-        private System.Windows.Forms.RichTextBox labelValidationResult;
-        // [视图切换栏]
-        private System.Windows.Forms.FlowLayoutPanel panelViewBar;
-        private System.Windows.Forms.Button btnViewSign;
-        private System.Windows.Forms.Button btnViewEncrypt;
-        private System.Windows.Forms.Button btnViewFile;
-        private System.Windows.Forms.Button btnViewEcdh;
-        private System.Windows.Forms.Panel panelViewContent;
-        private System.Windows.Forms.Panel groupEcdh;
+        #region 字段声明 - 按功能分组
 
-        // [ECDH 密钥协商区 - 动态创建的控件]
-        private System.Windows.Forms.ComboBox comboEcdhCategory;
-        private System.Windows.Forms.ComboBox comboEcdhCurve;
-        private System.Windows.Forms.ComboBox comboEcdhMode;
-        private System.Windows.Forms.ComboBox comboEcdhEncoding;
-        private System.Windows.Forms.Button btnGenerateEcdhKeys;
-        private System.Windows.Forms.TextBox textEcdhAlicePrivate;
-        private System.Windows.Forms.TextBox textEcdhAlicePublic;
-        private System.Windows.Forms.TextBox textEcdhBobPrivate;
-        private System.Windows.Forms.TextBox textEcdhBobPublic;
-        private System.Windows.Forms.TextBox textEcdhInput;
-        private System.Windows.Forms.TextBox textEcdhOutput;
-        private System.Windows.Forms.TextBox textEcdhSharedKey;
-        private System.Windows.Forms.TextBox textEcdhIV;
-        private System.Windows.Forms.Label lblEcdhIV;
-        private System.Windows.Forms.Button btnEcdhEncrypt;
-        private System.Windows.Forms.Button btnEcdhDecrypt;
-        private System.Windows.Forms.Button btnEcdhCopyResult;
-        private System.Windows.Forms.Button btnEcdhPasteInput;
-        private System.Windows.Forms.Button btnEcdhClear;
-        private TableLayoutPanel panelSignOptions;
+        // [主布局]
+        private TableLayoutPanel mainTableLayout = null!;
+
+        // [密钥管理区]
+        private GroupBox groupKey = null!;
+        private TableLayoutPanel tableLayoutKey = null!;
+        private Panel panelPrivateKeyBox = null!;
+        private Panel panelPublicKeyBox = null!;
+        private Label labelPrivateKey = null!;
+        private Label labelPrivateActionsTitle = null!;
+        private TextBox textPrivateKey = null!;
+        private TableLayoutPanel panelPrivateKeyActions = null!;
+        private Button btnCopyPrivateKey = null!;
+        private Button btnPastePrivateKey = null!;
+        private Button btnImportPrivateKey = null!;
+        private Button btnSavePrivateKey = null!;
+        private Button btnClearPrivateKey = null!;
+        private Label labelPublicKey = null!;
+        private Label labelPublicActionsTitle = null!;
+        private TextBox textPublicKey = null!;
+        private TableLayoutPanel panelPublicKeyActions = null!;
+        private Button btnCopyPublicKey = null!;
+        private Button btnPastePublicKey = null!;
+        private Button btnImportPublicKey = null!;
+        private Button btnSavePublicKey = null!;
+        private Button btnClearPublicKey = null!;
+
+        // [密钥操作面板 - 右侧]
+        private Panel panelActionButtons = null!;
+        private TableLayoutPanel tableActionButtons = null!;
+        private GroupBox groupKeyActions = null!;
+        private TableLayoutPanel tableKeyActions = null!;
+        private Panel panelButtonArea = null!;
+        private TableLayoutPanel tableButtonArea = null!;
+        private TableLayoutPanel tableRightActions = null!;
+        private Panel panelKeyControlsContainer = null!;
+        private FlowLayoutPanel panelKeyControls = null!;
+        private Button btnGenerateKeyPair = null!;
+        private Button btnValidateKeyPair = null!;
+        private Button btnGetPublicKeyFromPrivate = null!;
+        private Button btnGetCurveType = null!;
+        private Button btnClearAll = null!;
+        private FlowLayoutPanel panelRightSettings = null!;
+        private FlowLayoutPanel panelFormatRow = null!;
+        private Label labelOutputFormat = null!;
+        private ComboBox comboOutputFormat = null!;
+        private FlowLayoutPanel panelKeyTypeRow = null!;
+        private Label labelKeyType = null!;
+        private FlowLayoutPanel radioPanel = null!;
+        private RadioButton radioPrivateKey = null!;
+        private RadioButton radioPublicKey = null!;
+        private Button btnConvertKey = null!;
+        private Panel panelCurveContainer = null!;
+        private FlowLayoutPanel panelCurveRow = null!;
+        private Label labelCurve = null!;
+        private ComboBox comboCategory = null!;
+        private Label lblArrow = null!;
+        private ComboBox comboCurve = null!;
+        private GroupBox groupComputeResult = null!;
+        private RichTextBox textKeyResult = null!;
+        private GroupBox groupRunResult = null!;
+        private RichTextBox labelValidationResult = null!;
+
+        // [视图切换]
+        private FlowLayoutPanel panelViewBar = null!;
+        private Button btnViewEcdh = null!;
+        private Button btnViewSign = null!;
+        private Button btnViewEncrypt = null!;
+        private Button btnViewFile = null!;
+        private Panel panelViewContent = null!;
+
+        // [签名验签]
+        private Panel groupSign = null!;
+        private TableLayoutPanel tableLayoutSign = null!;
+        private GroupBox groupSignInput = null!;
+        private TableLayoutPanel panelSignInput = null!;
+        private Panel panelPlainDataBox = null!;
+        private Label labelPlainData = null!;
+        private TextBox textPlainData = null!;
+        private TableLayoutPanel panelPlainDataActions = null!;
+        private Label labelPlainDataActionsTitle = null!;
+        private Button btnCopyPlainData = null!;
+        private Button btnPastePlainData = null!;
+        private Button btnClearPlainData = null!;
+        private Panel panelSignatureBox = null!;
+        private Label labelSignature = null!;
+        private TextBox textSignature = null!;
+        private TableLayoutPanel panelSignatureActions = null!;
+        private Label labelSignatureActionsTitle = null!;
+        private Button btnCopySignatureData = null!;
+        private Button btnPasteSignatureData = null!;
+        private Button btnClearSignatureData = null!;
+        private GroupBox groupSignActions = null!;
+        private TableLayoutPanel panelSignActions = null!;
+        private Button btnSign = null!;
+        private Button btnVerify = null!;
+        private Button btnCopySignature = null!;
+        private TableLayoutPanel panelSignOptions = null!;
+        private Label labelHashAlgorithm = null!;
+        private ComboBox comboHashAlgorithm = null!;
+        private Label labelSignatureFormat = null!;
+        private ComboBox comboSignatureFormat = null!;
+
+        // [加密/解密]
+        private Panel groupEncrypt = null!;
+        private TableLayoutPanel tableLayoutEncrypt = null!;
+        private Label labelEncMode = null!;
+        private ComboBox comboEncMode = null!;
+        private Label labelEncInputFormat = null!;
+        private ComboBox comboEncInputFormat = null!;
+        private Label labelEncOutputFormat = null!;
+        private ComboBox comboEncOutputFormat = null!;
+        private Label labelEncKey = null!;
+        private TextBox textEncKey = null!;
+        private Label labelEncIV = null!;
+        private TextBox textEncIV = null!;
+        private Label labelEncBobPublic = null!;
+        private TextBox textEncBobPublic = null!;
+        private Label labelEncCurve = null!;
+        private ComboBox comboEncCurveCategory = null!;
+        private Label labelEncCurveArrow = null!;
+        private ComboBox comboEncCurve = null!;
+        private Label labelEncInput = null!;
+        private TextBox textEncInput = null!;
+        private TextBox textEncOutput = null!;
+        private FlowLayoutPanel panelEncBtns = null!;
+        private Button btnEncrypt = null!;
+        private Button btnDecrypt = null!;
+        private Button btnEncClear = null!;
+        private Button btnEncCopy = null!;
+        private Button btnEncPaste = null!;
+        private Label labelEncOutputLabel = null!;
+
+        // [文件操作]
+        private GroupBox groupFile = null!;
+        private FlowLayoutPanel panelFileControls = null!;
+        private Button btnSignFile = null!;
+        private Button btnVerifyFile = null!;
+
+        // [ECDH 密钥协商]
+        private Panel groupEcdh = null!;
+        private TextBox labelEncResult = null!;
+        private ComboBox comboEcdhMode = null!;
+        private ComboBox comboEcdhCategory = null!;
+        private ComboBox comboEcdhCurve = null!;
+        private TextBox textEcdhAlicePrivate = null!;
+        private TextBox textEcdhAlicePublic = null!;
+        private TextBox textEcdhBobPrivate = null!;
+        private TextBox textEcdhBobPublic = null!;
+        private TextBox textEcdhSharedKey = null!;
+        private TextBox textEcdhIV = null!;
+        private TextBox textEcdhInput = null!;
+        private TextBox textEcdhOutput = null!;
+        private Button btnGenerateEcdhKeys = null!;
+        private Button btnEcdhEncrypt = null!;
+        private Button btnEcdhDecrypt = null!;
+        private Button btnEcdhCopyResult = null!;
+        private Button btnEcdhPasteInput = null!;
+        private Button btnEcdhClear = null!;
+        private ComboBox comboEcdhEncoding = null!;
+        private Label labelEcdhMode = null!;
+        private Label labelEcdhCategory = null!;
+        private Label labelEcdhCurve = null!;
+        private Label labelEcdhAlicePriv = null!;
+        private Label labelEcdhAlicePub = null!;
+        private Label labelEcdhBobPriv = null!;
+        private Label labelEcdhBobPub = null!;
+        private Label labelEcdhShared = null!;
+        private Label labelEcdhIV = null!;
+        private Label labelEcdhInput = null!;
+        private Label labelEcdhOutput = null!;
+        private Label labelEcdhEncoding = null!;
+
+        // [分隔容器]
+        private SplitContainer splitSignEncrypt = null!;
+        private GroupBox groupEncFile = null!;
+        private FlowLayoutPanel panelEncFileBtns = null!;
+        private Button btnEncryptFile = null!;
+        private Button btnDecryptFile = null!;
+        private SplitContainer splitFileResult = null!;
+
+        #endregion
     }
 }
-
