@@ -370,6 +370,16 @@ namespace CryptoTool.Win
             comboSignatureFormat.SelectedIndex = 0;
 
             radioPrivateKey.Checked = true;
+
+            if (comboEncMode.Items.Count > 0)
+                comboEncMode.SelectedIndex = 0;
+            if (comboEncInputFormat.Items.Count > 0)
+                comboEncInputFormat.SelectedIndex = 0;
+            if (comboEncOutputFormat.Items.Count > 0)
+                comboEncOutputFormat.SelectedIndex = 0;
+
+            InitializeEncryptCurveList();
+
             ResetValidationResult("未验证", Color.Gray);
             textKeyResult.Text = "从私钥提取/曲线检测：\n等待操作...";
             textKeyResult.ForeColor = Color.Gray;
@@ -399,6 +409,25 @@ namespace CryptoTool.Win
             if (comboCurve.SelectedItem is KeyValuePair<string, string> sel && !string.IsNullOrEmpty(sel.Key))
                 return sel.Key;
             return "prime256v1";
+        }
+
+        private void ComboEncCurveCategory_SelectedIndexChanged(object? sender, EventArgs e)
+        {
+            if (sender == null || comboEncCurveCategory.SelectedItem == null)
+                return;
+
+            dynamic selectedItem = comboEncCurveCategory.SelectedItem;
+            string categoryKey = selectedItem.Value;
+
+            if (!_allCurveData.TryGetValue(categoryKey, out var categoryData))
+                return;
+
+            comboEncCurve.Items.Clear();
+            foreach (var c in categoryData.Curves)
+                comboEncCurve.Items.Add(c);
+
+            if (comboEncCurve.Items.Count > 0)
+                comboEncCurve.SelectedIndex = 0;
         }
         #endregion
 
@@ -1058,7 +1087,7 @@ namespace CryptoTool.Win
             return derivedKey;
         }
 
-        private byte[] GetEncIV(string mode)
+        private byte[] GetEncIV(string mode, bool forEncryption)
         {
             int ivLen = mode switch
             {
@@ -1066,16 +1095,25 @@ namespace CryptoTool.Win
                 _ => 12
             };
 
-            // 如果 IV 框内容非空，且与上次自动生成的 IV 不同，则视为用户手动指定
             if (!string.IsNullOrWhiteSpace(textEncIV.Text))
             {
                 string currentHex = textEncIV.Text.Trim().ToLowerInvariant();
+
+                // 解密时直接使用 IV 框中的内容
+                if (!forEncryption)
+                    return Convert.FromHexString(currentHex);
+
+                // 加密时，只有与上次自动生成的 IV 不同时才视为用户手动指定
                 string lastHex = _lastEncIV != null ? Convert.ToHexString(_lastEncIV).ToLowerInvariant() : string.Empty;
                 if (currentHex != lastHex)
                 {
                     return Convert.FromHexString(currentHex);
                 }
             }
+
+            // 解密时 IV 框不能为空
+            if (!forEncryption)
+                throw new ArgumentException("解密时必须提供 IV（HEX 格式），请从运行结果中复制加密时使用的 IV");
 
             byte[] iv = RandomNumberGenerator.GetBytes(ivLen);
             _lastEncIV = iv;
@@ -1167,7 +1205,7 @@ namespace CryptoTool.Win
                 string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM)";
                 byte[] plain = GetEncInputBytes();
                 byte[] key = GetEncKey();
-                byte[] iv = GetEncIV(mode);
+                byte[] iv = GetEncIV(mode, true);
 
                 byte[] cipher = mode switch
                 {
@@ -1211,7 +1249,7 @@ namespace CryptoTool.Win
                 string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM)";
                 byte[] cipher = GetCipherBytes(cipherSource, mode);
                 byte[] key = GetEncKey();
-                byte[] iv = GetEncIV(mode);
+                byte[] iv = GetEncIV(mode, false);
 
                 byte[] plain = mode switch
                 {

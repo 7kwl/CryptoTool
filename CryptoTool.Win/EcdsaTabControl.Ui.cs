@@ -273,7 +273,7 @@ namespace CryptoTool.Win
                 leftGroup.Controls.Add(leftLayout);
 
                 // --------------------- 右栏: 操作与配置区 ---------------------
-                // 纵向排列3个操作按钮，再把加密模式、输入/输出格式、曲线移到本列
+                // 操作区使用左侧按钮列 + 右侧配置行的布局，参考密钥操作区 tableRightActions
                 var middleGroup = new GroupBox
                 {
                     Text = "操作",
@@ -283,83 +283,113 @@ namespace CryptoTool.Win
                 var middleLayout = new TableLayoutPanel
                 {
                     Dock = DockStyle.Fill,
-                    ColumnCount = 1,
-                    RowCount = 5,
+                    ColumnCount = 2,
+                    RowCount = 1,
                     Margin = new Padding(0),
                     Padding = new Padding(0)
                 };
-                // 前3行按按钮自身高度排列，第4行合并加密模式/输入输出格式/曲线，最后一行弹簧把内容顶到上方
-                middleLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-                middleLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-                middleLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-                middleLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+                middleLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 150F));
+                middleLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
                 middleLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
 
+                // 左侧按钮列
+                var buttonPanel = new FlowLayoutPanel
+                {
+                    Dock = DockStyle.Fill,
+                    FlowDirection = FlowDirection.TopDown,
+                    WrapContents = false,
+                    Margin = new Padding(0),
+                    Padding = new Padding(0, 4, 6, 0)
+                };
                 Button[] buttons = [btnEncrypt, btnDecrypt, btnEncClear];
                 for (int i = 0; i < buttons.Length; i++)
                 {
-                    buttons[i].Dock = DockStyle.Top;
-                    buttons[i].Height = 28;
-                    buttons[i].Margin = new Padding(0, 2, 0, 2);
                     buttons[i].AutoSize = false;
-                    middleLayout.Controls.Add(buttons[i], 0, i);
+                    buttons[i].Height = 28;
+                    buttons[i].Width = 140;
+                    buttons[i].Margin = new Padding(0, 2, 0, 2);
+                    buttonPanel.Controls.Add(buttons[i]);
                 }
+                middleLayout.Controls.Add(buttonPanel, 0, 0);
 
-                // 加密模式、输入/输出格式、曲线对齐到同一行
-                var configRow = new FlowLayoutPanel
+                // 右侧配置项：每行一个标签 + 控件，冒号后对齐
+                var configPanel = new TableLayoutPanel
+                {
+                    Dock = DockStyle.Fill,
+                    ColumnCount = 2,
+                    RowCount = 4,
+                    Margin = new Padding(0),
+                    Padding = new Padding(0, 4, 0, 0)
+                };
+                configPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 120F));
+                configPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+                for (int i = 0; i < 4; i++)
+                    configPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+
+                labelEncMode.AutoSize = false;
+                labelEncMode.Size = new Size(120, 28);
+                labelEncMode.Margin = new Padding(0, 4, 4, 4);
+                labelEncMode.TextAlign = ContentAlignment.MiddleRight;
+                comboEncMode.Margin = new Padding(0, 3, 0, 3);
+                comboEncMode.Width = 300;
+                comboEncMode.Anchor = AnchorStyles.Left;
+
+                labelEncInputFormat.AutoSize = false;
+                labelEncInputFormat.Size = new Size(120, 28);
+                labelEncInputFormat.Margin = new Padding(0, 4, 4, 4);
+                labelEncInputFormat.TextAlign = ContentAlignment.MiddleRight;
+                comboEncInputFormat.Margin = new Padding(0, 3, 0, 3);
+                comboEncInputFormat.Width = 140;
+                comboEncInputFormat.Anchor = AnchorStyles.Left;
+
+                labelEncOutputFormat.AutoSize = false;
+                labelEncOutputFormat.Size = new Size(120, 28);
+                labelEncOutputFormat.Margin = new Padding(0, 4, 4, 4);
+                labelEncOutputFormat.TextAlign = ContentAlignment.MiddleRight;
+                comboEncOutputFormat.Margin = new Padding(0, 3, 0, 3);
+                comboEncOutputFormat.Width = 140;
+                comboEncOutputFormat.Anchor = AnchorStyles.Left;
+
+                labelEncCurve.AutoSize = false;
+                labelEncCurve.Size = new Size(120, 28);
+                labelEncCurve.Margin = new Padding(0, 4, 4, 4);
+                labelEncCurve.Text = "椭圆曲线：";
+                labelEncCurve.TextAlign = ContentAlignment.MiddleRight;
+                comboEncCurveCategory.Margin = new Padding(0, 3, 2, 3);
+                comboEncCurveCategory.Width = 130;
+                comboEncCurveCategory.Anchor = AnchorStyles.Left;
+                labelEncCurveArrow.AutoSize = true;
+                labelEncCurveArrow.Margin = new Padding(0, 6, 2, 0);
+                labelEncCurveArrow.Text = "→";
+                labelEncCurveArrow.TextAlign = ContentAlignment.MiddleCenter;
+                comboEncCurve.Margin = new Padding(0, 3, 0, 3);
+                comboEncCurve.Dock = DockStyle.Fill;
+                comboEncCurve.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+                var curveRow = new TableLayoutPanel
                 {
                     Dock = DockStyle.Fill,
                     Margin = new Padding(0),
                     Padding = new Padding(0),
-                    WrapContents = false
+                    ColumnCount = 3,
+                    RowCount = 1
                 };
+                curveRow.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+                curveRow.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+                curveRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+                curveRow.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+                curveRow.Controls.Add(comboEncCurveCategory, 0, 0);
+                curveRow.Controls.Add(labelEncCurveArrow, 1, 0);
+                curveRow.Controls.Add(comboEncCurve, 2, 0);
 
-                labelEncMode.AutoSize = true;
-                labelEncMode.Margin = new Padding(0, 0, 2, 0);
-                labelEncMode.TextAlign = ContentAlignment.MiddleLeft;
-                comboEncMode.Margin = new Padding(0, 0, 12, 0);
-                comboEncMode.Width = 110;
-                comboEncMode.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-
-                labelEncInputFormat.AutoSize = true;
-                labelEncInputFormat.Margin = new Padding(0, 0, 2, 0);
-                labelEncInputFormat.TextAlign = ContentAlignment.MiddleLeft;
-                comboEncInputFormat.Margin = new Padding(0, 0, 12, 0);
-                comboEncInputFormat.Width = 90;
-                comboEncInputFormat.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-
-                labelEncOutputFormat.AutoSize = true;
-                labelEncOutputFormat.Margin = new Padding(0, 0, 2, 0);
-                labelEncOutputFormat.TextAlign = ContentAlignment.MiddleLeft;
-                comboEncOutputFormat.Margin = new Padding(0, 0, 12, 0);
-                comboEncOutputFormat.Width = 90;
-                comboEncOutputFormat.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-
-                labelEncCurve.AutoSize = true;
-                labelEncCurve.Margin = new Padding(0, 0, 2, 0);
-                labelEncCurve.TextAlign = ContentAlignment.MiddleLeft;
-                comboEncCurveCategory.Margin = new Padding(0, 0, 2, 0);
-                comboEncCurveCategory.Width = 120;
-                comboEncCurveCategory.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-                labelEncCurveArrow.AutoSize = true;
-                labelEncCurveArrow.Margin = new Padding(0, 5, 2, 0);
-                labelEncCurveArrow.Text = "→";
-                labelEncCurveArrow.TextAlign = ContentAlignment.MiddleCenter;
-                comboEncCurve.Margin = new Padding(0, 0, 12, 0);
-                comboEncCurve.Width = 180;
-                comboEncCurve.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-
-                configRow.Controls.Add(labelEncMode);
-                configRow.Controls.Add(comboEncMode);
-                configRow.Controls.Add(labelEncInputFormat);
-                configRow.Controls.Add(comboEncInputFormat);
-                configRow.Controls.Add(labelEncOutputFormat);
-                configRow.Controls.Add(comboEncOutputFormat);
-                configRow.Controls.Add(labelEncCurve);
-                configRow.Controls.Add(comboEncCurveCategory);
-                configRow.Controls.Add(labelEncCurveArrow);
-                configRow.Controls.Add(comboEncCurve);
-                middleLayout.Controls.Add(configRow, 0, 3);
+                configPanel.Controls.Add(labelEncMode, 0, 0);
+                configPanel.Controls.Add(comboEncMode, 1, 0);
+                configPanel.Controls.Add(labelEncInputFormat, 0, 1);
+                configPanel.Controls.Add(comboEncInputFormat, 1, 1);
+                configPanel.Controls.Add(labelEncOutputFormat, 0, 2);
+                configPanel.Controls.Add(comboEncOutputFormat, 1, 2);
+                configPanel.Controls.Add(labelEncCurve, 0, 3);
+                configPanel.Controls.Add(curveRow, 1, 3);
+                middleLayout.Controls.Add(configPanel, 1, 0);
 
                 middleGroup.Controls.Add(middleLayout);
 
@@ -388,9 +418,9 @@ namespace CryptoTool.Win
                 rightLayout.Controls.Add(CreateLabelControlRow(labelEncIV, textEncIV), 0, 1);
                 rightLayout.Controls.Add(CreateLabelControlRow(labelEncBobPublic, textEncBobPublic), 0, 2);
 
-                // 非 ECIES 模式时隐藏 Bob 公钥和曲线
+                // 非 ECIES 模式时隐藏 Bob 公钥；曲线选择保持与 ECDH 区一致
                 labelEncBobPublic.Visible = false; textEncBobPublic.Visible = false;
-                labelEncCurve.Visible = false; comboEncCurve.Visible = false;
+                labelEncCurve.Visible = true; comboEncCurve.Visible = true;
 
                 rightGroup.Controls.Add(rightLayout);
 
@@ -878,6 +908,35 @@ namespace CryptoTool.Win
 
             if (comboEcdhCategory.Items.Count > 0)
                 comboEcdhCategory.SelectedIndex = 0;
+        }
+
+        /// <summary>
+        /// 初始化 ECIES 加密区曲线级联下拉框。
+        /// 联动逻辑: comboEncCurveCategory 选择变化 → comboEncCurve 更新对应类别的曲线列表。
+        /// </summary>
+        public void InitializeEncryptCurveList()
+        {
+            if (_allCurveData.Count == 0)
+                _allCurveData = EcdsaCurveNames.GetAllCurvesByCategory();
+
+            comboEncCurveCategory.DisplayMember = "Text";
+            comboEncCurveCategory.ValueMember = "Value";
+            foreach (var cat in _allCurveData)
+            {
+                comboEncCurveCategory.Items.Add(new
+                {
+                    Text = $"{cat.Value.Icon} {cat.Key}",
+                    Value = cat.Key
+                });
+            }
+
+            comboEncCurve.DisplayMember = "Value";
+            comboEncCurve.ValueMember = "Key";
+
+            comboEncCurveCategory.SelectedIndexChanged += ComboEncCurveCategory_SelectedIndexChanged;
+
+            if (comboEncCurveCategory.Items.Count > 0)
+                comboEncCurveCategory.SelectedIndex = 0;
         }
 
         /// <summary>
