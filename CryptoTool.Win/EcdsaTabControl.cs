@@ -36,6 +36,7 @@ namespace CryptoTool.Win
         public EcdsaTabControl()
         {
             InitializeComponent();
+            InitializeEncryptControlDefaults();
             InitializeEncryptLayout();
             InitializeViewSwitcher();
             InitializeSignLayoutLabels();
