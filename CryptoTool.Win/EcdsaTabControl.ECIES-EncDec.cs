@@ -23,8 +23,13 @@ namespace CryptoTool.Win
         private byte[]? _derivedEncKey = null;
         private byte[]? _lastEncIV = null;
         private byte[]? _lastEphemeralPubKey = null;
+        private byte[]? _lastEphemeralPrivKey = null;
         private System.Windows.Forms.Label labelEncTest = null!;
         private System.Windows.Forms.TextBox textEncTest = null!;
+        private System.Windows.Forms.Label labelEncEphemeralPub = null!;
+        private System.Windows.Forms.TextBox textEncEphemeralPub = null!;
+        private System.Windows.Forms.Label labelEncExtra = null!;
+        private System.Windows.Forms.TextBox textEncExtra = null!;
         #endregion
 
         #region 初始化
@@ -37,6 +42,10 @@ namespace CryptoTool.Win
         {
             labelEncTest = new Label();
             textEncTest = new TextBox();
+            labelEncEphemeralPub = new Label();
+            textEncEphemeralPub = new TextBox();
+            labelEncExtra = new Label();
+            textEncExtra = new TextBox();
 
             // ---- 标签文本 ----
             labelEncMode.Text = "加密模式：";
@@ -48,6 +57,8 @@ namespace CryptoTool.Win
             labelEncTest.Text = "测试：";
             labelEncInput.Text = "明文输入：";
             labelEncOutputLabel.Text = "密文结果：";
+            labelEncEphemeralPub.Text = "临时公钥ePub：";
+            labelEncExtra.Text = "临时私钥ePriv：";
 
             // ---- 加密模式下拉框 ----
             comboEncMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -83,6 +94,17 @@ namespace CryptoTool.Win
             textEncTest.Font = new System.Drawing.Font("Consolas", 9F);
             textEncTest.Multiline = true;
             textEncTest.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+
+            // ---- 临时公钥/私钥显示框（只读） ----
+            textEncEphemeralPub.Font = new System.Drawing.Font("Consolas", 9F);
+            textEncEphemeralPub.Multiline = true;
+            textEncEphemeralPub.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            textEncEphemeralPub.ReadOnly = true;
+
+            textEncExtra.Font = new System.Drawing.Font("Consolas", 9F);
+            textEncExtra.Multiline = true;
+            textEncExtra.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            textEncExtra.ReadOnly = true;
 
             // ---- 明文/密文输入框 ----
             textEncInput.Font = new System.Drawing.Font("Consolas", 9F);
@@ -188,14 +210,16 @@ namespace CryptoTool.Win
                 {
                     Dock = DockStyle.Fill,
                     ColumnCount = 2,
-                    RowCount = 2,
+                    RowCount = 4,
                     Margin = new Padding(0),
                     Padding = new Padding(0)
                 };
                 leftLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
                 leftLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
-                leftLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-                leftLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+                leftLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+                leftLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+                leftLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+                leftLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
 
                 // ---- 局部函数: 创建带有右上角标签的输入面板 ----
                 Panel CreateTextPanelWithLabel(TextBox textBox, string labelText)
@@ -234,6 +258,14 @@ namespace CryptoTool.Win
                 // 输出面板（文本框 + 右上角标签）
                 var outputPanel = CreateTextPanelWithLabel(textEncOutput, labelEncOutputLabel.Text);
                 leftLayout.Controls.Add(outputPanel, 0, 1);
+
+                // 临时公钥面板
+                var ephemeralPubPanel = CreateTextPanelWithLabel(textEncEphemeralPub, labelEncEphemeralPub.Text);
+                leftLayout.Controls.Add(ephemeralPubPanel, 0, 2);
+
+                // 临时私钥面板
+                var extraPanel = CreateTextPanelWithLabel(textEncExtra, labelEncExtra.Text);
+                leftLayout.Controls.Add(extraPanel, 0, 3);
 
                 // ---- 局部函数: 为输入框创建复制/粘贴按钮面板 ----
                 // 每个面板包含2个按钮(复制/粘贴)，绑定到目标 TextBox
@@ -277,9 +309,13 @@ namespace CryptoTool.Win
 
                 var inputBtnPanel = CreateButtonPanel(textEncInput);
                 var outputBtnPanel = CreateButtonPanel(textEncOutput);
+                var ephemeralPubBtnPanel = CreateButtonPanel(textEncEphemeralPub);
+                var extraBtnPanel = CreateButtonPanel(textEncExtra);
 
                 leftLayout.Controls.Add(inputBtnPanel, 1, 0);
                 leftLayout.Controls.Add(outputBtnPanel, 1, 1);
+                leftLayout.Controls.Add(ephemeralPubBtnPanel, 1, 2);
+                leftLayout.Controls.Add(extraBtnPanel, 1, 3);
 
                 leftGroup.Controls.Add(leftLayout);
 
@@ -476,11 +512,14 @@ namespace CryptoTool.Win
             }
 
             // ======== ECIES 模式：标准 ECDH + 临时密钥对 ========
-            if (string.IsNullOrWhiteSpace(textEncBobPublic.Text))
-                throw new InvalidOperationException("ECIES 加密需要填写 Bob 公钥（接收方公钥）");
+            // 从顶部公钥区域的 PEM 框读取 Bob 公钥
+            string bobPem = textPublicKey?.Text ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(bobPem))
+                throw new InvalidOperationException("ECIES 加密需要在顶部公钥区域生成/导入 Bob 公钥");
 
             // 1. 导入 Bob 公钥
-            var bobPublicKey = EcdsaKeyHelper.ImportPublicKeyPem(textEncBobPublic.Text);
+            var bobPublicKey = EcdsaKeyHelper.ImportPublicKeyPem(bobPem);
 
             // 2. 获取曲线名
             string curveName = EcdsaKeyHelper.GetCurveName(bobPublicKey)
@@ -491,8 +530,9 @@ namespace CryptoTool.Win
             var ephPriv = (ECPrivateKeyParameters)ephKp.Private;
             var ephPub = (ECPublicKeyParameters)ephKp.Public;
 
-            // 4. 缓存临时公钥编码，供加密时拼入密文头部
+            // 4. 缓存临时密钥对，供加密时拼入密文头部及 UI 展示
             _lastEphemeralPubKey = ephPub.Q.GetEncoded(false);
+            _lastEphemeralPrivKey = ephPriv.D.ToByteArrayUnsigned();
 
             // 5. ECDH：临时私钥 × Bob 公钥 → 共享密钥
             byte[] sharedSecret = EcdhAlgorithm.DeriveSharedSecret(ephPriv, bobPublicKey);
@@ -671,6 +711,13 @@ namespace CryptoTool.Win
                     ? $"\r\n临时公钥(Hex): {Convert.ToHexString(_lastEphemeralPubKey).ToLowerInvariant()}"
                     : string.Empty;
                 AppendValidationResult($"✅ 加密成功\r\n算法: {mode}{epubInfo}\r\nIV: {Convert.ToHexString(iv).ToLowerInvariant()}\r\n密文长度: {cipher.Length}字节", Color.Green);
+
+                // 展示临时密钥对到 UI 文本框
+                if (isEcies && _lastEphemeralPubKey != null)
+                    textEncEphemeralPub.Text = Convert.ToHexString(_lastEphemeralPubKey).ToLowerInvariant();
+                if (isEcies && _lastEphemeralPrivKey != null)
+                    textEncExtra.Text = Convert.ToHexString(_lastEphemeralPrivKey).ToLowerInvariant();
+
                 SetStatus("加密完成");
             }
             catch (Exception ex)
@@ -761,6 +808,9 @@ namespace CryptoTool.Win
             _derivedEncKey = null;
             _lastEncIV = null;
             _lastEphemeralPubKey = null;
+            _lastEphemeralPrivKey = null;
+            textEncEphemeralPub.Text = string.Empty;
+            textEncExtra.Text = string.Empty;
         }
 
         private void BtnEncCopy_Click(object? sender, EventArgs e)
