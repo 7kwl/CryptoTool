@@ -531,6 +531,29 @@ namespace CryptoTool.Win
             }
         }
 
+        /// <summary>
+        /// 获取实际使用的私钥 PEM：优先用已导入的 _privateKeyPem，
+        /// 为空时尝试从文本框 textPrivateKey 解析 PEM / Base64 / Hex。
+        /// </summary>
+        private string GetEffectivePrivateKeyPem()
+        {
+            if (!string.IsNullOrWhiteSpace(_privateKeyPem))
+                return _privateKeyPem;
+
+            string displayText = textPrivateKey.Text.Trim();
+            if (string.IsNullOrWhiteSpace(displayText))
+                return string.Empty;
+
+            try
+            {
+                return ConvertDisplayToPem(displayText, true);
+            }
+            catch
+            {
+                return displayText;
+            }
+        }
+
         private byte[] GetEncKey()
         {
             if (!string.IsNullOrWhiteSpace(textEncKey.Text))
@@ -543,14 +566,15 @@ namespace CryptoTool.Win
 
             string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM, SHA-256)";
             bool isEcies = mode.StartsWith("ECIES", StringComparison.OrdinalIgnoreCase);
+            string privateKeyPem = GetEffectivePrivateKeyPem();
 
             if (!isEcies)
             {
                 // 非 ECIES 模式：直接以私钥值作为 HKDF 种子派生密钥
-                if (string.IsNullOrWhiteSpace(_privateKeyPem))
+                if (string.IsNullOrWhiteSpace(privateKeyPem))
                     throw new InvalidOperationException("请先生成/导入ECDSA私钥，或手动填写对称密钥");
 
-                var privateKey = EcdsaKeyHelper.ImportPrivateKeyPem(_privateKeyPem);
+                var privateKey = EcdsaKeyHelper.ImportPrivateKeyPem(privateKeyPem);
                 byte[] rawKey = privateKey.D.ToByteArrayUnsigned();
                 return DeriveKeyFromSecret(rawKey, mode);
             }
@@ -605,10 +629,11 @@ namespace CryptoTool.Win
         /// </summary>
         private byte[] RecoverEciesKeyFromEphemeralPub(byte[] ephemeralPubBytes, string mode)
         {
-            if (string.IsNullOrWhiteSpace(_privateKeyPem))
+            string privateKeyPem = GetEffectivePrivateKeyPem();
+            if (string.IsNullOrWhiteSpace(privateKeyPem))
                 throw new InvalidOperationException("ECIES 解密需要当前 ECDSA 私钥（Bob 的私钥）");
 
-            var ourPrivateKey = EcdsaKeyHelper.ImportPrivateKeyPem(_privateKeyPem);
+            var ourPrivateKey = EcdsaKeyHelper.ImportPrivateKeyPem(privateKeyPem);
             var domain = ourPrivateKey.Parameters;
 
             // 从编码字节还原临时公钥
@@ -796,9 +821,10 @@ namespace CryptoTool.Win
                 if (isEcies)
                 {
                     // ECIES: 临时公钥 || IV(12B) || 密文+tag(16B)
-                    if (string.IsNullOrWhiteSpace(_privateKeyPem))
+                    string privateKeyPem = GetEffectivePrivateKeyPem();
+                    if (string.IsNullOrWhiteSpace(privateKeyPem))
                         throw new InvalidOperationException("ECIES 解密需要当前 ECDSA 私钥");
-                    var privKey = EcdsaKeyHelper.ImportPrivateKeyPem(_privateKeyPem);
+                    var privKey = EcdsaKeyHelper.ImportPrivateKeyPem(privateKeyPem);
                     string curveName = EcdsaKeyHelper.GetCurveName(privKey)
                         ?? throw new InvalidOperationException("无法识别私钥的曲线类型");
                     int epubLen = EcdhAlgorithm.GetEphemeralPubKeyLength(curveName);
@@ -1041,9 +1067,10 @@ namespace CryptoTool.Win
                 if (isEcies)
                 {
                     // ECIES 文件格式：临时公钥 || IV || 密文+tag
-                    if (string.IsNullOrWhiteSpace(_privateKeyPem))
+                    string privateKeyPem = GetEffectivePrivateKeyPem();
+                    if (string.IsNullOrWhiteSpace(privateKeyPem))
                         throw new InvalidOperationException("ECIES 解密需要当前 ECDSA 私钥");
-                    var privKey = EcdsaKeyHelper.ImportPrivateKeyPem(_privateKeyPem);
+                    var privKey = EcdsaKeyHelper.ImportPrivateKeyPem(privateKeyPem);
                     string curveName = EcdsaKeyHelper.GetCurveName(privKey)
                         ?? throw new InvalidOperationException("无法识别私钥的曲线类型");
                     int epubLen = EcdhAlgorithm.GetEphemeralPubKeyLength(curveName);
