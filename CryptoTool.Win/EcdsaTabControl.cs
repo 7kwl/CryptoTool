@@ -125,6 +125,7 @@ namespace CryptoTool.Win
                 var mode = GetEcdhMode();
                 string curve = GetEcdhSelectedCurve();
                 byte[] plain = GetEcdhEncoding().GetBytes(textEcdhInput.Text);
+                textEcdhIV.Clear();
                 byte[]? userIv = null;
                 if (!string.IsNullOrWhiteSpace(textEcdhIV.Text))
                 {
@@ -164,6 +165,7 @@ namespace CryptoTool.Win
 
                 textEcdhOutput.Text = output;
                 textEcdhSharedKey.Text = Convert.ToBase64String(shared);
+                textEcdhIV.Text = EcdhAlgorithm.FormatIv(iv, mode);
                 _ecdhLastIV = iv;
                 SetStatus($"{comboEcdhMode.SelectedItem} 加密完成");
             }

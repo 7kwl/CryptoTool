@@ -1,4 +1,4 @@
-#nullable disable
+﻿#nullable disable
 
 using CryptoTool.Algorithm.Algorithms.ECDSA;
 using CryptoTool.Win.Enums;
@@ -1937,6 +1937,8 @@ namespace CryptoTool.Win
         private System.Windows.Forms.Button btnEcdhCopyResult;
         private System.Windows.Forms.Button btnEcdhPasteInput;
         private System.Windows.Forms.Button btnEcdhClear;
+        private System.Windows.Forms.Button btnEcdhAliceCurve;
+        private System.Windows.Forms.Button btnEcdhBobCurve;
         private TableLayoutPanel panelSignOptions;
     }
 }

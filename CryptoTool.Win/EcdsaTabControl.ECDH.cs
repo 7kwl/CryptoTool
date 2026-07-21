@@ -198,15 +198,15 @@ namespace CryptoTool.Win
                 {
                     Dock = DockStyle.Fill,
                     ColumnCount = 2,
-                    RowCount = 6,
+                    RowCount = 8,
                     Margin = new Padding(3),
                     Padding = new Padding(6)
                 };
                 operationsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 170F));
                 operationsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-                for (int i = 0; i < 6; i++)
+                for (int i = 0; i < 8; i++)
                 {
-                    float pct = (i == 2 || i == 5) ? 16.6666F : 16.6667F;
+                    float pct = 12.5F;
                     operationsPanel.RowStyles.Add(new RowStyle(SizeType.Percent, pct));
                 }
 
@@ -331,18 +331,20 @@ namespace CryptoTool.Win
                 {
                     Dock = DockStyle.Fill,
                     ColumnCount = 1,
-                    RowCount = 6,
+                    RowCount = 8,
                     Margin = new Padding(0),
                     Padding = new Padding(0, 4, 0, 4)
                 };
-                for (int i = 0; i < 6; i++)
-                    btnPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 16.6667F));
+                for (int i = 0; i < 8; i++)
+                    btnPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
 
                 btnEcdhEncrypt = new Button { Text = "加密", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
                 btnEcdhDecrypt = new Button { Text = "解密", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
                 btnEcdhCopyResult = new Button { Text = "复制结果", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
                 btnEcdhPasteInput = new Button { Text = "粘贴输入", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
                 btnEcdhClear = new Button { Text = "清空", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
+                btnEcdhAliceCurve = new Button { Text = "私钥1曲线", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
+                btnEcdhBobCurve = new Button { Text = "私钥2曲线", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
                 lblEcdhIV = new Label { Text = "IV (Base64，可编辑/留空随机):", AutoSize = false, Height = 22, Margin = new Padding(0, 0, 4, 2), TextAlign = ContentAlignment.MiddleLeft };
                 textEcdhIV = new TextBox
                 {
@@ -359,6 +361,66 @@ namespace CryptoTool.Win
                 btnEcdhCopyResult.Click += BtnEcdhCopyResult_Click;
                 btnEcdhPasteInput.Click += BtnEcdhPasteInput_Click;
                 btnEcdhClear.Click += BtnEcdhClear_Click;
+                btnEcdhAliceCurve.Click += (s, ev) =>
+                {
+                    try
+                    {
+                        string pem = textEcdhAlicePrivate.Text?.Trim() ?? string.Empty;
+                        if (string.IsNullOrEmpty(pem))
+                        {
+                            AppendKeyResult("私钥1 为空，无法检测曲线", Color.Red);
+                            SetStatus("私钥1 为空");
+                            return;
+                        }
+                        var privateKey = EcdsaKeyHelper.ImportPrivateKeyPem(pem);
+                        string curveName = EcdsaKeyHelper.GetCurveName(privateKey);
+                        if (string.IsNullOrEmpty(curveName) || curveName == "未知曲线")
+                        {
+                            AppendKeyResult("私钥1 曲线检测: 非OpenSSL标准曲线", Color.Orange);
+                            SetStatus("私钥1 非OpenSSL标准曲线");
+                        }
+                        else
+                        {
+                            AppendKeyResult($"私钥1 曲线检测: {curveName}", Color.Green, curveName);
+                            SetStatus($"私钥1 曲线: {curveName}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        AppendKeyResult($"私钥1 曲线检测失败: {ex.Message}", Color.Red);
+                        SetStatus("私钥1 曲线检测失败");
+                    }
+                };
+                btnEcdhBobCurve.Click += (s, ev) =>
+                {
+                    try
+                    {
+                        string pem = textEcdhBobPrivate.Text?.Trim() ?? string.Empty;
+                        if (string.IsNullOrEmpty(pem))
+                        {
+                            AppendKeyResult("私钥2 为空，无法检测曲线", Color.Red);
+                            SetStatus("私钥2 为空");
+                            return;
+                        }
+                        var privateKey = EcdsaKeyHelper.ImportPrivateKeyPem(pem);
+                        string curveName = EcdsaKeyHelper.GetCurveName(privateKey);
+                        if (string.IsNullOrEmpty(curveName) || curveName == "未知曲线")
+                        {
+                            AppendKeyResult("私钥2 曲线检测: 非OpenSSL标准曲线", Color.Orange);
+                            SetStatus("私钥2 非OpenSSL标准曲线");
+                        }
+                        else
+                        {
+                            AppendKeyResult($"私钥2 曲线检测: {curveName}", Color.Green, curveName);
+                            SetStatus($"私钥2 曲线: {curveName}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        AppendKeyResult($"私钥2 曲线检测失败: {ex.Message}", Color.Red);
+                        SetStatus("私钥2 曲线检测失败");
+                    }
+                };
 
                 btnPanel.Controls.Add(btnGenerateEcdhKeys, 0, 0);
                 btnPanel.Controls.Add(btnEcdhEncrypt, 0, 1);
@@ -366,8 +428,10 @@ namespace CryptoTool.Win
                 btnPanel.Controls.Add(btnEcdhCopyResult, 0, 3);
                 btnPanel.Controls.Add(btnEcdhPasteInput, 0, 4);
                 btnPanel.Controls.Add(btnEcdhClear, 0, 5);
+                btnPanel.Controls.Add(btnEcdhAliceCurve, 0, 6);
+                btnPanel.Controls.Add(btnEcdhBobCurve, 0, 7);
                 operationsPanel.Controls.Add(btnPanel, 0, 0);
-                operationsPanel.SetRowSpan(btnPanel, 6);
+                operationsPanel.SetRowSpan(btnPanel, 8);
 
                 operationsPanel.Controls.Add(curveRow, 1, 0);
                 operationsPanel.Controls.Add(modeRow, 1, 1);

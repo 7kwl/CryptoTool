@@ -51,7 +51,7 @@ namespace CryptoTool.Win
             // ---- 加密模式下拉框 ----
             comboEncMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             comboEncMode.FormattingEnabled = true;
-            comboEncMode.Items.AddRange(["ECIES (ECDH+AES-GCM)", "AES-256-GCM", "AES-256-CBC", "ChaCha20-Poly1305"]);
+            comboEncMode.Items.AddRange(["ECIES (ECDH+AES-GCM, SHA-256)", "ECIES (ECDH+AES-GCM, SHA-512)", "AES-256-GCM", "AES-256-CBC", "ChaCha20-Poly1305"]);
 
             // ---- 输入格式下拉框 ----
             comboEncInputFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -550,7 +550,10 @@ namespace CryptoTool.Win
             var privateKey = EcdsaKeyHelper.ImportPrivateKeyPem(_privateKeyPem);
             byte[] rawKey = privateKey.D.ToByteArrayUnsigned();
 
-            var hkdf = new HkdfBytesGenerator(new Sha256Digest());
+            string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM, SHA-256)";
+            bool useSha512 = mode.Contains("SHA-512", StringComparison.OrdinalIgnoreCase);
+            var digest = useSha512 ? (Org.BouncyCastle.Crypto.IDigest)new Sha512Digest() : new Sha256Digest();
+            var hkdf = new HkdfBytesGenerator(digest);
             hkdf.Init(new HkdfParameters(rawKey, null, Encoding.UTF8.GetBytes("CryptoTool-ECDSA-EncKey")));
             byte[] derivedKey = new byte[32];
             hkdf.GenerateBytes(derivedKey, 0, derivedKey.Length);
@@ -671,7 +674,7 @@ namespace CryptoTool.Win
                     return;
                 }
 
-                string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM)";
+                string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM, SHA-256)";
                 byte[] plain = GetEncInputBytes();
                 byte[] key = GetEncKey();
                 byte[] iv = GetEncIV(mode, true);
@@ -715,7 +718,7 @@ namespace CryptoTool.Win
                     return;
                 }
 
-                string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM)";
+                string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM, SHA-256)";
                 byte[] cipher = GetCipherBytes(cipherSource);
                 byte[] key = GetEncKey();
                 byte[] iv = GetEncIV(mode, false);
@@ -780,7 +783,7 @@ namespace CryptoTool.Win
                 };
                 if (saveDlg.ShowDialog() != DialogResult.OK) return;
 
-                string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM)";
+                string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM, SHA-256)";
                 byte[] key = GetEncKey();
                 byte[] iv = RandomNumberGenerator.GetBytes(mode == "AES-256-CBC" ? 16 : 12);
                 byte[] plain = File.ReadAllBytes(openDlg.FileName);
@@ -825,7 +828,7 @@ namespace CryptoTool.Win
                 };
                 if (saveDlg.ShowDialog() != DialogResult.OK) return;
 
-                string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM)";
+                string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM, SHA-256)";
                 byte[] key = GetEncKey();
                 byte[] allBytes = File.ReadAllBytes(openDlg.FileName);
                 int ivLen = mode == "AES-256-CBC" ? 16 : 12;
