@@ -95,5 +95,21 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
             }
             return "未知曲线";
         }
+
+        public static string GetCurveName(ECPublicKeyParameters publicKey)
+        {
+            foreach (string name in ECNamedCurveTable.Names)
+            {
+                var ecParams = ECNamedCurveTable.GetByName(name);
+                if (ecParams != null
+                    && ecParams.Curve?.Equals(publicKey.Parameters.Curve) == true
+                    && ecParams.G?.Equals(publicKey.Parameters.G) == true
+                    && ecParams.N?.Equals(publicKey.Parameters.N) == true)
+                {
+                    return CurveAliasMap.TryGetValue(name, out var canonical) ? canonical : name;
+                }
+            }
+            return "未知曲线";
+        }
     }
 }

@@ -22,6 +22,7 @@ namespace CryptoTool.Win
         #region 字段
         private byte[]? _derivedEncKey = null;
         private byte[]? _lastEncIV = null;
+        private byte[]? _lastEphemeralPubKey = null;
         private System.Windows.Forms.Label labelEncTest = null!;
         private System.Windows.Forms.TextBox textEncTest = null!;
         #endregion
@@ -45,8 +46,8 @@ namespace CryptoTool.Win
             labelEncIV.Text = "IV/Nonce (HEX，留空随机生成)：";
             labelEncBobPublic.Text = "Bob 公钥 (接收方)：";
             labelEncTest.Text = "测试：";
-            labelEncInput.Text = "明文 / 密文输入：";
-            labelEncOutputLabel.Text = "加密结果 / 解密输入：";
+            labelEncInput.Text = "明文输入：";
+            labelEncOutputLabel.Text = "密文结果：";
 
             // ---- 加密模式下拉框 ----
             comboEncMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -336,14 +337,16 @@ namespace CryptoTool.Win
                 for (int i = 0; i < 3; i++)
                     configPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
+                // ---- 加密模式 ----
                 labelEncMode.AutoSize = false;
                 labelEncMode.Size = new Size(120, 28);
                 labelEncMode.Margin = new Padding(0, 4, 4, 4);
                 labelEncMode.TextAlign = ContentAlignment.MiddleRight;
                 comboEncMode.Margin = new Padding(0, 3, 0, 3);
-                comboEncMode.Width = 300;
+                comboEncMode.Width = 360;
                 comboEncMode.Anchor = AnchorStyles.Left;
 
+                // ---- 输入格式 ----
                 labelEncInputFormat.AutoSize = false;
                 labelEncInputFormat.Size = new Size(120, 28);
                 labelEncInputFormat.Margin = new Padding(0, 4, 4, 4);
@@ -352,6 +355,7 @@ namespace CryptoTool.Win
                 comboEncInputFormat.Width = 140;
                 comboEncInputFormat.Anchor = AnchorStyles.Left;
 
+                // ---- 输出格式 ----
                 labelEncOutputFormat.AutoSize = false;
                 labelEncOutputFormat.Size = new Size(120, 28);
                 labelEncOutputFormat.Margin = new Padding(0, 4, 4, 4);
@@ -360,6 +364,7 @@ namespace CryptoTool.Win
                 comboEncOutputFormat.Width = 140;
                 comboEncOutputFormat.Anchor = AnchorStyles.Left;
 
+                // ---- 加入 configPanel ----
                 configPanel.Controls.Add(labelEncMode, 0, 0);
                 configPanel.Controls.Add(comboEncMode, 1, 0);
                 configPanel.Controls.Add(labelEncInputFormat, 0, 1);
@@ -367,7 +372,6 @@ namespace CryptoTool.Win
                 configPanel.Controls.Add(labelEncOutputFormat, 0, 2);
                 configPanel.Controls.Add(comboEncOutputFormat, 1, 2);
                 actionLayout.Controls.Add(configPanel, 1, 0);
-
                 actionGroup.Controls.Add(actionLayout);
 
                 // --------------------- 中栏: 参数配置区 ---------------------
@@ -457,24 +461,83 @@ namespace CryptoTool.Win
                 return key;
             }
 
-            if (string.IsNullOrWhiteSpace(_privateKeyPem))
-                throw new InvalidOperationException("请先生成/导入ECDSA私钥，或手动填写对称密钥");
-
-            var privateKey = EcdsaKeyHelper.ImportPrivateKeyPem(_privateKeyPem);
-            byte[] rawKey = privateKey.D.ToByteArrayUnsigned();
-
             string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM, SHA-256)";
+            bool isEcies = mode.StartsWith("ECIES", StringComparison.OrdinalIgnoreCase);
+
+            if (!isEcies)
+            {
+                // 非 ECIES 模式：直接以私钥值作为 HKDF 种子派生密钥
+                if (string.IsNullOrWhiteSpace(_privateKeyPem))
+                    throw new InvalidOperationException("请先生成/导入ECDSA私钥，或手动填写对称密钥");
+
+                var privateKey = EcdsaKeyHelper.ImportPrivateKeyPem(_privateKeyPem);
+                byte[] rawKey = privateKey.D.ToByteArrayUnsigned();
+                return DeriveKeyFromSecret(rawKey, mode);
+            }
+
+            // ======== ECIES 模式：标准 ECDH + 临时密钥对 ========
+            if (string.IsNullOrWhiteSpace(textEncBobPublic.Text))
+                throw new InvalidOperationException("ECIES 加密需要填写 Bob 公钥（接收方公钥）");
+
+            // 1. 导入 Bob 公钥
+            var bobPublicKey = EcdsaKeyHelper.ImportPublicKeyPem(textEncBobPublic.Text);
+
+            // 2. 获取曲线名
+            string curveName = EcdsaKeyHelper.GetCurveName(bobPublicKey)
+                ?? throw new InvalidOperationException("无法识别 Bob 公钥的曲线类型");
+
+            // 3. 生成临时密钥对
+            var ephKp = EcdhAlgorithm.GenerateKeyPair(curveName);
+            var ephPriv = (ECPrivateKeyParameters)ephKp.Private;
+            var ephPub = (ECPublicKeyParameters)ephKp.Public;
+
+            // 4. 缓存临时公钥编码，供加密时拼入密文头部
+            _lastEphemeralPubKey = ephPub.Q.GetEncoded(false);
+
+            // 5. ECDH：临时私钥 × Bob 公钥 → 共享密钥
+            byte[] sharedSecret = EcdhAlgorithm.DeriveSharedSecret(ephPriv, bobPublicKey);
+
+            // 6. HKDF 派生 AES-256 密钥
+            return DeriveKeyFromSecret(sharedSecret, mode);
+        }
+
+        /// <summary>
+        /// 通过 HKDF（SHA-256 或 SHA-512）从共享密钥/私钥值派生 AES-256 密钥
+        /// </summary>
+        private static byte[] DeriveKeyFromSecret(byte[] secret, string mode)
+        {
             bool useSha512 = mode.Contains("SHA-512", StringComparison.OrdinalIgnoreCase);
             var digest = useSha512 ? (Org.BouncyCastle.Crypto.IDigest)new Sha512Digest() : new Sha256Digest();
             var hkdf = new HkdfBytesGenerator(digest);
-            hkdf.Init(new HkdfParameters(rawKey, null, Encoding.UTF8.GetBytes("CryptoTool-ECDSA-EncKey")));
+            hkdf.Init(new HkdfParameters(secret, null, Encoding.UTF8.GetBytes("CryptoTool-ECIES-EncKey")));
             byte[] derivedKey = new byte[32];
             hkdf.GenerateBytes(derivedKey, 0, derivedKey.Length);
-            _derivedEncKey = derivedKey;
             return derivedKey;
         }
 
-        private byte[] GetEncIV(string mode, bool forEncryption)
+        /// <summary>
+        /// 从密文中提取临时公钥并执行 ECDH 还原对称密钥（仅 ECIES 解密时调用）
+        /// </summary>
+        private byte[] RecoverEciesKeyFromEphemeralPub(byte[] ephemeralPubBytes, string mode)
+        {
+            if (string.IsNullOrWhiteSpace(_privateKeyPem))
+                throw new InvalidOperationException("ECIES 解密需要当前 ECDSA 私钥（Bob 的私钥）");
+
+            var ourPrivateKey = EcdsaKeyHelper.ImportPrivateKeyPem(_privateKeyPem);
+            var domain = ourPrivateKey.Parameters;
+
+            // 从编码字节还原临时公钥
+            var point = domain.Curve.DecodePoint(ephemeralPubBytes);
+            var epub = new ECPublicKeyParameters("ECDH", point, domain);
+
+            // ECDH：Bob 私钥 × 临时公钥 → 共享密钥
+            byte[] sharedSecret = EcdhAlgorithm.DeriveSharedSecret(ourPrivateKey, epub);
+
+            // HKDF 派生 AES-256 密钥
+            return DeriveKeyFromSecret(sharedSecret, mode);
+        }
+
+        private byte[] GetEncIV(string mode)
         {
             int ivLen = mode switch
             {
@@ -486,21 +549,13 @@ namespace CryptoTool.Win
             {
                 string currentHex = textEncIV.Text.Trim().ToLowerInvariant();
 
-                // 解密时直接使用 IV 框中的内容
-                if (!forEncryption)
-                    return Convert.FromHexString(currentHex);
-
-                // 加密时，只有与上次自动生成的 IV 不同时才视为用户手动指定
+                // 与上次自动生成的 IV 不同时才视为用户手动指定
                 string lastHex = _lastEncIV != null ? Convert.ToHexString(_lastEncIV).ToLowerInvariant() : string.Empty;
                 if (currentHex != lastHex)
                 {
                     return Convert.FromHexString(currentHex);
                 }
             }
-
-            // 解密时 IV 框不能为空
-            if (!forEncryption)
-                throw new ArgumentException("解密时必须提供 IV（HEX 格式），请从运行结果中复制加密时使用的 IV");
 
             byte[] iv = RandomNumberGenerator.GetBytes(ivLen);
             _lastEncIV = iv;
@@ -588,9 +643,10 @@ namespace CryptoTool.Win
                 }
 
                 string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM, SHA-256)";
+                bool isEcies = mode.StartsWith("ECIES", StringComparison.OrdinalIgnoreCase);
                 byte[] plain = GetEncInputBytes();
                 byte[] key = GetEncKey();
-                byte[] iv = GetEncIV(mode, true);
+                byte[] iv = GetEncIV(mode);
 
                 byte[] cipher = mode switch
                 {
@@ -600,13 +656,21 @@ namespace CryptoTool.Win
                     _ => EncryptAesGcm(plain, key, iv)
                 };
 
+                // 拼接输出：ECIES 模式 = 临时公钥 || IV || 密文+tag；非 ECIES = IV || 密文+tag
+                byte[] combined = isEcies && _lastEphemeralPubKey != null
+                    ? [.. _lastEphemeralPubKey, .. iv, .. cipher]
+                    : [.. iv, .. cipher];
+
                 textEncIV.Text = Convert.ToHexString(iv).ToLowerInvariant();
                 string outFormat = comboEncOutputFormat.SelectedItem?.ToString() ?? "Base64";
                 textEncOutput.Text = outFormat == "Hex"
-                    ? Convert.ToHexString(cipher).ToLowerInvariant()
-                    : Convert.ToBase64String(cipher);
+                    ? Convert.ToHexString(combined).ToLowerInvariant()
+                    : Convert.ToBase64String(combined);
 
-                AppendValidationResult($"✅ 加密成功\r\n算法: {mode}\r\nIV: {Convert.ToHexString(iv).ToLowerInvariant()}\r\n长度: {cipher.Length}字节", Color.Green);
+                string epubInfo = isEcies && _lastEphemeralPubKey != null
+                    ? $"\r\n临时公钥(Hex): {Convert.ToHexString(_lastEphemeralPubKey).ToLowerInvariant()}"
+                    : string.Empty;
+                AppendValidationResult($"✅ 加密成功\r\n算法: {mode}{epubInfo}\r\nIV: {Convert.ToHexString(iv).ToLowerInvariant()}\r\n密文长度: {cipher.Length}字节", Color.Green);
                 SetStatus("加密完成");
             }
             catch (Exception ex)
@@ -632,9 +696,42 @@ namespace CryptoTool.Win
                 }
 
                 string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM, SHA-256)";
-                byte[] cipher = GetCipherBytes(cipherSource);
-                byte[] key = GetEncKey();
-                byte[] iv = GetEncIV(mode, false);
+                bool isEcies = mode.StartsWith("ECIES", StringComparison.OrdinalIgnoreCase);
+
+                // 从密文 blob 中提取 IV 和密文（ECIES 模式还需先提取临时公钥）
+                byte[] combined = GetCipherBytes(cipherSource);
+                byte[] iv;
+                byte[] cipher;
+                byte[] key;
+
+                if (isEcies)
+                {
+                    // ECIES: 临时公钥 || IV(12B) || 密文+tag(16B)
+                    if (string.IsNullOrWhiteSpace(_privateKeyPem))
+                        throw new InvalidOperationException("ECIES 解密需要当前 ECDSA 私钥");
+                    var privKey = EcdsaKeyHelper.ImportPrivateKeyPem(_privateKeyPem);
+                    string curveName = EcdsaKeyHelper.GetCurveName(privKey)
+                        ?? throw new InvalidOperationException("无法识别私钥的曲线类型");
+                    int epubLen = EcdhAlgorithm.GetEphemeralPubKeyLength(curveName);
+
+                    byte[] epubBytes = [.. combined.Take(epubLen)];
+                    byte[] rest = [.. combined.Skip(epubLen)];
+                    iv = [.. rest.Take(12)];
+                    cipher = [.. rest.Skip(12)];
+
+                    // 用 ECDH 恢复对称密钥
+                    key = RecoverEciesKeyFromEphemeralPub(epubBytes, mode);
+                    textEncIV.Text = Convert.ToHexString(iv).ToLowerInvariant();
+                }
+                else
+                {
+                    // 非 ECIES: IV || 密文+tag
+                    int ivLen = mode == "AES-256-CBC" ? 16 : 12;
+                    iv = [.. combined.Take(ivLen)];
+                    cipher = [.. combined.Skip(ivLen)];
+                    textEncIV.Text = Convert.ToHexString(iv).ToLowerInvariant();
+                    key = GetEncKey();
+                }
 
                 byte[] plain = mode switch
                 {
@@ -663,6 +760,7 @@ namespace CryptoTool.Win
             textEncIV.Clear();
             _derivedEncKey = null;
             _lastEncIV = null;
+            _lastEphemeralPubKey = null;
         }
 
         private void BtnEncCopy_Click(object? sender, EventArgs e)
@@ -697,6 +795,7 @@ namespace CryptoTool.Win
                 if (saveDlg.ShowDialog() != DialogResult.OK) return;
 
                 string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM, SHA-256)";
+                bool isEcies = mode.StartsWith("ECIES", StringComparison.OrdinalIgnoreCase);
                 byte[] key = GetEncKey();
                 byte[] iv = RandomNumberGenerator.GetBytes(mode == "AES-256-CBC" ? 16 : 12);
                 byte[] plain = File.ReadAllBytes(openDlg.FileName);
@@ -709,6 +808,8 @@ namespace CryptoTool.Win
                 };
 
                 using var fs = new FileStream(saveDlg.FileName, FileMode.Create);
+                if (isEcies && _lastEphemeralPubKey != null)
+                    fs.Write(_lastEphemeralPubKey, 0, _lastEphemeralPubKey.Length);
                 fs.Write(iv, 0, iv.Length);
                 fs.Write(cipher, 0, cipher.Length);
 
@@ -742,11 +843,35 @@ namespace CryptoTool.Win
                 if (saveDlg.ShowDialog() != DialogResult.OK) return;
 
                 string mode = comboEncMode.SelectedItem?.ToString() ?? "ECIES (ECDH+AES-GCM, SHA-256)";
-                byte[] key = GetEncKey();
+                bool isEcies = mode.StartsWith("ECIES", StringComparison.OrdinalIgnoreCase);
                 byte[] allBytes = File.ReadAllBytes(openDlg.FileName);
-                int ivLen = mode == "AES-256-CBC" ? 16 : 12;
-                byte[] iv = [.. allBytes.Take(ivLen)];
-                byte[] cipher = [.. allBytes.Skip(ivLen)];
+                byte[] iv;
+                byte[] cipher;
+                byte[] key;
+
+                if (isEcies)
+                {
+                    // ECIES 文件格式：临时公钥 || IV || 密文+tag
+                    if (string.IsNullOrWhiteSpace(_privateKeyPem))
+                        throw new InvalidOperationException("ECIES 解密需要当前 ECDSA 私钥");
+                    var privKey = EcdsaKeyHelper.ImportPrivateKeyPem(_privateKeyPem);
+                    string curveName = EcdsaKeyHelper.GetCurveName(privKey)
+                        ?? throw new InvalidOperationException("无法识别私钥的曲线类型");
+                    int epubLen = EcdhAlgorithm.GetEphemeralPubKeyLength(curveName);
+
+                    byte[] epubBytes = [.. allBytes.Take(epubLen)];
+                    byte[] rest = [.. allBytes.Skip(epubLen)];
+                    iv = [.. rest.Take(12)];
+                    cipher = [.. rest.Skip(12)];
+                    key = RecoverEciesKeyFromEphemeralPub(epubBytes, mode);
+                }
+                else
+                {
+                    int ivLen = mode == "AES-256-CBC" ? 16 : 12;
+                    iv = [.. allBytes.Take(ivLen)];
+                    cipher = [.. allBytes.Skip(ivLen)];
+                    key = GetEncKey();
+                }
 
                 byte[] plain = mode switch
                 {
