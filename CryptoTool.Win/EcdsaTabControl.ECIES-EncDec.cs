@@ -63,14 +63,6 @@ namespace CryptoTool.Win
             comboEncOutputFormat.FormattingEnabled = true;
             comboEncOutputFormat.Items.AddRange(["Base64", "Hex"]);
 
-            // ---- 曲线分类下拉框 ----
-            comboEncCurveCategory.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            comboEncCurveCategory.FormattingEnabled = true;
-
-            // ---- 具体曲线下拉框 ----
-            comboEncCurve.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            comboEncCurve.FormattingEnabled = true;
-
             // ---- 对称密钥输入框 ----
             textEncKey.Font = new System.Drawing.Font("Consolas", 9F);
             textEncKey.Multiline = true;
@@ -122,28 +114,8 @@ namespace CryptoTool.Win
                 comboEncInputFormat.SelectedIndex = 0;
             if (comboEncOutputFormat.Items.Count > 0)
                 comboEncOutputFormat.SelectedIndex = 0;
-
-            InitializeEncryptCurveList();
         }
 
-        private void ComboEncCurveCategory_SelectedIndexChanged(object? sender, EventArgs e)
-        {
-            if (sender == null || comboEncCurveCategory.SelectedItem == null)
-                return;
-
-            dynamic selectedItem = comboEncCurveCategory.SelectedItem;
-            string categoryKey = selectedItem.Value;
-
-            if (!_allCurveData.TryGetValue(categoryKey, out var categoryData))
-                return;
-
-            comboEncCurve.Items.Clear();
-            foreach (var c in categoryData.Curves)
-                comboEncCurve.Items.Add(c);
-
-            if (comboEncCurve.Items.Count > 0)
-                comboEncCurve.SelectedIndex = 0;
-        }
         #endregion
 
         #region UI 布局辅助
@@ -361,7 +333,7 @@ namespace CryptoTool.Win
                 };
                 configPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 120F));
                 configPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 3; i++)
                     configPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
                 labelEncMode.AutoSize = false;
@@ -388,45 +360,12 @@ namespace CryptoTool.Win
                 comboEncOutputFormat.Width = 140;
                 comboEncOutputFormat.Anchor = AnchorStyles.Left;
 
-                labelEncCurve.AutoSize = false;
-                labelEncCurve.Size = new Size(120, 28);
-                labelEncCurve.Margin = new Padding(0, 4, 4, 4);
-                labelEncCurve.Text = "椭圆曲线：";
-                labelEncCurve.TextAlign = ContentAlignment.MiddleRight;
-                comboEncCurveCategory.Margin = new Padding(0, 3, 2, 3);
-                comboEncCurveCategory.Width = 130;
-                comboEncCurveCategory.Anchor = AnchorStyles.Left;
-                labelEncCurveArrow.AutoSize = true;
-                labelEncCurveArrow.Margin = new Padding(0, 6, 2, 0);
-                labelEncCurveArrow.Text = "→";
-                labelEncCurveArrow.TextAlign = ContentAlignment.MiddleCenter;
-                comboEncCurve.Margin = new Padding(0, 3, 0, 3);
-                comboEncCurve.Dock = DockStyle.Fill;
-                comboEncCurve.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-                var curveRow = new TableLayoutPanel
-                {
-                    Dock = DockStyle.Fill,
-                    Margin = new Padding(0),
-                    Padding = new Padding(0),
-                    ColumnCount = 3,
-                    RowCount = 1
-                };
-                curveRow.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-                curveRow.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-                curveRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-                curveRow.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-                curveRow.Controls.Add(comboEncCurveCategory, 0, 0);
-                curveRow.Controls.Add(labelEncCurveArrow, 1, 0);
-                curveRow.Controls.Add(comboEncCurve, 2, 0);
-
                 configPanel.Controls.Add(labelEncMode, 0, 0);
                 configPanel.Controls.Add(comboEncMode, 1, 0);
                 configPanel.Controls.Add(labelEncInputFormat, 0, 1);
                 configPanel.Controls.Add(comboEncInputFormat, 1, 1);
                 configPanel.Controls.Add(labelEncOutputFormat, 0, 2);
                 configPanel.Controls.Add(comboEncOutputFormat, 1, 2);
-                configPanel.Controls.Add(labelEncCurve, 0, 3);
-                configPanel.Controls.Add(curveRow, 1, 3);
                 actionLayout.Controls.Add(configPanel, 1, 0);
 
                 actionGroup.Controls.Add(actionLayout);
@@ -458,9 +397,7 @@ namespace CryptoTool.Win
                 paramLayout.Controls.Add(CreateTextPanelWithLabel(textEncBobPublic, labelEncBobPublic.Text), 0, 2);
                 paramLayout.Controls.Add(CreateTextPanelWithLabel(textEncTest, labelEncTest.Text), 0, 3);
 
-                // 非 ECIES 模式时隐藏 Bob 公钥；曲线选择保持与 ECDH 区一致
                 textEncBobPublic.Visible = true;
-                labelEncCurve.Visible = true; comboEncCurveCategory.Visible = true; labelEncCurveArrow.Visible = true; comboEncCurve.Visible = true;
 
                 paramGroup.Controls.Add(paramLayout);
 
@@ -478,30 +415,6 @@ namespace CryptoTool.Win
             }
         }
 
-        public void InitializeEncryptCurveList()
-        {
-            if (_allCurveData.Count == 0)
-                _allCurveData = EcdsaCurveNames.GetAllCurvesByCategory();
-
-            comboEncCurveCategory.DisplayMember = "Text";
-            comboEncCurveCategory.ValueMember = "Value";
-            foreach (var cat in _allCurveData)
-            {
-                comboEncCurveCategory.Items.Add(new
-                {
-                    Text = $"{cat.Value.Icon} {cat.Key}",
-                    Value = cat.Key
-                });
-            }
-
-            comboEncCurve.DisplayMember = "Value";
-            comboEncCurve.ValueMember = "Key";
-
-            comboEncCurveCategory.SelectedIndexChanged += ComboEncCurveCategory_SelectedIndexChanged;
-
-            if (comboEncCurveCategory.Items.Count > 0)
-                comboEncCurveCategory.SelectedIndex = 0;
-        }
         #endregion
 
         #region 加密与解密逻辑
