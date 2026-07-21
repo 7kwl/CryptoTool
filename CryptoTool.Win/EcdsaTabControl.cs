@@ -164,7 +164,6 @@ namespace CryptoTool.Win
 
                 textEcdhOutput.Text = output;
                 textEcdhSharedKey.Text = Convert.ToBase64String(shared);
-                textEcdhIV.Text = EcdhAlgorithm.FormatIv(iv, mode);
                 _ecdhLastIV = iv;
                 SetStatus($"{comboEcdhMode.SelectedItem} 加密完成");
             }
