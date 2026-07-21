@@ -56,8 +56,8 @@ namespace CryptoTool.Win
 
             // ---- 标签文本 ----
             labelEncMode.Text = "加密模式：";
-            labelEncInputFormat.Text = "输入格式：";
-            labelEncOutputFormat.Text = "输出格式：";
+            labelEncInputFormat.Text = "明文格式：";
+            labelEncOutputFormat.Text = "密文格式：";
             labelEncKey.Text = "对称密钥 (HEX，留空自动派生)：";
             labelEncIV.Text = "IV/Nonce (HEX，留空随机生成)：";
             labelEncBobPublic.Text = "Bob 公钥 (接收方)：";
@@ -276,13 +276,13 @@ namespace CryptoTool.Win
                 var outputPanel = CreateTextPanelWithLabel(textEncOutput, labelEncOutputLabel.Text);
                 leftLayout.Controls.Add(outputPanel, 0, 1);
 
-                // 临时公钥面板
-                var ephemeralPubPanel = CreateTextPanelWithLabel(textEncEphemeralPub, labelEncEphemeralPub.Text);
-                leftLayout.Controls.Add(ephemeralPubPanel, 0, 2);
-
                 // 临时私钥面板
                 var extraPanel = CreateTextPanelWithLabel(textEncExtra, labelEncExtra.Text);
-                leftLayout.Controls.Add(extraPanel, 0, 3);
+                leftLayout.Controls.Add(extraPanel, 0, 2);
+
+                // 临时公钥面板
+                var ephemeralPubPanel = CreateTextPanelWithLabel(textEncEphemeralPub, labelEncEphemeralPub.Text);
+                leftLayout.Controls.Add(ephemeralPubPanel, 0, 3);
 
                 // ---- 局部函数: 为输入框创建复制/粘贴按钮面板 ----
                 // 每个面板包含2个按钮(复制/粘贴)，绑定到目标 TextBox
@@ -326,13 +326,13 @@ namespace CryptoTool.Win
 
                 var inputBtnPanel = CreateButtonPanel(textEncInput);
                 var outputBtnPanel = CreateButtonPanel(textEncOutput);
-                var ephemeralPubBtnPanel = CreateButtonPanel(textEncEphemeralPub);
                 var extraBtnPanel = CreateButtonPanel(textEncExtra);
+                var ephemeralPubBtnPanel = CreateButtonPanel(textEncEphemeralPub);
 
                 leftLayout.Controls.Add(inputBtnPanel, 1, 0);
                 leftLayout.Controls.Add(outputBtnPanel, 1, 1);
-                leftLayout.Controls.Add(ephemeralPubBtnPanel, 1, 2);
-                leftLayout.Controls.Add(extraBtnPanel, 1, 3);
+                leftLayout.Controls.Add(extraBtnPanel, 1, 2);
+                leftLayout.Controls.Add(ephemeralPubBtnPanel, 1, 3);
 
                 leftGroup.Controls.Add(leftLayout);
 
@@ -369,9 +369,9 @@ namespace CryptoTool.Win
                 for (int i = 0; i < buttons.Length; i++)
                 {
                     buttons[i].AutoSize = false;
-                    buttons[i].Height = 28;
+                    buttons[i].Height = 32;
                     buttons[i].Width = 140;
-                    buttons[i].Margin = new Padding(0, 2, 0, 2);
+                    buttons[i].Margin = new Padding(0, 3, 0, 3);
                     buttonPanel.Controls.Add(buttons[i]);
                 }
                 actionLayout.Controls.Add(buttonPanel, 0, 0);
@@ -754,11 +754,11 @@ namespace CryptoTool.Win
 
                 AppendValidationResult($"✅ 加密成功\r\n算法: {mode}\r\nIV: {Convert.ToHexString(iv).ToLowerInvariant()}\r\n密文长度: {cipher.Length}字节", Color.Green);
 
-                // 展示临时密钥对到 UI 文本框
+                // 展示临时密钥对到 UI 文本框（首次生成使用 Base64 格式）
                 if (isEcies && _lastEphemeralPubKey != null)
-                    textEncEphemeralPub.Text = Convert.ToHexString(_lastEphemeralPubKey).ToLowerInvariant();
+                    textEncEphemeralPub.Text = Convert.ToBase64String(_lastEphemeralPubKey);
                 if (isEcies && _lastEphemeralPrivKey != null)
-                    textEncExtra.Text = Convert.ToHexString(_lastEphemeralPrivKey).ToLowerInvariant();
+                    textEncExtra.Text = Convert.ToBase64String(_lastEphemeralPrivKey);
 
                 SetStatus("加密完成");
             }
@@ -882,9 +882,6 @@ namespace CryptoTool.Win
                 }
 
                 bool isPub = selected.Contains("公钥");
-                bool toBase64 = selected.Contains("Base64");
-                bool toPem = selected.Contains("PEM");
-
                 TextBox targetBox = isPub ? textEncEphemeralPub : textEncExtra;
                 if (string.IsNullOrWhiteSpace(targetBox.Text))
                 {
@@ -892,30 +889,39 @@ namespace CryptoTool.Win
                     return;
                 }
 
-                string currentText = targetBox.Text.Trim().Replace(" ", "").Replace("\r", "").Replace("\n", "");
-                byte[] bytes;
+                string currentText = targetBox.Text.Trim();
+                string currentFormat = DetectKeyFormat(currentText);
+                if (currentFormat == "Unknown")
+                {
+                    MessageBox.Show("无法识别当前文本格式（需要 Hex、Base64 或 PEM）", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
 
-                // 先尝试 Hex，失败则尝试 Base64
-                try
+                // 按当前格式自动决定下一个格式：Hex -> Base64 -> PEM -> Hex
+                string targetFormat = currentFormat switch
                 {
-                    bytes = Convert.FromHexString(currentText);
-                }
-                catch
-                {
-                    try
-                    {
-                        bytes = Convert.FromBase64String(currentText);
-                    }
-                    catch
-                    {
-                        MessageBox.Show("无法识别当前文本格式（需要 Hex 或 Base64）", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
-                    }
-                }
+                    "Hex" => "Base64",
+                    "Base64" => "PEM",
+                    "PEM" => "Hex",
+                    _ => "Base64"
+                };
 
                 string result;
-                if (toPem)
+                if (currentFormat == "PEM")
                 {
+                    // PEM 直接解析为原始字节，再转成 Hex
+                    byte[] bytes = isPub
+                        ? EcdsaKeyHelper.ImportPublicKeyPem(currentText).Q.GetEncoded(false)
+                        : EcdsaKeyHelper.ImportPrivateKeyPem(currentText).D.ToByteArrayUnsigned();
+                    result = Convert.ToHexString(bytes).ToLowerInvariant();
+                }
+                else if (targetFormat == "PEM")
+                {
+                    // Hex/Base64 -> PEM 需要曲线信息
+                    byte[] bytes = currentFormat == "Hex"
+                        ? Convert.FromHexString(currentText.Replace(" ", ""))
+                        : Convert.FromBase64String(currentText.Replace("\r", "").Replace("\n", ""));
+
                     if (string.IsNullOrEmpty(_lastEphemeralCurveName))
                     {
                         MessageBox.Show("未找到曲线信息，无法转换为 PEM 格式（请先执行 ECIES 加密）", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -940,17 +946,19 @@ namespace CryptoTool.Win
                         result = EcdsaKeyHelper.ExportPrivateKeyPem(privKey);
                     }
                 }
-                else if (toBase64)
+                else if (targetFormat == "Base64")
                 {
+                    byte[] bytes = Convert.FromHexString(currentText.Replace(" ", ""));
                     result = Convert.ToBase64String(bytes);
                 }
                 else
                 {
+                    byte[] bytes = Convert.FromBase64String(currentText.Replace("\r", "").Replace("\n", ""));
                     result = Convert.ToHexString(bytes).ToLowerInvariant();
                 }
 
                 targetBox.Text = result;
-                AppendValidationResult($"✅ 转换成功: {selected}", Color.Green);
+                AppendValidationResult($"✅ 转换成功: {currentFormat} → {targetFormat}", Color.Green);
             }
             catch (Exception ex)
             {
