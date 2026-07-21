@@ -86,6 +86,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove=".案例代码【腾讯元宝整理】\**\*.cs" />
+    <Compile Remove="publish\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="assets\三花猫.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>

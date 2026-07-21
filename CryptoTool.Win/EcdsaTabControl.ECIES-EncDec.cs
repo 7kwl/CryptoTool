@@ -24,12 +24,16 @@ namespace CryptoTool.Win
         private byte[]? _lastEncIV = null;
         private byte[]? _lastEphemeralPubKey = null;
         private byte[]? _lastEphemeralPrivKey = null;
+        private string? _lastEphemeralCurveName = null;
         private System.Windows.Forms.Label labelEncTest = null!;
         private System.Windows.Forms.TextBox textEncTest = null!;
         private System.Windows.Forms.Label labelEncEphemeralPub = null!;
         private System.Windows.Forms.TextBox textEncEphemeralPub = null!;
         private System.Windows.Forms.Label labelEncExtra = null!;
         private System.Windows.Forms.TextBox textEncExtra = null!;
+        private System.Windows.Forms.Label labelEncKeyConvert = null!;
+        private System.Windows.Forms.ComboBox comboEncKeyConvert = null!;
+        private System.Windows.Forms.Button btnEncKeyConvert = null!;
         #endregion
 
         #region 初始化
@@ -46,6 +50,9 @@ namespace CryptoTool.Win
             textEncEphemeralPub = new TextBox();
             labelEncExtra = new Label();
             textEncExtra = new TextBox();
+            labelEncKeyConvert = new Label();
+            comboEncKeyConvert = new ComboBox();
+            btnEncKeyConvert = new Button();
 
             // ---- 标签文本 ----
             labelEncMode.Text = "加密模式：";
@@ -59,6 +66,7 @@ namespace CryptoTool.Win
             labelEncOutputLabel.Text = "密文结果：";
             labelEncEphemeralPub.Text = "临时公钥ePub：";
             labelEncExtra.Text = "临时私钥ePriv：";
+            labelEncKeyConvert.Text = "临时密钥：";
 
             // ---- 加密模式下拉框 ----
             comboEncMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -74,6 +82,11 @@ namespace CryptoTool.Win
             comboEncOutputFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             comboEncOutputFormat.FormattingEnabled = true;
             comboEncOutputFormat.Items.AddRange(["Base64", "Hex"]);
+
+            // ---- 临时密钥转换下拉框 ----
+            comboEncKeyConvert.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            comboEncKeyConvert.FormattingEnabled = true;
+            comboEncKeyConvert.Items.AddRange(["临时公钥 → Base64", "临时公钥 → PEM", "临时私钥 → Base64", "临时私钥 → PEM"]);
 
             // ---- 对称密钥输入框 ----
             textEncKey.Font = new System.Drawing.Font("Consolas", 9F);
@@ -127,6 +140,8 @@ namespace CryptoTool.Win
             btnEncCopy.Click += BtnEncCopy_Click;
             btnEncPaste.Text = "粘贴输入";
             btnEncPaste.Click += BtnEncPaste_Click;
+            btnEncKeyConvert.Text = "转换";
+            btnEncKeyConvert.Click += BtnEncKeyConvert_Click;
         }
 
         private void InitializeEncryptDefaults()
@@ -137,6 +152,8 @@ namespace CryptoTool.Win
                 comboEncInputFormat.SelectedIndex = 0;
             if (comboEncOutputFormat.Items.Count > 0)
                 comboEncOutputFormat.SelectedIndex = 0;
+            if (comboEncKeyConvert.Items.Count > 0)
+                comboEncKeyConvert.SelectedIndex = 0;
         }
 
         #endregion
@@ -372,6 +389,7 @@ namespace CryptoTool.Win
                 configPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
                 for (int i = 0; i < 3; i++)
                     configPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+                configPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
 
                 // ---- 加密模式 ----
                 labelEncMode.AutoSize = false;
@@ -400,6 +418,30 @@ namespace CryptoTool.Win
                 comboEncOutputFormat.Width = 140;
                 comboEncOutputFormat.Anchor = AnchorStyles.Left;
 
+                // ---- 临时密钥转换 ----
+                labelEncKeyConvert.AutoSize = false;
+                labelEncKeyConvert.Size = new Size(120, 32);
+                labelEncKeyConvert.Margin = new Padding(0, 3, 4, 3);
+                labelEncKeyConvert.TextAlign = ContentAlignment.MiddleRight;
+                comboEncKeyConvert.Margin = new Padding(0, 3, 6, 3);
+                comboEncKeyConvert.Size = new Size(360, 32);
+                comboEncKeyConvert.Anchor = AnchorStyles.Left;
+                btnEncKeyConvert.AutoSize = false;
+                btnEncKeyConvert.Size = new Size(100, 32);
+                btnEncKeyConvert.Anchor = AnchorStyles.Left;
+                btnEncKeyConvert.Margin = new Padding(0, 3, 0, 3);
+                var keyConvertPanel = new FlowLayoutPanel
+                {
+                    AutoSize = true,
+                    AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                    FlowDirection = FlowDirection.LeftToRight,
+                    WrapContents = false,
+                    Margin = new Padding(0),
+                    Padding = new Padding(0, 2, 0, 2)
+                };
+                keyConvertPanel.Controls.Add(comboEncKeyConvert);
+                keyConvertPanel.Controls.Add(btnEncKeyConvert);
+
                 // ---- 加入 configPanel ----
                 configPanel.Controls.Add(labelEncMode, 0, 0);
                 configPanel.Controls.Add(comboEncMode, 1, 0);
@@ -407,6 +449,8 @@ namespace CryptoTool.Win
                 configPanel.Controls.Add(comboEncInputFormat, 1, 1);
                 configPanel.Controls.Add(labelEncOutputFormat, 0, 2);
                 configPanel.Controls.Add(comboEncOutputFormat, 1, 2);
+                configPanel.Controls.Add(labelEncKeyConvert, 0, 3);
+                configPanel.Controls.Add(keyConvertPanel, 1, 3);
                 actionLayout.Controls.Add(configPanel, 1, 0);
                 actionGroup.Controls.Add(actionLayout);
 
@@ -530,7 +574,8 @@ namespace CryptoTool.Win
             var ephPriv = (ECPrivateKeyParameters)ephKp.Private;
             var ephPub = (ECPublicKeyParameters)ephKp.Public;
 
-            // 4. 缓存临时密钥对，供加密时拼入密文头部及 UI 展示
+            // 4. 缓存临时密钥对及曲线名，供加密时拼入密文头部及 UI 展示/转换
+            _lastEphemeralCurveName = curveName;
             _lastEphemeralPubKey = ephPub.Q.GetEncoded(false);
             _lastEphemeralPrivKey = ephPriv.D.ToByteArrayUnsigned();
 
@@ -707,10 +752,7 @@ namespace CryptoTool.Win
                     ? Convert.ToHexString(combined).ToLowerInvariant()
                     : Convert.ToBase64String(combined);
 
-                string epubInfo = isEcies && _lastEphemeralPubKey != null
-                    ? $"\r\n临时公钥(Hex): {Convert.ToHexString(_lastEphemeralPubKey).ToLowerInvariant()}"
-                    : string.Empty;
-                AppendValidationResult($"✅ 加密成功\r\n算法: {mode}{epubInfo}\r\nIV: {Convert.ToHexString(iv).ToLowerInvariant()}\r\n密文长度: {cipher.Length}字节", Color.Green);
+                AppendValidationResult($"✅ 加密成功\r\n算法: {mode}\r\nIV: {Convert.ToHexString(iv).ToLowerInvariant()}\r\n密文长度: {cipher.Length}字节", Color.Green);
 
                 // 展示临时密钥对到 UI 文本框
                 if (isEcies && _lastEphemeralPubKey != null)
@@ -809,6 +851,7 @@ namespace CryptoTool.Win
             _lastEncIV = null;
             _lastEphemeralPubKey = null;
             _lastEphemeralPrivKey = null;
+            _lastEphemeralCurveName = null;
             textEncEphemeralPub.Text = string.Empty;
             textEncExtra.Text = string.Empty;
         }
@@ -824,6 +867,94 @@ namespace CryptoTool.Win
             {
                 textEncInput.Text = Clipboard.GetText().Trim();
                 SetStatus("内容已粘贴到输入框");
+            }
+        }
+
+        private void BtnEncKeyConvert_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                string selected = comboEncKeyConvert.SelectedItem?.ToString() ?? string.Empty;
+                if (string.IsNullOrEmpty(selected))
+                {
+                    MessageBox.Show("请选择要转换的临时密钥", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                bool isPub = selected.Contains("公钥");
+                bool toBase64 = selected.Contains("Base64");
+                bool toPem = selected.Contains("PEM");
+
+                TextBox targetBox = isPub ? textEncEphemeralPub : textEncExtra;
+                if (string.IsNullOrWhiteSpace(targetBox.Text))
+                {
+                    MessageBox.Show("目标文本框为空，没有可转换的内容", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                string currentText = targetBox.Text.Trim().Replace(" ", "").Replace("\r", "").Replace("\n", "");
+                byte[] bytes;
+
+                // 先尝试 Hex，失败则尝试 Base64
+                try
+                {
+                    bytes = Convert.FromHexString(currentText);
+                }
+                catch
+                {
+                    try
+                    {
+                        bytes = Convert.FromBase64String(currentText);
+                    }
+                    catch
+                    {
+                        MessageBox.Show("无法识别当前文本格式（需要 Hex 或 Base64）", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                }
+
+                string result;
+                if (toPem)
+                {
+                    if (string.IsNullOrEmpty(_lastEphemeralCurveName))
+                    {
+                        MessageBox.Show("未找到曲线信息，无法转换为 PEM 格式（请先执行 ECIES 加密）", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    var curveParams = Org.BouncyCastle.Asn1.X9.ECNamedCurveTable.GetByName(_lastEphemeralCurveName)
+                        ?? throw new InvalidOperationException($"不支持的曲线: {_lastEphemeralCurveName}");
+                    var domain = new Org.BouncyCastle.Crypto.Parameters.ECDomainParameters(
+                        curveParams.Curve, curveParams.G, curveParams.N, curveParams.H, curveParams.GetSeed());
+
+                    if (isPub)
+                    {
+                        var point = domain.Curve.DecodePoint(bytes);
+                        var pubKey = new Org.BouncyCastle.Crypto.Parameters.ECPublicKeyParameters("ECDSA", point, domain);
+                        result = EcdsaKeyHelper.ExportPublicKeyPem(pubKey);
+                    }
+                    else
+                    {
+                        var privKey = new Org.BouncyCastle.Crypto.Parameters.ECPrivateKeyParameters(
+                            new Org.BouncyCastle.Math.BigInteger(1, bytes), domain);
+                        result = EcdsaKeyHelper.ExportPrivateKeyPem(privKey);
+                    }
+                }
+                else if (toBase64)
+                {
+                    result = Convert.ToBase64String(bytes);
+                }
+                else
+                {
+                    result = Convert.ToHexString(bytes).ToLowerInvariant();
+                }
+
+                targetBox.Text = result;
+                AppendValidationResult($"✅ 转换成功: {selected}", Color.Green);
+            }
+            catch (Exception ex)
+            {
+                AppendValidationResult($"❌ 转换失败: {ex.Message}", Color.Red);
             }
         }
         #endregion
