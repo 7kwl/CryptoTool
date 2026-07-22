@@ -20,7 +20,6 @@ namespace CryptoTool.Win
         // ═══════════════════════════════════════════════════════════════════
 
         #region 字段
-        private byte[]? _derivedEncKey = null;
         private byte[]? _lastEncIV = null;
         private byte[]? _lastEphemeralPubKey = null;
         private byte[]? _lastEphemeralPrivKey = null;
@@ -873,7 +872,6 @@ namespace CryptoTool.Win
             textEncOutput.Clear();
             textEncKey.Clear();
             textEncIV.Clear();
-            _derivedEncKey = null;
             _lastEncIV = null;
             _lastEphemeralPubKey = null;
             _lastEphemeralPrivKey = null;

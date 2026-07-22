@@ -339,3 +339,5 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 /installer
+# 备用代码 - 排除在项目外
+**/.案例代码【腾讯元宝整理】/

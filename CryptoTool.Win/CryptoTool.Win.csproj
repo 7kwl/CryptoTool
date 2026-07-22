@@ -25,6 +25,7 @@
     <!-- 添加编码相关配置 -->
     <InvariantGlobalization>false</InvariantGlobalization>
     <FileEncoding>UTF-8</FileEncoding>
+
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -87,6 +88,7 @@
 
   <ItemGroup>
     <Compile Remove=".案例代码【腾讯元宝整理】\**\*.cs" />
+    <None Remove=".案例代码【腾讯元宝整理】\**\*" />
     <Compile Remove="publish\*.cs" />
   </ItemGroup>
 
