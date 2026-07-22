@@ -34,6 +34,8 @@ namespace CryptoTool.Win
         private System.Windows.Forms.Label labelEncKeyConvert = null!;
         private System.Windows.Forms.ComboBox comboEncKeyConvert = null!;
         private System.Windows.Forms.Button btnEncKeyConvert = null!;
+        private System.Windows.Forms.Label labelEncInfo = null!;
+        private System.Windows.Forms.TextBox textEncInfo = null!;
         #endregion
 
         #region 初始化
@@ -54,6 +56,8 @@ namespace CryptoTool.Win
             comboEncKeyConvert = new ComboBox();
             btnEncKeyConvert = new Button();
             btnEncFormatInfo = new Button();
+            labelEncInfo = new Label();
+            textEncInfo = new TextBox();
 
             // ---- 标签文本 ----
             labelEncMode.Text = "加密模式：";
@@ -384,13 +388,13 @@ namespace CryptoTool.Win
                 {
                     Dock = DockStyle.Fill,
                     ColumnCount = 2,
-                    RowCount = 4,
+                    RowCount = 5,
                     Margin = new Padding(0),
                     Padding = new Padding(0, 4, 0, 0)
                 };
                 configPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 120F));
                 configPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 4; i++)
                     configPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
                 configPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
 
@@ -445,6 +449,28 @@ namespace CryptoTool.Win
                 keyConvertPanel.Controls.Add(comboEncKeyConvert);
                 keyConvertPanel.Controls.Add(btnEncKeyConvert);
 
+                // ---- info 参数 ----
+                labelEncInfo.AutoSize = false;
+                labelEncInfo.Size = new Size(120, 32);
+                labelEncInfo.Margin = new Padding(0, 3, 4, 3);
+                labelEncInfo.TextAlign = ContentAlignment.MiddleRight;
+                labelEncInfo.Text = "info参数：";
+                textEncInfo.Size = new Size(360, 32);
+                textEncInfo.Margin = new Padding(0, 3, 6, 3);
+                textEncInfo.Anchor = AnchorStyles.Left;
+                textEncInfo.Text = string.Empty;
+                textEncInfo.PlaceholderText = "留空为无 info";
+                var infoPanel = new FlowLayoutPanel
+                {
+                    AutoSize = true,
+                    AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                    FlowDirection = FlowDirection.LeftToRight,
+                    WrapContents = false,
+                    Margin = new Padding(0),
+                    Padding = new Padding(0, 2, 0, 2)
+                };
+                infoPanel.Controls.Add(textEncInfo);
+
                 // ---- 加入 configPanel ----
                 configPanel.Controls.Add(labelEncMode, 0, 0);
                 configPanel.Controls.Add(comboEncMode, 1, 0);
@@ -454,6 +480,8 @@ namespace CryptoTool.Win
                 configPanel.Controls.Add(comboEncOutputFormat, 1, 2);
                 configPanel.Controls.Add(labelEncKeyConvert, 0, 3);
                 configPanel.Controls.Add(keyConvertPanel, 1, 3);
+                configPanel.Controls.Add(labelEncInfo, 0, 4);
+                configPanel.Controls.Add(infoPanel, 1, 4);
                 actionLayout.Controls.Add(configPanel, 1, 0);
                 actionGroup.Controls.Add(actionLayout);
 
@@ -571,6 +599,8 @@ namespace CryptoTool.Win
             bool isEcies = mode.StartsWith("ECIES", StringComparison.OrdinalIgnoreCase);
             string privateKeyPem = GetEffectivePrivateKeyPem();
 
+            byte[] infoBytes = System.Text.Encoding.UTF8.GetBytes(textEncInfo.Text ?? string.Empty);
+
             if (!isEcies)
             {
                 // 非 ECIES 模式：直接以私钥值作为 HKDF 种子派生密钥
@@ -579,7 +609,7 @@ namespace CryptoTool.Win
 
                 var privateKey = EcdsaKeyHelper.ImportPrivateKeyPem(privateKeyPem);
                 byte[] rawKey = privateKey.D.ToByteArrayUnsigned();
-                return DeriveKeyFromSecret(rawKey, mode);
+                return DeriveKeyFromSecret(rawKey, mode, infoBytes);
             }
 
             // ======== ECIES 模式：标准 ECDH + 临时密钥对 ========
@@ -610,18 +640,19 @@ namespace CryptoTool.Win
             byte[] sharedSecret = EcdhAlgorithm.DeriveSharedSecret(ephPriv, bobPublicKey);
 
             // 6. HKDF 派生 AES-256 密钥
-            return DeriveKeyFromSecret(sharedSecret, mode);
+            return DeriveKeyFromSecret(sharedSecret, mode, infoBytes);
         }
 
         /// <summary>
         /// 通过 HKDF（SHA-256 或 SHA-512）从共享密钥/私钥值派生 AES-256 密钥
         /// </summary>
-        private static byte[] DeriveKeyFromSecret(byte[] secret, string mode)
+        private static byte[] DeriveKeyFromSecret(byte[] secret, string mode, byte[]? info = null)
         {
             bool useSha512 = mode.Contains("SHA-512", StringComparison.OrdinalIgnoreCase);
             var digest = useSha512 ? (Org.BouncyCastle.Crypto.IDigest)new Sha512Digest() : new Sha256Digest();
             var hkdf = new HkdfBytesGenerator(digest);
-            hkdf.Init(new HkdfParameters(secret, null, Encoding.UTF8.GetBytes("CryptoTool-ECIES-EncKey")));
+            byte[] effectiveInfo = info ?? Array.Empty<byte>();
+            hkdf.Init(new HkdfParameters(secret, null, effectiveInfo));
             byte[] derivedKey = new byte[32];
             hkdf.GenerateBytes(derivedKey, 0, derivedKey.Length);
             return derivedKey;
@@ -647,7 +678,8 @@ namespace CryptoTool.Win
             byte[] sharedSecret = EcdhAlgorithm.DeriveSharedSecret(ourPrivateKey, epub);
 
             // HKDF 派生 AES-256 密钥
-            return DeriveKeyFromSecret(sharedSecret, mode);
+            byte[] infoBytes = System.Text.Encoding.UTF8.GetBytes(textEncInfo.Text ?? string.Empty);
+            return DeriveKeyFromSecret(sharedSecret, mode, infoBytes);
         }
 
         private byte[] GetEncIV(string mode)
@@ -882,6 +914,7 @@ namespace CryptoTool.Win
             _lastEphemeralCurveName = null;
             textEncEphemeralPub.Text = string.Empty;
             textEncExtra.Text = string.Empty;
+            textEncInfo.Text = string.Empty;
         }
 
         private void BtnEncCopy_Click(object? sender, EventArgs e)
