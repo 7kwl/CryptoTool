@@ -26,6 +26,7 @@ namespace CryptoTool.Win
         private string? _lastEphemeralCurveName = null;
         private System.Windows.Forms.Label labelEncTest = null!;
         private System.Windows.Forms.TextBox textEncTest = null!;
+        private System.Windows.Forms.Button btnEncFormatInfo = null!;
         private System.Windows.Forms.Label labelEncEphemeralPub = null!;
         private System.Windows.Forms.TextBox textEncEphemeralPub = null!;
         private System.Windows.Forms.Label labelEncExtra = null!;
@@ -52,6 +53,7 @@ namespace CryptoTool.Win
             labelEncKeyConvert = new Label();
             comboEncKeyConvert = new ComboBox();
             btnEncKeyConvert = new Button();
+            btnEncFormatInfo = new Button();
 
             // ---- 标签文本 ----
             labelEncMode.Text = "加密模式：";
@@ -107,16 +109,16 @@ namespace CryptoTool.Win
             textEncTest.Multiline = true;
             textEncTest.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
 
-            // ---- 临时公钥/私钥显示框（只读） ----
+            // ---- 临时公钥/私钥显示框 ----
             textEncEphemeralPub.Font = new System.Drawing.Font("Consolas", 9F);
             textEncEphemeralPub.Multiline = true;
             textEncEphemeralPub.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            textEncEphemeralPub.ReadOnly = true;
+            textEncEphemeralPub.ReadOnly = false;
 
             textEncExtra.Font = new System.Drawing.Font("Consolas", 9F);
             textEncExtra.Multiline = true;
             textEncExtra.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            textEncExtra.ReadOnly = true;
+            textEncExtra.ReadOnly = false;
 
             // ---- 明文/密文输入框 ----
             textEncInput.Font = new System.Drawing.Font("Consolas", 9F);
@@ -141,6 +143,8 @@ namespace CryptoTool.Win
             btnEncPaste.Click += BtnEncPaste_Click;
             btnEncKeyConvert.Text = "转换";
             btnEncKeyConvert.Click += BtnEncKeyConvert_Click;
+            btnEncFormatInfo.Text = "密文拼接标准";
+            btnEncFormatInfo.Click += BtnEncFormatInfo_Click;
         }
 
         private void InitializeEncryptDefaults()
@@ -364,7 +368,7 @@ namespace CryptoTool.Win
                     Margin = new Padding(0),
                     Padding = new Padding(0, 4, 6, 0)
                 };
-                Button[] buttons = [btnEncrypt, btnDecrypt, btnEncClear];
+                Button[] buttons = [btnEncrypt, btnDecrypt, btnEncClear, btnEncFormatInfo];
                 for (int i = 0; i < buttons.Length; i++)
                 {
                     buttons[i].AutoSize = false;
@@ -987,6 +991,143 @@ namespace CryptoTool.Win
             catch (Exception ex)
             {
                 AppendValidationResult($"❌ 转换失败: {ex.Message}", Color.Red);
+            }
+        }
+
+        private void BtnEncFormatInfo_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                string cipherText = textEncOutput.Text.Trim();
+                if (string.IsNullOrEmpty(cipherText))
+                {
+                    AppendValidationResult("⚠️ 密文结果为空，请先进行加密操作或粘贴密文。", Color.Orange);
+                    return;
+                }
+
+                string mode = comboEncMode.SelectedItem?.ToString() ?? string.Empty;
+                bool isEcies = mode.Contains("ECIES", StringComparison.OrdinalIgnoreCase);
+                string outputFormat = comboEncOutputFormat.SelectedItem?.ToString() ?? "Base64";
+                bool isHex = outputFormat.Contains("Hex", StringComparison.OrdinalIgnoreCase);
+
+                byte[] data;
+                try
+                {
+                    data = isHex
+                        ? Convert.FromHexString(cipherText.Replace(" ", ""))
+                        : Convert.FromBase64String(cipherText.Replace("\r", "").Replace("\n", ""));
+                }
+                catch
+                {
+                    AppendValidationResult("❌ 密文格式解析失败，请检查输出格式（Base64/Hex）是否选择正确。", Color.Red);
+                    return;
+                }
+
+                var sb = new System.Text.StringBuilder();
+                sb.AppendLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                sb.AppendLine("【密文拼接标准】");
+                sb.AppendLine($"模式：{mode}");
+                sb.AppendLine($"输出编码：{outputFormat}");
+                sb.AppendLine($"总字节数：{data.Length} 字节");
+                sb.AppendLine();
+
+                int offset = 0;
+                int partIndex = 0;
+
+                if (isEcies)
+                {
+                    string curveName = _lastEphemeralCurveName ?? comboEncCurve.SelectedItem?.ToString() ?? "secp256r1";
+                    int pubKeyLen;
+                    try
+                    {
+                        var curveParams = Org.BouncyCastle.Asn1.X9.ECNamedCurveTable.GetByName(curveName);
+                        int fieldSize = (curveParams.Curve.FieldSize + 7) / 8;
+                        pubKeyLen = 1 + 2 * fieldSize; // 未压缩公钥：0x04 || X || Y
+                    }
+                    catch
+                    {
+                        pubKeyLen = 65; // P-256 默认值
+                    }
+
+                    if (data.Length < pubKeyLen + 12 + 16)
+                    {
+                        AppendValidationResult($"❌ 密文长度过短，无法按 ECIES 标准解析（至少需要 {pubKeyLen + 12 + 16} 字节）。", Color.Red);
+                        return;
+                    }
+
+                    sb.AppendLine($"拼接标准：[临时公钥 ePub] || [IV/Nonce] || [Ciphertext] || [Tag]");
+                    sb.AppendLine();
+
+                    partIndex++;
+                    sb.AppendLine($"第 {partIndex} 部分：临时公钥 ePub");
+                    sb.AppendLine($"  长度：{pubKeyLen} 字节");
+                    sb.AppendLine($"  偏移：{offset} ~ {offset + pubKeyLen - 1}");
+                    sb.AppendLine($"  曲线：{curveName}");
+                    sb.AppendLine($"  内容（前 16 字节 HEX）：{BitConverter.ToString(data, offset, Math.Min(16, pubKeyLen)).Replace("-", " ")}...");
+                    offset += pubKeyLen;
+                }
+                else
+                {
+                    string formatDesc = mode.Contains("CBC", StringComparison.OrdinalIgnoreCase)
+                        ? "[IV] || [Ciphertext]（无认证标签）"
+                        : "[IV/Nonce] || [Ciphertext] || [Tag]";
+                    sb.AppendLine($"拼接标准：{formatDesc}");
+                    sb.AppendLine();
+                }
+
+                int ivLen = mode.Contains("CBC", StringComparison.OrdinalIgnoreCase) ? 16 : 12;
+                if (data.Length < offset + ivLen)
+                {
+                    AppendValidationResult("❌ 密文长度不足以包含 IV/Nonce。", Color.Red);
+                    return;
+                }
+
+                partIndex++;
+                sb.AppendLine($"第 {partIndex} 部分：IV / Nonce");
+                sb.AppendLine($"  长度：{ivLen} 字节");
+                sb.AppendLine($"  偏移：{offset} ~ {offset + ivLen - 1}");
+                sb.AppendLine($"  内容（HEX）：{BitConverter.ToString(data, offset, ivLen).Replace("-", " ")}");
+                offset += ivLen;
+
+                int tagLen = mode.Contains("CBC", StringComparison.OrdinalIgnoreCase) ? 0 : 16;
+                if (data.Length < offset + tagLen)
+                {
+                    AppendValidationResult("❌ 密文长度不足以包含认证标签。", Color.Red);
+                    return;
+                }
+
+                int cipherLen = data.Length - offset - tagLen;
+                if (cipherLen < 0)
+                {
+                    AppendValidationResult("❌ 密文长度异常。", Color.Red);
+                    return;
+                }
+
+                if (cipherLen > 0)
+                {
+                    partIndex++;
+                    sb.AppendLine($"第 {partIndex} 部分：密文 Ciphertext");
+                    sb.AppendLine($"  长度：{cipherLen} 字节");
+                    sb.AppendLine($"  偏移：{offset} ~ {offset + cipherLen - 1}");
+                    sb.AppendLine($"  内容（前 16 字节 HEX）：{BitConverter.ToString(data, offset, Math.Min(16, cipherLen)).Replace("-", " ")}...");
+                    offset += cipherLen;
+                }
+
+                if (tagLen > 0)
+                {
+                    partIndex++;
+                    sb.AppendLine($"第 {partIndex} 部分：认证标签 Tag");
+                    sb.AppendLine($"  长度：{tagLen} 字节");
+                    sb.AppendLine($"  偏移：{offset} ~ {offset + tagLen - 1}");
+                    sb.AppendLine($"  内容（HEX）：{BitConverter.ToString(data, offset, tagLen).Replace("-", " ")}");
+                }
+
+                sb.AppendLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                AppendValidationResult(sb.ToString(), Color.DarkBlue);
+            }
+            catch (Exception ex)
+            {
+                AppendValidationResult($"❌ 密文结构解析失败: {ex.Message}", Color.Red);
             }
         }
         #endregion
