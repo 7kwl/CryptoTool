@@ -27,10 +27,6 @@ namespace CryptoTool.Win
         private System.Windows.Forms.Label labelEncTest = null!;
         private System.Windows.Forms.TextBox textEncTest = null!;
         private System.Windows.Forms.Button btnEncFormatInfo = null!;
-        private System.Windows.Forms.Label labelEncEphemeralPub = null!;
-        private System.Windows.Forms.TextBox textEncEphemeralPub = null!;
-        private System.Windows.Forms.Label labelEncExtra = null!;
-        private System.Windows.Forms.TextBox textEncExtra = null!;
         private System.Windows.Forms.Label labelEncKeyConvert = null!;
         private System.Windows.Forms.ComboBox comboEncKeyConvert = null!;
         private System.Windows.Forms.Button btnEncKeyConvert = null!;
@@ -651,7 +647,7 @@ namespace CryptoTool.Win
             bool useSha512 = mode.Contains("SHA-512", StringComparison.OrdinalIgnoreCase);
             var digest = useSha512 ? (Org.BouncyCastle.Crypto.IDigest)new Sha512Digest() : new Sha256Digest();
             var hkdf = new HkdfBytesGenerator(digest);
-            byte[] effectiveInfo = info ?? Array.Empty<byte>();
+            byte[] effectiveInfo = info ?? [];
             hkdf.Init(new HkdfParameters(secret, null, effectiveInfo));
             byte[] derivedKey = new byte[32];
             hkdf.GenerateBytes(derivedKey, 0, derivedKey.Length);
@@ -685,7 +681,7 @@ namespace CryptoTool.Win
         /// <summary>
         /// 将缓存的临时密钥原始字节按指定曲线导出为 PEM（与顶部密钥对格式一致）
         /// </summary>
-        private string ConvertEphemeralKeyToPem(byte[] keyBytes, bool isPublic, string curveName)
+        private static string ConvertEphemeralKeyToPem(byte[] keyBytes, bool isPublic, string curveName)
         {
             var curveParams = Org.BouncyCastle.Asn1.X9.ECNamedCurveTable.GetByName(curveName)
                 ?? throw new InvalidOperationException($"不支持的曲线: {curveName}");
