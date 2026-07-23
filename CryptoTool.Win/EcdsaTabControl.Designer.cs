@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 
 using CryptoTool.Algorithm.Algorithms.ECDSA;
 using CryptoTool.Win.Enums;
@@ -1884,6 +1884,10 @@ namespace CryptoTool.Win
         private System.Windows.Forms.TextBox textEncInput;
         private System.Windows.Forms.Label labelEncOutputLabel;
         private System.Windows.Forms.TextBox textEncOutput;
+        private System.Windows.Forms.Label labelEncEphemeralPub;
+        private System.Windows.Forms.TextBox textEncEphemeralPub;
+        private System.Windows.Forms.Label labelEncExtra;
+        private System.Windows.Forms.TextBox textEncExtra;
         private System.Windows.Forms.FlowLayoutPanel panelEncBtns;
         private System.Windows.Forms.Button btnEncrypt;
         private System.Windows.Forms.Button btnDecrypt;
