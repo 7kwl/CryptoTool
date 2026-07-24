@@ -679,9 +679,9 @@ namespace CryptoTool.Win
         }
 
         /// <summary>
-        /// 将缓存的临时密钥原始字节按指定曲线导出为 PEM（与顶部密钥对格式一致）
+        /// 将缓存的临时密钥原始字节按指定曲线和存储标准导出为 PEM
         /// </summary>
-        private static string ConvertEphemeralKeyToPem(byte[] keyBytes, bool isPublic, string curveName)
+        private static string ConvertEphemeralKeyToPem(byte[] keyBytes, bool isPublic, string curveName, string standard)
         {
             var curveParams = Org.BouncyCastle.Asn1.X9.ECNamedCurveTable.GetByName(curveName)
                 ?? throw new InvalidOperationException($"不支持的曲线: {curveName}");
@@ -692,13 +692,17 @@ namespace CryptoTool.Win
             {
                 var point = domain.Curve.DecodePoint(keyBytes);
                 var pubKey = new ECPublicKeyParameters("ECDSA", point, domain);
-                return EcdsaKeyHelper.ExportPublicKeyPem(pubKey);
+                return standard == PublicKeyStandardNamedCurve
+                    ? EcdsaKeyHelper.ExportPublicKeyPemNamedCurve(pubKey)
+                    : EcdsaKeyHelper.ExportPublicKeyPem(pubKey);
             }
             else
             {
                 var privKey = new ECPrivateKeyParameters(
                     new Org.BouncyCastle.Math.BigInteger(1, keyBytes), domain);
-                return EcdsaKeyHelper.ExportPrivateKeyPem(privKey);
+                return standard == PrivateKeyStandardPkcs8
+                    ? EcdsaKeyHelper.ExportPrivateKeyPemPkcs8(privKey)
+                    : EcdsaKeyHelper.ExportPrivateKeyPem(privKey);
             }
         }
 
@@ -834,11 +838,13 @@ namespace CryptoTool.Win
 
                 AppendValidationResult($"✅ 加密成功\r\n算法: {mode}\r\nIV: {Convert.ToHexString(iv).ToLowerInvariant()}\r\n密文长度: {cipher.Length}字节", Color.Green);
 
-                // 展示临时密钥对到 UI 文本框（默认 PEM 格式，与顶部密钥对一致）
+                // 展示临时密钥对到 UI 文本框，按顶部 ECDSA 面板存储标准生成
+                string pubStandard = comboPublicKeyStandard.SelectedItem?.ToString() ?? PublicKeyStandardSpecifiedCurve;
+                string privStandard = comboPrivateKeyStandard.SelectedItem?.ToString() ?? PrivateKeyStandardSec1;
                 if (isEcies && _lastEphemeralPubKey != null && _lastEphemeralCurveName != null)
-                    textEncEphemeralPub.Text = ConvertEphemeralKeyToPem(_lastEphemeralPubKey, true, _lastEphemeralCurveName);
+                    textEncEphemeralPub.Text = ConvertEphemeralKeyToPem(_lastEphemeralPubKey, true, _lastEphemeralCurveName, pubStandard);
                 if (isEcies && _lastEphemeralPrivKey != null && _lastEphemeralCurveName != null)
-                    textEncExtra.Text = ConvertEphemeralKeyToPem(_lastEphemeralPrivKey, false, _lastEphemeralCurveName);
+                    textEncExtra.Text = ConvertEphemeralKeyToPem(_lastEphemeralPrivKey, false, _lastEphemeralCurveName, privStandard);
 
                 SetStatus("加密完成");
             }
