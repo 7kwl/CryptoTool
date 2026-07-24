@@ -205,11 +205,11 @@ namespace CryptoTool.Win
                 tableLayoutEncrypt.ColumnStyles.Clear();
                 tableLayoutEncrypt.RowStyles.Clear();
 
-                // 设置三栏比例: 左30% | 中30% | 右40%
+                // 设置三栏比例: 左30% | 中20% | 右50%
                 tableLayoutEncrypt.ColumnCount = 3;
                 tableLayoutEncrypt.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30F));
-                tableLayoutEncrypt.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30F));
-                tableLayoutEncrypt.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F));
+                tableLayoutEncrypt.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+                tableLayoutEncrypt.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
                 tableLayoutEncrypt.RowCount = 1;
                 tableLayoutEncrypt.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
 
