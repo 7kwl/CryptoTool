@@ -6,6 +6,7 @@ using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.OpenSsl;
+using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.Security;
 
 namespace CryptoTool.Algorithm.Algorithms.ECDSA 
@@ -17,6 +18,19 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
             using var sw = new StringWriter();
             var pemWriter = new PemWriter(sw);
             pemWriter.WriteObject(privateKey);
+            pemWriter.Writer.Flush();
+            return sw.ToString();
+        }
+
+        /// <summary>
+        /// 将 EC 私钥导出为 PKCS#8 (RFC 5958) 格式 PEM
+        /// </summary>
+        public static string ExportPrivateKeyPemPkcs8(ECPrivateKeyParameters privateKey)
+        {
+            using var sw = new StringWriter();
+            var pemWriter = new PemWriter(sw);
+            var pkcs8Info = PrivateKeyInfoFactory.CreatePrivateKeyInfo(privateKey);
+            pemWriter.WriteObject(new Org.BouncyCastle.Utilities.IO.Pem.PemObject("PRIVATE KEY", pkcs8Info.GetEncoded()));
             pemWriter.Writer.Flush();
             return sw.ToString();
         }

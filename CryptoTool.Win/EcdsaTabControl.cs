@@ -20,6 +20,9 @@ namespace CryptoTool.Win
         private string _publicKeyPem = string.Empty;
         private string _lastSignHashAlgorithm = string.Empty;
 
+        private const string PrivateKeyStandardSec1 = "SEC1/RFC 5915";
+        private const string PrivateKeyStandardPkcs8 = "PKCS#8 / RFC 5958";
+
         private Dictionary<string, (string Icon, List<KeyValuePair<string, string>> Curves)> _allCurveData = [];
 
 
@@ -370,6 +373,10 @@ namespace CryptoTool.Win
             comboSignatureFormat.Items.AddRange(["Base64", "Hex"]);
             comboSignatureFormat.SelectedIndex = 0;
 
+            comboPrivateKeyStandard.Items.Clear();
+            comboPrivateKeyStandard.Items.AddRange([PrivateKeyStandardSec1, PrivateKeyStandardPkcs8]);
+            comboPrivateKeyStandard.SelectedIndex = 0;
+
             radioPrivateKey.Checked = true;
 
             InitializeEncryptDefaults();
@@ -403,6 +410,16 @@ namespace CryptoTool.Win
             if (comboCurve.SelectedItem is KeyValuePair<string, string> sel && !string.IsNullOrEmpty(sel.Key))
                 return sel.Key;
             return "prime256v1";
+        }
+
+        /// <summary>
+        /// 根据下拉框选项将 EC 私钥导出为 SEC1 或 PKCS#8
+        /// </summary>
+        private string ExportPrivateKeyByStandard(ECPrivateKeyParameters priv)
+        {
+            return comboPrivateKeyStandard.SelectedItem?.ToString() == PrivateKeyStandardPkcs8
+                ? EcdsaKeyHelper.ExportPrivateKeyPemPkcs8(priv)
+                : EcdsaKeyHelper.ExportPrivateKeyPem(priv);
         }
 
         #endregion
@@ -441,7 +458,7 @@ namespace CryptoTool.Win
                 var priv = (ECPrivateKeyParameters)kp.Private;
                 var pub = (ECPublicKeyParameters)kp.Public;
 
-                _privateKeyPem = EcdsaKeyHelper.ExportPrivateKeyPem(priv);
+                _privateKeyPem = ExportPrivateKeyByStandard(priv);
                 _publicKeyPem = EcdsaKeyHelper.ExportPublicKeyPem(pub);
 
                 RefreshKeyDisplay();
@@ -485,7 +502,7 @@ namespace CryptoTool.Win
 
                 var pub = EcdsaAlgorithm.GetPublicKey(priv);
 
-                _privateKeyPem = EcdsaKeyHelper.ExportPrivateKeyPem(priv);
+                _privateKeyPem = ExportPrivateKeyByStandard(priv);
                 _publicKeyPem = EcdsaKeyHelper.ExportPublicKeyPem(pub);
 
                 RefreshKeyDisplay();
@@ -695,6 +712,34 @@ namespace CryptoTool.Win
             }
         }
 
+        private void BtnConvertPrivateKeyStandard_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(_privateKeyPem))
+                {
+                    MessageBox.Show("当前没有私钥内容可转换，请先生成或导入私钥。", "提示",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                string pem = ConvertDisplayToPem(_privateKeyPem, true);
+                ECPrivateKeyParameters priv = EcdsaKeyHelper.ImportPrivateKeyPem(pem);
+                _privateKeyPem = ExportPrivateKeyByStandard(priv);
+                textPrivateKey.Text = FormatKeyForDisplay(_privateKeyPem, GetCurrentOutputFormat());
+
+                string standard = comboPrivateKeyStandard.SelectedItem?.ToString() ?? PrivateKeyStandardSec1;
+                AppendValidationResult($"私钥已转换为 {standard}", Color.Gray);
+                SetStatus($"私钥存储标准转换完成 - {standard}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"转换私钥存储标准失败：{ex.Message}", "错误",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                SetStatus("私钥存储标准转换失败");
+            }
+        }
+
         private static string DetectKeyFormat(string input)
         {
             if (input.Contains("BEGIN", StringComparison.OrdinalIgnoreCase) || input.Contains("END", StringComparison.OrdinalIgnoreCase))
@@ -777,7 +822,7 @@ namespace CryptoTool.Win
                 if (isPrivate)
                 {
                     var priv = EcdsaKeyHelper.ImportPrivateKeyPem(pem);
-                    _privateKeyPem = EcdsaKeyHelper.ExportPrivateKeyPem(priv);
+                    _privateKeyPem = ExportPrivateKeyByStandard(priv);
                     textPrivateKey.Text = FormatKeyForDisplay(_privateKeyPem, fmt);
                 }
                 else
@@ -859,7 +904,7 @@ namespace CryptoTool.Win
             {
                 string pem = ConvertDisplayToPem(c, true);
                 var priv = EcdsaKeyHelper.ImportPrivateKeyPem(pem);
-                _privateKeyPem = EcdsaKeyHelper.ExportPrivateKeyPem(priv);
+                _privateKeyPem = ExportPrivateKeyByStandard(priv);
                 textPrivateKey.Text = FormatKeyForDisplay(_privateKeyPem, GetCurrentOutputFormat());
                 SetStatus("私钥已从剪贴板粘贴");
             }
