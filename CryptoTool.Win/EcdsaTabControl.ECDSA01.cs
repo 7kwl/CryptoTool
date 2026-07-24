@@ -206,18 +206,19 @@ namespace CryptoTool.Win
                 };
                 operationsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 170F));
                 operationsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-                for (int i = 0; i < 8; i++)
-                {
-                    float pct = 12.5F;
-                    operationsPanel.RowStyles.Add(new RowStyle(SizeType.Percent, pct));
-                }
+                operationsPanel.RowStyles.Clear();
+                operationsPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 55F));
+                operationsPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 55F));
+                operationsPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 55F));
+                for (int i = 3; i < 8; i++)
+                    operationsPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
 
                 const int ecdhBtnWidth = 150;
                 var curveRow = new FlowLayoutPanel
                 {
                     Dock = DockStyle.Fill,
                     Margin = new Padding(50, 0, 0, 0),
-                    Padding = new Padding(0, 4, 0, 4),
+                    Padding = new Padding(0, 8, 0, 9),
                     WrapContents = false
                 };
                 var lblCurve = new Label
@@ -296,7 +297,7 @@ namespace CryptoTool.Win
                     Dock = DockStyle.Fill,
                     FlowDirection = FlowDirection.LeftToRight,
                     Margin = new Padding(50, 0, 0, 0),
-                    Padding = new Padding(0, 4, 0, 4),
+                    Padding = new Padding(0, 8, 0, 9),
                     WrapContents = false
                 };
                 modeRow.Controls.Add(lblMode);
@@ -307,7 +308,7 @@ namespace CryptoTool.Win
                     Dock = DockStyle.Fill,
                     FlowDirection = FlowDirection.LeftToRight,
                     Margin = new Padding(50, 0, 0, 0),
-                    Padding = new Padding(0, 4, 0, 4),
+                    Padding = new Padding(0, 8, 0, 9),
                     WrapContents = false
                 };
                 var lblEncoding = new Label
@@ -333,12 +334,14 @@ namespace CryptoTool.Win
                 {
                     Dock = DockStyle.Fill,
                     ColumnCount = 1,
-                    RowCount = 8,
+                    RowCount = 9,
                     Margin = new Padding(0),
                     Padding = new Padding(0, 4, 0, 4)
                 };
+                btnPanel.RowStyles.Clear();
                 for (int i = 0; i < 8; i++)
-                    btnPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
+                    btnPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 55F));
+                btnPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F)); // 吸收剩余空间，避免最后一个按钮被拉伸
 
                 btnEcdhEncrypt = new Button { Text = "加密", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
                 btnEcdhDecrypt = new Button { Text = "解密", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
@@ -347,7 +350,7 @@ namespace CryptoTool.Win
                 btnEcdhClear = new Button { Text = "清空", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
                 btnEcdhAliceCurve = new Button { Text = "私钥1曲线", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
                 btnEcdhBobCurve = new Button { Text = "私钥2曲线", Width = ecdhBtnWidth, Dock = DockStyle.Fill, Padding = new Padding(8, 2, 8, 2), Margin = new Padding(0, 2, 0, 2) };
-                lblEcdhIV = new Label { Text = "IV (Base64，可编辑/留空随机):", AutoSize = false, Height = 22, Margin = new Padding(0, 0, 4, 2), TextAlign = ContentAlignment.MiddleLeft };
+                lblEcdhIV = new Label { Text = "IV (Base64，可编辑/留空随):", AutoSize = false, Height = 22, Margin = new Padding(0, 0, 4, 2), TextAlign = ContentAlignment.MiddleLeft };
                 textEcdhIV = new TextBox
                 {
                     Dock = DockStyle.Fill,
