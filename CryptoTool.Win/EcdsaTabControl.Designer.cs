@@ -786,14 +786,12 @@ namespace CryptoTool.Win
             btnClearAll.Click += BtnClearAll_Click;
             // --------------------------------------------------
             // 右侧设置面板 (panelRightSettings) - 6行网格布局
-            //   输出格式行 | 密钥类型转换行 | 私钥存储标准行 | 公钥存储标准行 | 曲线分类行 | 降级曲线行
+            //   私钥存储标准行 | 公钥存储标准行 | 曲线分类行 | 降级曲线行 | 输出格式行 | 密钥类型转换行
             // --------------------------------------------------
             // 
             // panelRightSettings
             // 
             panelRightSettings.AutoSize = true;
-            panelRightSettings.Controls.Add(panelFormatRow);
-            panelRightSettings.Controls.Add(panelKeyTypeRow);
             panelRightSettings.Dock = DockStyle.Top;
             panelRightSettings.FlowDirection = FlowDirection.TopDown;
             panelRightSettings.Location = new Point(183, 3);

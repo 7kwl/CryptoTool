@@ -598,10 +598,12 @@ public partial class EcdsaTabControl
         comboCurve.TabIndex = 3;
         comboCurve.ValueMember = "Key";
 
-        // 将三行加入右侧设置面板
+        // 将三行加入右侧设置面板，最后追加输出格式/密钥类型转换行
         panelRightSettings.Controls.Add(panelPrivateKeyStandardRow);
         panelRightSettings.Controls.Add(panelPublicKeyStandardRow);
         panelRightSettings.Controls.Add(panelCurveContainer);
+        panelRightSettings.Controls.Add(panelFormatRow);
+        panelRightSettings.Controls.Add(panelKeyTypeRow);
     }
 
     #endregion
