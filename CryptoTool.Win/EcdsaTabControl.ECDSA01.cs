@@ -207,11 +207,11 @@ namespace CryptoTool.Win
                 operationsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 170F));
                 operationsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
                 operationsPanel.RowStyles.Clear();
-                operationsPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 55F));
-                operationsPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 55F));
-                operationsPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 55F));
                 operationsPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 55F)); // 私钥存储标准
                 operationsPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 55F)); // 公钥存储标准
+                operationsPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 55F)); // 椭圆曲线
+                operationsPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 55F)); // 密钥模型
+                operationsPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 55F)); // 明文编码
                 operationsPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
                 operationsPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
 
@@ -404,11 +404,11 @@ namespace CryptoTool.Win
                 operationsPanel.Controls.Add(btnPanel, 0, 0);
                 operationsPanel.SetRowSpan(btnPanel, 7);
 
-                operationsPanel.Controls.Add(modeRow, 1, 0);
-                operationsPanel.Controls.Add(encRow, 1, 1);
-                operationsPanel.Controls.Add(privateStandardRow, 1, 2);
-                operationsPanel.Controls.Add(publicStandardRow, 1, 3);
-                operationsPanel.Controls.Add(curveRow, 1, 4);
+                operationsPanel.Controls.Add(privateStandardRow, 1, 0);
+                operationsPanel.Controls.Add(publicStandardRow, 1, 1);
+                operationsPanel.Controls.Add(curveRow, 1, 2);
+                operationsPanel.Controls.Add(modeRow, 1, 3);
+                operationsPanel.Controls.Add(encRow, 1, 4);
 
                 var operationsGroup = new GroupBox
                 {
