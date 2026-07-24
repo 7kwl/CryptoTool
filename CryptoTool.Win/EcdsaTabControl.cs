@@ -382,7 +382,7 @@ namespace CryptoTool.Win
 
             comboPublicKeyStandard.Items.Clear();
             comboPublicKeyStandard.Items.AddRange([PublicKeyStandardNamedCurve, PublicKeyStandardSpecifiedCurve]);
-            comboPublicKeyStandard.SelectedIndex = 1;
+            comboPublicKeyStandard.SelectedIndex = 0;
 
             radioPrivateKey.Checked = true;
 
@@ -424,9 +424,14 @@ namespace CryptoTool.Win
         /// </summary>
         private string ExportPrivateKeyByStandard(ECPrivateKeyParameters priv)
         {
-            return comboPrivateKeyStandard.SelectedItem?.ToString() == PrivateKeyStandardPkcs8
-                ? EcdsaKeyHelper.ExportPrivateKeyPemPkcs8(priv)
-                : EcdsaKeyHelper.ExportPrivateKeyPem(priv);
+            if (comboPrivateKeyStandard.SelectedItem?.ToString() == PrivateKeyStandardPkcs8)
+                return EcdsaKeyHelper.ExportPrivateKeyPemPkcs8(priv);
+
+            // SEC1/RFC 5915: 强制使用显式参数 (specifiedCurve)，避免 namedCurve 私钥被输出为短编码
+            var explicitParams = new ECDomainParameters(
+                priv.Parameters.Curve, priv.Parameters.G, priv.Parameters.N, priv.Parameters.H, priv.Parameters.GetSeed());
+            var explicitPriv = new ECPrivateKeyParameters(priv.D, explicitParams);
+            return EcdsaKeyHelper.ExportPrivateKeyPem(explicitPriv);
         }
 
         /// <summary>

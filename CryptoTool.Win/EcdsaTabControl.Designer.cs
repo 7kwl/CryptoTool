@@ -937,7 +937,7 @@ namespace CryptoTool.Win
             comboPrivateKeyStandard.Location = new Point(133, 3);
             comboPrivateKeyStandard.Margin = new Padding(0, 3, 8, 3);
             comboPrivateKeyStandard.Name = "comboPrivateKeyStandard";
-            comboPrivateKeyStandard.Size = new Size(220, 32);
+            comboPrivateKeyStandard.Size = new Size(420, 32);
             comboPrivateKeyStandard.TabIndex = 1;
             // 
             // btnConvertPrivateKeyStandard
@@ -982,7 +982,7 @@ namespace CryptoTool.Win
             comboPublicKeyStandard.Location = new Point(133, 3);
             comboPublicKeyStandard.Margin = new Padding(0, 3, 8, 3);
             comboPublicKeyStandard.Name = "comboPublicKeyStandard";
-            comboPublicKeyStandard.Size = new Size(220, 32);
+            comboPublicKeyStandard.Size = new Size(420, 32);
             comboPublicKeyStandard.TabIndex = 1;
             // 
             // btnConvertPublicKeyStandard

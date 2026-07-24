@@ -26,13 +26,20 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
         }
 
         /// <summary>
-        /// 将 EC 私钥导出为 PKCS#8 (RFC 5958) 格式 PEM
+        /// 将 EC 私钥导出为 PKCS#8 (RFC 5958) 格式 PEM，使用 namedCurve OID 编码以减小体积
         /// </summary>
         public static string ExportPrivateKeyPemPkcs8(ECPrivateKeyParameters privateKey)
         {
+            var namedCurveOid = privateKey.PublicKeyParamSet
+                ?? FindNamedCurveOid(privateKey.Parameters)
+                ?? throw new ArgumentException("无法将私钥转换为 PKCS#8 namedCurve 格式：未找到匹配的命名曲线");
+
+            var namedParams = new ECNamedDomainParameters(namedCurveOid, privateKey.Parameters);
+            var namedPriv = new ECPrivateKeyParameters(privateKey.D, namedParams);
+
             using var sw = new StringWriter();
             var pemWriter = new PemWriter(sw);
-            var pkcs8Info = PrivateKeyInfoFactory.CreatePrivateKeyInfo(privateKey);
+            var pkcs8Info = PrivateKeyInfoFactory.CreatePrivateKeyInfo(namedPriv);
             pemWriter.WriteObject(new Org.BouncyCastle.Utilities.IO.Pem.PemObject("PRIVATE KEY", pkcs8Info.GetEncoded()));
             pemWriter.Writer.Flush();
             return sw.ToString();

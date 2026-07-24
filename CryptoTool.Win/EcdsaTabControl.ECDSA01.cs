@@ -164,9 +164,11 @@ namespace CryptoTool.Win
                     Margin = new Padding(0),
                     Padding = new Padding(4)
                 };
-                main.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 35F));
+                main.ColumnStyles.Clear();
                 main.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30F));
-                main.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 35F));
+                main.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+                main.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+                main.RowStyles.Clear();
                 main.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
                 main.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
 
@@ -437,7 +439,16 @@ namespace CryptoTool.Win
                 operationsPanel.Controls.Add(modeRow, 1, 1);
                 operationsPanel.Controls.Add(encRow, 1, 2);
 
-                main.Controls.Add(operationsPanel, 2, 0);
+                var operationsGroup = new GroupBox
+                {
+                    Name = "groupEcdhOperations",
+                    Text = "密钥操作",
+                    Dock = DockStyle.Fill,
+                    Padding = new Padding(6)
+                };
+                operationsGroup.Controls.Add(operationsPanel);
+                main.Controls.Add(operationsGroup, 2, 0);
+                main.SetRowSpan(operationsGroup, 2);
 
                 // --------------------- 中栏: ECDH 加解密操作区 ---------------------
                 // 8行: 明文标签 | 明文输入框 | 密文标签 | 密文输入框 | 共享密钥标签 | 共享密钥输入框 | IV标签 | IV输入框
