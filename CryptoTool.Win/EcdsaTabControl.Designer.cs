@@ -1025,7 +1025,7 @@ namespace CryptoTool.Win
             labelCurve.Location = new Point(34, 5);
             labelCurve.Margin = new Padding(34, 3, 2, 3);
             labelCurve.Name = "labelCurve";
-            labelCurve.Size = new Size(100, 32);
+            labelCurve.Size = new Size(200, 32);
             labelCurve.TabIndex = 0;
             labelCurve.Text = "椭圆曲线：";
             labelCurve.TextAlign = ContentAlignment.MiddleLeft;
@@ -1061,7 +1061,7 @@ namespace CryptoTool.Win
             comboCurve.Location = new Point(367, 5);
             comboCurve.Margin = new Padding(0, 3, 4, 3);
             comboCurve.Name = "comboCurve";
-            comboCurve.Size = new Size(520, 32);
+            comboCurve.Size = new Size(330, 32);
             comboCurve.TabIndex = 3;
             comboCurve.ValueMember = "Key";
             // ==================================================
@@ -2040,6 +2040,10 @@ namespace CryptoTool.Win
         private System.Windows.Forms.ComboBox comboEcdhCurve;
         private System.Windows.Forms.ComboBox comboEcdhMode;
         private System.Windows.Forms.ComboBox comboEcdhEncoding;
+        private System.Windows.Forms.ComboBox comboEcdhPrivateKeyStandard;
+        private System.Windows.Forms.ComboBox comboEcdhPublicKeyStandard;
+        private System.Windows.Forms.Button btnConvertEcdhPrivateKeyStandard;
+        private System.Windows.Forms.Button btnConvertEcdhPublicKeyStandard;
         private System.Windows.Forms.Button btnGenerateEcdhKeys;
         private System.Windows.Forms.TextBox textEcdhAlicePrivate;
         private System.Windows.Forms.TextBox textEcdhAlicePublic;

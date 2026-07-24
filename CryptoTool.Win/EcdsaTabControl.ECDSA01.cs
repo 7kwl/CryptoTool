@@ -195,12 +195,12 @@ namespace CryptoTool.Win
 
                 // --------------------- 右栏: 配置参数 + 操作按钮 ---------------------
                 // 两列: 列0=按钮面板(170px固定) | 列1=设置项(100%)
-                // 6行: 曲线选择 | 密钥模型 | 编码格式 | 按钮区(跨3行)
+                // 6行: 密钥模型 | 编码格式 | 私钥存储标准 | 公钥存储标准 | 椭圆曲线 | 计算结果
                 var operationsPanel = new TableLayoutPanel
                 {
                     Dock = DockStyle.Fill,
                     ColumnCount = 2,
-                    RowCount = 8,
+                    RowCount = 7,
                     Margin = new Padding(3),
                     Padding = new Padding(6)
                 };
@@ -210,8 +210,10 @@ namespace CryptoTool.Win
                 operationsPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 55F));
                 operationsPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 55F));
                 operationsPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 55F));
-                for (int i = 3; i < 8; i++)
-                    operationsPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+                operationsPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 55F)); // 私钥存储标准
+                operationsPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 55F)); // 公钥存储标准
+                operationsPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+                operationsPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
 
                 const int ecdhBtnWidth = 150;
                 var curveRow = new FlowLayoutPanel
@@ -225,7 +227,7 @@ namespace CryptoTool.Win
                 {
                     Text = "椭圆曲线：",
                     AutoSize = false,
-                    Size = new Size(100, 32),
+                    Size = new Size(200, 32),
                     TextAlign = ContentAlignment.MiddleLeft,
                     Margin = new Padding(0, 3, 8, 3)
                 };
@@ -329,6 +331,79 @@ namespace CryptoTool.Win
                 comboEcdhEncoding.SelectedIndex = 0;
                 encRow.Controls.Add(lblEncoding);
                 encRow.Controls.Add(comboEcdhEncoding);
+
+                // --------------------- 右栏: 密钥标准转换区 ---------------------
+                var privateStandardRow = new FlowLayoutPanel
+                {
+                    Dock = DockStyle.Fill,
+                    FlowDirection = FlowDirection.LeftToRight,
+                    Margin = new Padding(50, 0, 0, 0),
+                    Padding = new Padding(0, 8, 0, 9),
+                    WrapContents = false
+                };
+                var lblPrivateStandard = new Label
+                {
+                    Text = "私钥存储标准：",
+                    AutoSize = false,
+                    Size = new Size(130, 32),
+                    TextAlign = ContentAlignment.MiddleLeft,
+                    Margin = new Padding(0, 3, 4, 3)
+                };
+                comboEcdhPrivateKeyStandard = new ComboBox
+                {
+                    DropDownStyle = ComboBoxStyle.DropDownList,
+                    Size = new Size(300, 32),
+                    Margin = new Padding(0, 3, 4, 3)
+                };
+                comboEcdhPrivateKeyStandard.Items.AddRange([PrivateKeyStandardPkcs8, PrivateKeyStandardSec1]);
+                comboEcdhPrivateKeyStandard.SelectedIndex = 0;
+                btnConvertEcdhPrivateKeyStandard = new Button
+                {
+                    Text = "转换",
+                    Size = new Size(60, 32),
+                    Margin = new Padding(0, 3, 0, 3)
+                };
+                btnConvertEcdhPrivateKeyStandard.Click += BtnConvertEcdhPrivateKeyStandard_Click;
+                comboEcdhPrivateKeyStandard.SelectedIndexChanged += ComboEcdhPrivateKeyStandard_SelectedIndexChanged;
+                privateStandardRow.Controls.Add(lblPrivateStandard);
+                privateStandardRow.Controls.Add(comboEcdhPrivateKeyStandard);
+                privateStandardRow.Controls.Add(btnConvertEcdhPrivateKeyStandard);
+
+                var publicStandardRow = new FlowLayoutPanel
+                {
+                    Dock = DockStyle.Fill,
+                    FlowDirection = FlowDirection.LeftToRight,
+                    Margin = new Padding(50, 0, 0, 0),
+                    Padding = new Padding(0, 8, 0, 9),
+                    WrapContents = false
+                };
+                var lblPublicStandard = new Label
+                {
+                    Text = "公钥存储标准：",
+                    AutoSize = false,
+                    Size = new Size(130, 32),
+                    TextAlign = ContentAlignment.MiddleLeft,
+                    Margin = new Padding(0, 3, 4, 3)
+                };
+                comboEcdhPublicKeyStandard = new ComboBox
+                {
+                    DropDownStyle = ComboBoxStyle.DropDownList,
+                    Size = new Size(300, 32),
+                    Margin = new Padding(0, 3, 4, 3)
+                };
+                comboEcdhPublicKeyStandard.Items.AddRange([PublicKeyStandardNamedCurve, PublicKeyStandardSpecifiedCurve]);
+                comboEcdhPublicKeyStandard.SelectedIndex = 0;
+                btnConvertEcdhPublicKeyStandard = new Button
+                {
+                    Text = "转换",
+                    Size = new Size(60, 32),
+                    Margin = new Padding(0, 3, 0, 3)
+                };
+                btnConvertEcdhPublicKeyStandard.Click += BtnConvertEcdhPublicKeyStandard_Click;
+                comboEcdhPublicKeyStandard.SelectedIndexChanged += ComboEcdhPublicKeyStandard_SelectedIndexChanged;
+                publicStandardRow.Controls.Add(lblPublicStandard);
+                publicStandardRow.Controls.Add(comboEcdhPublicKeyStandard);
+                publicStandardRow.Controls.Add(btnConvertEcdhPublicKeyStandard);
 
                 var btnPanel = new TableLayoutPanel
                 {
@@ -436,11 +511,13 @@ namespace CryptoTool.Win
                 btnPanel.Controls.Add(btnEcdhAliceCurve, 0, 6);
                 btnPanel.Controls.Add(btnEcdhBobCurve, 0, 7);
                 operationsPanel.Controls.Add(btnPanel, 0, 0);
-                operationsPanel.SetRowSpan(btnPanel, 8);
+                operationsPanel.SetRowSpan(btnPanel, 7);
 
-                operationsPanel.Controls.Add(curveRow, 1, 0);
-                operationsPanel.Controls.Add(modeRow, 1, 1);
-                operationsPanel.Controls.Add(encRow, 1, 2);
+                operationsPanel.Controls.Add(modeRow, 1, 0);
+                operationsPanel.Controls.Add(encRow, 1, 1);
+                operationsPanel.Controls.Add(privateStandardRow, 1, 2);
+                operationsPanel.Controls.Add(publicStandardRow, 1, 3);
+                operationsPanel.Controls.Add(curveRow, 1, 4);
 
                 var operationsGroup = new GroupBox
                 {
