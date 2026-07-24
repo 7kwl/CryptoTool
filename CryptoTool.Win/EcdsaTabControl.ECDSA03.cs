@@ -700,8 +700,8 @@ namespace CryptoTool.Win
             {
                 var privKey = new ECPrivateKeyParameters(
                     new Org.BouncyCastle.Math.BigInteger(1, keyBytes), domain);
-                return standard == PrivateKeyStandardPkcs8
-                    ? EcdsaKeyHelper.ExportPrivateKeyPemPkcs8(privKey)
+                return standard == PrivateKeyStandardNamedCurve
+                    ? EcdsaKeyHelper.ExportPrivateKeyPemNamedCurve(privKey)
                     : EcdsaKeyHelper.ExportPrivateKeyPem(privKey);
             }
         }

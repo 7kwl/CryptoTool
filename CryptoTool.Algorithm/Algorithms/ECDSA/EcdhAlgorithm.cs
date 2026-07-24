@@ -56,7 +56,9 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
             X9ECParameters curveParams = ECNamedCurveTable.GetByName(curveName)
                 ?? throw new ArgumentException($"不支持的曲线: {curveName}");
 
-            var domain = new ECDomainParameters(curveParams.Curve, curveParams.G, curveParams.N, curveParams.H, curveParams.GetSeed());
+            var oid = ECNamedCurveTable.GetOid(curveName);
+            var domain = new ECNamedDomainParameters(oid,
+                curveParams.Curve, curveParams.G, curveParams.N, curveParams.H, curveParams.GetSeed());
             var generator = new ECKeyPairGenerator("ECDH");
             generator.Init(new ECKeyGenerationParameters(domain, new SecureRandom()));
             return generator.GenerateKeyPair();

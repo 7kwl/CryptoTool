@@ -91,9 +91,9 @@ namespace CryptoTool.Win
                 var bobPriv = (ECPrivateKeyParameters)bob.Private;
                 var bobPub = (ECPublicKeyParameters)bob.Public;
 
-                textEcdhAlicePrivate.Text = ExportPrivateKeyByStandard(alicePriv, comboEcdhPrivateKeyStandard.SelectedItem?.ToString() ?? PrivateKeyStandardPkcs8);
+                textEcdhAlicePrivate.Text = ExportPrivateKeyByStandard(alicePriv, comboEcdhPrivateKeyStandard.SelectedItem?.ToString() ?? PrivateKeyStandardNamedCurve);
                 textEcdhAlicePublic.Text = ExportPublicKeyByStandard(alicePub, comboEcdhPublicKeyStandard.SelectedItem?.ToString() ?? PublicKeyStandardNamedCurve);
-                textEcdhBobPrivate.Text = ExportPrivateKeyByStandard(bobPriv, comboEcdhPrivateKeyStandard.SelectedItem?.ToString() ?? PrivateKeyStandardPkcs8);
+                textEcdhBobPrivate.Text = ExportPrivateKeyByStandard(bobPriv, comboEcdhPrivateKeyStandard.SelectedItem?.ToString() ?? PrivateKeyStandardNamedCurve);
                 textEcdhBobPublic.Text = ExportPublicKeyByStandard(bobPub, comboEcdhPublicKeyStandard.SelectedItem?.ToString() ?? PublicKeyStandardNamedCurve);
 
                 byte[] shared = EcdhAlgorithm.DeriveSharedSecret(alicePriv, bobPub);

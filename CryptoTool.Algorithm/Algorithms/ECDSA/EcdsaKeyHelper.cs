@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Org.BouncyCastle.Asn1;
-using Org.BouncyCastle.Asn1.X509;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.OpenSsl;
-using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.Security;
 
 namespace CryptoTool.Algorithm.Algorithms.ECDSA 
@@ -26,21 +24,20 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
         }
 
         /// <summary>
-        /// 将 EC 私钥导出为 PKCS#8 (RFC 5958) 格式 PEM，使用 namedCurve OID 编码以减小体积
+        /// 将 EC 私钥导出为 SEC1/RFC 5915 namedCurve 格式 PEM（曲线用 OID 引用，体积小，与 OpenSSL 默认输出一致）
         /// </summary>
-        public static string ExportPrivateKeyPemPkcs8(ECPrivateKeyParameters privateKey)
+        public static string ExportPrivateKeyPemNamedCurve(ECPrivateKeyParameters privateKey)
         {
             var namedCurveOid = privateKey.PublicKeyParamSet
                 ?? FindNamedCurveOid(privateKey.Parameters)
-                ?? throw new ArgumentException("无法将私钥转换为 PKCS#8 namedCurve 格式：未找到匹配的命名曲线");
+                ?? throw new ArgumentException("无法将私钥转换为 SEC1 namedCurve 格式：未找到匹配的命名曲线");
 
             var namedParams = new ECNamedDomainParameters(namedCurveOid, privateKey.Parameters);
             var namedPriv = new ECPrivateKeyParameters(privateKey.D, namedParams);
 
             using var sw = new StringWriter();
             var pemWriter = new PemWriter(sw);
-            var pkcs8Info = PrivateKeyInfoFactory.CreatePrivateKeyInfo(namedPriv);
-            pemWriter.WriteObject(new Org.BouncyCastle.Utilities.IO.Pem.PemObject("PRIVATE KEY", pkcs8Info.GetEncoded()));
+            pemWriter.WriteObject(namedPriv);
             pemWriter.Writer.Flush();
             return sw.ToString();
         }
@@ -63,12 +60,12 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
                 ?? FindNamedCurveOid(publicKey.Parameters)
                 ?? throw new ArgumentException("无法将公钥转换为 namedCurve 格式：未找到匹配的命名曲线");
 
-            var algorithmIdentifier = new AlgorithmIdentifier(X9ObjectIdentifiers.IdECPublicKey, namedCurveOid);
-            var namedCurveSpi = new SubjectPublicKeyInfo(algorithmIdentifier, publicKey.Q.GetEncoded(false));
+            var namedParams = new ECNamedDomainParameters(namedCurveOid, publicKey.Parameters);
+            var namedPub = new ECPublicKeyParameters(publicKey.Q, namedParams);
 
             using var sw = new StringWriter();
             var pemWriter = new PemWriter(sw);
-            pemWriter.WriteObject(new Org.BouncyCastle.Utilities.IO.Pem.PemObject("PUBLIC KEY", namedCurveSpi.GetEncoded()));
+            pemWriter.WriteObject(namedPub);
             pemWriter.Writer.Flush();
             return sw.ToString();
         }

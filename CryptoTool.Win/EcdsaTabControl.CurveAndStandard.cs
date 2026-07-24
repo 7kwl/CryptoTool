@@ -9,8 +9,8 @@ public partial class EcdsaTabControl
 {
     #region 密钥存储标准常量
 
-    private const string PrivateKeyStandardSec1 = "SEC1/RFC 5915（长编码 / specifiedCurve）";
-    private const string PrivateKeyStandardPkcs8 = "PKCS#8 / RFC 5958（短编码 / namedCurve）";
+        private const string PrivateKeyStandardSec1 = "SEC1/RFC 5915（长编码 / specifiedCurve）";
+        private const string PrivateKeyStandardNamedCurve = "SEC1 / RFC 5915（短编码 / namedCurve）";
 
     private const string PublicKeyStandardNamedCurve = "RFC 5480/namedCurve";
     private const string PublicKeyStandardSpecifiedCurve = "RFC 5480/specifiedCurve";
@@ -25,7 +25,7 @@ public partial class EcdsaTabControl
     private void InitializeKeyStandards()
     {
         comboPrivateKeyStandard.Items.Clear();
-        comboPrivateKeyStandard.Items.AddRange([PrivateKeyStandardPkcs8, PrivateKeyStandardSec1]);
+        comboPrivateKeyStandard.Items.AddRange([PrivateKeyStandardNamedCurve, PrivateKeyStandardSec1]);
         comboPrivateKeyStandard.SelectedIndex = 0;
 
         comboPublicKeyStandard.Items.Clear();
@@ -48,8 +48,8 @@ public partial class EcdsaTabControl
 
     private static string ExportPrivateKeyByStandard(ECPrivateKeyParameters priv, string standard)
     {
-        if (standard == PrivateKeyStandardPkcs8)
-            return EcdsaKeyHelper.ExportPrivateKeyPemPkcs8(priv);
+        if (standard == PrivateKeyStandardNamedCurve)
+            return EcdsaKeyHelper.ExportPrivateKeyPemNamedCurve(priv);
 
         // SEC1/RFC 5915: 强制使用显式参数 (specifiedCurve)，避免 namedCurve 私钥被输出为短编码
         var explicitParams = new ECDomainParameters(
@@ -187,7 +187,7 @@ public partial class EcdsaTabControl
     {
         try
         {
-            string standard = comboEcdhPrivateKeyStandard.SelectedItem?.ToString() ?? PrivateKeyStandardPkcs8;
+            string standard = comboEcdhPrivateKeyStandard.SelectedItem?.ToString() ?? PrivateKeyStandardNamedCurve;
             int convertedCount = 0;
             if (ConvertEcdhPrivateKey(textEcdhAlicePrivate, standard)) convertedCount++;
             if (ConvertEcdhPrivateKey(textEcdhBobPrivate, standard)) convertedCount++;
@@ -263,7 +263,7 @@ public partial class EcdsaTabControl
     {
         try
         {
-            string standard = comboEcdhPrivateKeyStandard.SelectedItem?.ToString() ?? PrivateKeyStandardPkcs8;
+            string standard = comboEcdhPrivateKeyStandard.SelectedItem?.ToString() ?? PrivateKeyStandardNamedCurve;
             ConvertEcdhPrivateKey(textEcdhAlicePrivate, standard);
             ConvertEcdhPrivateKey(textEcdhBobPrivate, standard);
         }
@@ -318,7 +318,7 @@ public partial class EcdsaTabControl
             Size = new Size(300, 32),
             Margin = new Padding(0, 3, 4, 3)
         };
-        comboEcdhPrivateKeyStandard.Items.AddRange([PrivateKeyStandardPkcs8, PrivateKeyStandardSec1]);
+        comboEcdhPrivateKeyStandard.Items.AddRange([PrivateKeyStandardNamedCurve, PrivateKeyStandardSec1]);
         comboEcdhPrivateKeyStandard.SelectedIndex = 0;
         btnConvertEcdhPrivateKeyStandard = new Button
         {
