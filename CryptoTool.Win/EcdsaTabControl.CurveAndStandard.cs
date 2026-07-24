@@ -83,6 +83,36 @@ public partial class EcdsaTabControl
 
     #region ECDSA 密钥存储标准转换按钮
 
+    private bool TryConvertPrivateKeyStandard()
+    {
+        if (string.IsNullOrWhiteSpace(_privateKeyPem)) return false;
+
+        string pem = ConvertDisplayToPem(_privateKeyPem, true);
+        ECPrivateKeyParameters priv = EcdsaKeyHelper.ImportPrivateKeyPem(pem);
+        _privateKeyPem = ExportPrivateKeyByStandard(priv);
+        textPrivateKey.Text = FormatKeyForDisplay(_privateKeyPem, GetCurrentOutputFormat());
+
+        string standard = comboPrivateKeyStandard.SelectedItem?.ToString() ?? PrivateKeyStandardSec1;
+        AppendValidationResult($"私钥已转换为 {standard}", Color.Gray);
+        SetStatus($"私钥存储标准转换完成 - {standard}");
+        return true;
+    }
+
+    private bool TryConvertPublicKeyStandard()
+    {
+        if (string.IsNullOrWhiteSpace(_publicKeyPem)) return false;
+
+        string pem = ConvertDisplayToPem(_publicKeyPem, false);
+        ECPublicKeyParameters pub = EcdsaKeyHelper.ImportPublicKeyPem(pem);
+        _publicKeyPem = ExportPublicKeyByStandard(pub);
+        textPublicKey.Text = FormatKeyForDisplay(_publicKeyPem, GetCurrentOutputFormat());
+
+        string standard = comboPublicKeyStandard.SelectedItem?.ToString() ?? PublicKeyStandardSpecifiedCurve;
+        AppendValidationResult($"公钥已转换为 {standard}", Color.Gray);
+        SetStatus($"公钥存储标准转换完成 - {standard}");
+        return true;
+    }
+
     private void BtnConvertPrivateKeyStandard_Click(object? sender, EventArgs e)
     {
         try
@@ -94,14 +124,7 @@ public partial class EcdsaTabControl
                 return;
             }
 
-            string pem = ConvertDisplayToPem(_privateKeyPem, true);
-            ECPrivateKeyParameters priv = EcdsaKeyHelper.ImportPrivateKeyPem(pem);
-            _privateKeyPem = ExportPrivateKeyByStandard(priv);
-            textPrivateKey.Text = FormatKeyForDisplay(_privateKeyPem, GetCurrentOutputFormat());
-
-            string standard = comboPrivateKeyStandard.SelectedItem?.ToString() ?? PrivateKeyStandardSec1;
-            AppendValidationResult($"私钥已转换为 {standard}", Color.Gray);
-            SetStatus($"私钥存储标准转换完成 - {standard}");
+            TryConvertPrivateKeyStandard();
         }
         catch (Exception ex)
         {
@@ -122,20 +145,37 @@ public partial class EcdsaTabControl
                 return;
             }
 
-            string pem = ConvertDisplayToPem(_publicKeyPem, false);
-            ECPublicKeyParameters pub = EcdsaKeyHelper.ImportPublicKeyPem(pem);
-            _publicKeyPem = ExportPublicKeyByStandard(pub);
-            textPublicKey.Text = FormatKeyForDisplay(_publicKeyPem, GetCurrentOutputFormat());
-
-            string standard = comboPublicKeyStandard.SelectedItem?.ToString() ?? PublicKeyStandardSpecifiedCurve;
-            AppendValidationResult($"公钥已转换为 {standard}", Color.Gray);
-            SetStatus($"公钥存储标准转换完成 - {standard}");
+            TryConvertPublicKeyStandard();
         }
         catch (Exception ex)
         {
             MessageBox.Show($"转换公钥存储标准失败：{ex.Message}", "错误",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
             SetStatus("公钥存储标准转换失败");
+        }
+    }
+
+    private void ComboPrivateKeyStandard_SelectedIndexChanged(object? sender, EventArgs e)
+    {
+        try
+        {
+            TryConvertPrivateKeyStandard();
+        }
+        catch
+        {
+            // 下拉框选项变化时仅静默转换已存在的密钥，避免弹窗干扰操作
+        }
+    }
+
+    private void ComboPublicKeyStandard_SelectedIndexChanged(object? sender, EventArgs e)
+    {
+        try
+        {
+            TryConvertPublicKeyStandard();
+        }
+        catch
+        {
+            // 下拉框选项变化时仅静默转换已存在的密钥，避免弹窗干扰操作
         }
     }
 
@@ -266,10 +306,10 @@ public partial class EcdsaTabControl
         };
         var lbl = new Label
         {
-            Text = "私钥存储标准：",
+            Text = "私钥编码标准2：",
             AutoSize = false,
-            Size = new Size(130, 32),
-            TextAlign = ContentAlignment.MiddleLeft,
+            Size = new Size(150, 24),
+            TextAlign = ContentAlignment.MiddleRight,
             Margin = new Padding(0, 3, 4, 3)
         };
         comboEcdhPrivateKeyStandard = new ComboBox
@@ -309,10 +349,10 @@ public partial class EcdsaTabControl
         };
         var lbl = new Label
         {
-            Text = "公钥存储标准：",
+            Text = "公钥编码标准2：",
             AutoSize = false,
-            Size = new Size(130, 32),
-            TextAlign = ContentAlignment.MiddleLeft,
+            Size = new Size(150, 24),
+            TextAlign = ContentAlignment.MiddleRight,
             Margin = new Padding(0, 3, 4, 3)
         };
         comboEcdhPublicKeyStandard = new ComboBox
@@ -354,9 +394,9 @@ public partial class EcdsaTabControl
         {
             Text = "椭圆曲线：",
             AutoSize = false,
-            Size = new Size(200, 32),
-            TextAlign = ContentAlignment.MiddleLeft,
-            Margin = new Padding(0, 3, 8, 3)
+            Size = new Size(150, 24),
+            TextAlign = ContentAlignment.MiddleRight,
+            Margin = new Padding(0, 3, 4, 3)
         };
         comboEcdhCategory = new ComboBox
         {
@@ -388,6 +428,17 @@ public partial class EcdsaTabControl
     }
 
     #endregion
+
+
+
+
+
+
+
+
+
+
+
 
     #region 上半部分：ECDSA 面板曲线与标准 UI（设计器拆分）
 
@@ -469,19 +520,20 @@ public partial class EcdsaTabControl
         panelPrivateKeyStandardRow.TabIndex = 7;
 
         // labelPrivateKeyStandard
-        labelPrivateKeyStandard.AutoSize = true;
-        labelPrivateKeyStandard.Location = new Point(9, 7);
-        labelPrivateKeyStandard.Margin = new Padding(3, 7, 3, 3);
+        labelPrivateKeyStandard.AutoSize = false;
+        labelPrivateKeyStandard.Location = new Point(9, 3);
+        labelPrivateKeyStandard.Margin = new Padding(3, 3, 4, 3);
         labelPrivateKeyStandard.Name = "labelPrivateKeyStandard";
-        labelPrivateKeyStandard.Size = new Size(118, 24);
+        labelPrivateKeyStandard.Size = new Size(150, 24);
         labelPrivateKeyStandard.TabIndex = 0;
-        labelPrivateKeyStandard.Text = "私钥存储标准：";
+        labelPrivateKeyStandard.Text = "私钥编码标准1：";
+        labelPrivateKeyStandard.TextAlign = ContentAlignment.MiddleRight;
 
         // comboPrivateKeyStandard
         comboPrivateKeyStandard.DropDownStyle = ComboBoxStyle.DropDownList;
         comboPrivateKeyStandard.FormattingEnabled = true;
-        comboPrivateKeyStandard.Location = new Point(133, 3);
-        comboPrivateKeyStandard.Margin = new Padding(0, 3, 8, 3);
+        comboPrivateKeyStandard.Location = new Point(163, 3);
+        comboPrivateKeyStandard.Margin = new Padding(0, 3, 4, 3);
         comboPrivateKeyStandard.Name = "comboPrivateKeyStandard";
         comboPrivateKeyStandard.Size = new Size(420, 32);
         comboPrivateKeyStandard.TabIndex = 1;
@@ -496,6 +548,7 @@ public partial class EcdsaTabControl
         btnConvertPrivateKeyStandard.TabIndex = 2;
         btnConvertPrivateKeyStandard.Text = "转换";
         btnConvertPrivateKeyStandard.Click += BtnConvertPrivateKeyStandard_Click;
+        comboPrivateKeyStandard.SelectedIndexChanged += ComboPrivateKeyStandard_SelectedIndexChanged;
 
         // panelPublicKeyStandardRow
         panelPublicKeyStandardRow.AutoSize = true;
@@ -509,19 +562,20 @@ public partial class EcdsaTabControl
         panelPublicKeyStandardRow.TabIndex = 8;
 
         // labelPublicKeyStandard
-        labelPublicKeyStandard.AutoSize = true;
-        labelPublicKeyStandard.Location = new Point(9, 7);
-        labelPublicKeyStandard.Margin = new Padding(3, 7, 3, 3);
+        labelPublicKeyStandard.AutoSize = false;
+        labelPublicKeyStandard.Location = new Point(9, 3);
+        labelPublicKeyStandard.Margin = new Padding(3, 3, 4, 3);
         labelPublicKeyStandard.Name = "labelPublicKeyStandard";
-        labelPublicKeyStandard.Size = new Size(118, 24);
+        labelPublicKeyStandard.Size = new Size(150, 24);
         labelPublicKeyStandard.TabIndex = 0;
-        labelPublicKeyStandard.Text = "公钥存储标准：";
+        labelPublicKeyStandard.Text = "公钥编码标准1：";
+        labelPublicKeyStandard.TextAlign = ContentAlignment.MiddleRight;
 
         // comboPublicKeyStandard
         comboPublicKeyStandard.DropDownStyle = ComboBoxStyle.DropDownList;
         comboPublicKeyStandard.FormattingEnabled = true;
-        comboPublicKeyStandard.Location = new Point(133, 3);
-        comboPublicKeyStandard.Margin = new Padding(0, 3, 8, 3);
+        comboPublicKeyStandard.Location = new Point(163, 3);
+        comboPublicKeyStandard.Margin = new Padding(0, 3, 4, 3);
         comboPublicKeyStandard.Name = "comboPublicKeyStandard";
         comboPublicKeyStandard.Size = new Size(420, 32);
         comboPublicKeyStandard.TabIndex = 1;
@@ -536,6 +590,7 @@ public partial class EcdsaTabControl
         btnConvertPublicKeyStandard.TabIndex = 2;
         btnConvertPublicKeyStandard.Text = "转换";
         btnConvertPublicKeyStandard.Click += BtnConvertPublicKeyStandard_Click;
+        comboPublicKeyStandard.SelectedIndexChanged += ComboPublicKeyStandard_SelectedIndexChanged;
 
         // panelCurveContainer
         panelCurveContainer.Controls.Add(panelCurveRow);
@@ -558,13 +613,13 @@ public partial class EcdsaTabControl
         panelCurveRow.WrapContents = false;
 
         // labelCurve
-        labelCurve.Location = new Point(34, 5);
-        labelCurve.Margin = new Padding(34, 3, 2, 3);
+        labelCurve.Location = new Point(9, 3);
+        labelCurve.Margin = new Padding(3, 3, 4, 3);
         labelCurve.Name = "labelCurve";
-        labelCurve.Size = new Size(200, 32);
+        labelCurve.Size = new Size(150, 24);
         labelCurve.TabIndex = 0;
         labelCurve.Text = "椭圆曲线：";
-        labelCurve.TextAlign = ContentAlignment.MiddleLeft;
+        labelCurve.TextAlign = ContentAlignment.MiddleRight;
         labelCurve.Click += LabelCurve_Click;
 
         // comboCategory

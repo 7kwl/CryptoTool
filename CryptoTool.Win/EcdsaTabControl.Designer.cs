@@ -815,21 +815,21 @@ namespace CryptoTool.Win
             // 
             // labelOutputFormat
             // 
-            labelOutputFormat.Location = new Point(40, 3);
-            labelOutputFormat.Margin = new Padding(34, 3, 2, 3);
+            labelOutputFormat.Location = new Point(9, 3);
+            labelOutputFormat.Margin = new Padding(3, 3, 4, 3);
             labelOutputFormat.Name = "labelOutputFormat";
-            labelOutputFormat.Size = new Size(100, 32);
+            labelOutputFormat.Size = new Size(150, 24);
             labelOutputFormat.TabIndex = 2;
             labelOutputFormat.Text = "输出格式：";
-            labelOutputFormat.TextAlign = ContentAlignment.MiddleLeft;
+            labelOutputFormat.TextAlign = ContentAlignment.MiddleRight;
             // 
             // comboOutputFormat
             // 
             comboOutputFormat.DropDownStyle = ComboBoxStyle.DropDownList;
             comboOutputFormat.FormattingEnabled = true;
             comboOutputFormat.Items.AddRange(new object[] { "PEM", "Base64", "Hex大写", "Hex小写" });
-            comboOutputFormat.Location = new Point(142, 3);
-            comboOutputFormat.Margin = new Padding(0, 3, 8, 3);
+            comboOutputFormat.Location = new Point(163, 3);
+            comboOutputFormat.Margin = new Padding(0, 3, 4, 3);
             comboOutputFormat.Name = "comboOutputFormat";
             comboOutputFormat.Size = new Size(147, 32);
             comboOutputFormat.TabIndex = 3;
@@ -850,21 +850,21 @@ namespace CryptoTool.Win
             // 
             // labelKeyType
             // 
-            labelKeyType.Location = new Point(40, 3);
-            labelKeyType.Margin = new Padding(34, 3, 2, 3);
+            labelKeyType.Location = new Point(9, 3);
+            labelKeyType.Margin = new Padding(3, 3, 4, 3);
             labelKeyType.Name = "labelKeyType";
-            labelKeyType.Size = new Size(100, 34);
+            labelKeyType.Size = new Size(150, 24);
             labelKeyType.TabIndex = 4;
             labelKeyType.Text = "密钥类型：";
-            labelKeyType.TextAlign = ContentAlignment.MiddleLeft;
+            labelKeyType.TextAlign = ContentAlignment.MiddleRight;
             // 
             // radioPanel
             // 
             radioPanel.AutoSize = true;
             radioPanel.Controls.Add(radioPrivateKey);
             radioPanel.Controls.Add(radioPublicKey);
-            radioPanel.Location = new Point(142, 3);
-            radioPanel.Margin = new Padding(0, 3, 8, 3);
+            radioPanel.Location = new Point(163, 3);
+            radioPanel.Margin = new Padding(0, 3, 4, 3);
             radioPanel.Name = "radioPanel";
             radioPanel.Size = new Size(157, 34);
             radioPanel.TabIndex = 5;

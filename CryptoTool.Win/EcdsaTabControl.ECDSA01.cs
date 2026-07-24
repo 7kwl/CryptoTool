@@ -221,8 +221,8 @@ namespace CryptoTool.Win
                 {
                     Text = "密钥模型：",
                     AutoSize = false,
-                    Size = new Size(100, 32),
-                    TextAlign = ContentAlignment.MiddleLeft,
+                    Size = new Size(150, 24),
+                    TextAlign = ContentAlignment.MiddleRight,
                     Margin = new Padding(0, 3, 4, 3)
                 };
                 comboEcdhMode = new ComboBox
@@ -277,8 +277,8 @@ namespace CryptoTool.Win
                 {
                     Text = "明文编码：",
                     AutoSize = false,
-                    Size = new Size(100, 32),
-                    TextAlign = ContentAlignment.MiddleLeft,
+                    Size = new Size(150, 24),
+                    TextAlign = ContentAlignment.MiddleRight,
                     Margin = new Padding(0, 3, 4, 3)
                 };
                 comboEcdhEncoding = new ComboBox
