@@ -794,9 +794,6 @@ namespace CryptoTool.Win
             panelRightSettings.AutoSize = true;
             panelRightSettings.Controls.Add(panelFormatRow);
             panelRightSettings.Controls.Add(panelKeyTypeRow);
-            panelRightSettings.Controls.Add(panelPrivateKeyStandardRow);
-            panelRightSettings.Controls.Add(panelPublicKeyStandardRow);
-            panelRightSettings.Controls.Add(panelCurveContainer);
             panelRightSettings.Dock = DockStyle.Top;
             panelRightSettings.FlowDirection = FlowDirection.TopDown;
             panelRightSettings.Location = new Point(183, 3);
@@ -907,163 +904,10 @@ namespace CryptoTool.Win
             btnConvertKey.Text = "转换";
             btnConvertKey.Click += BtnConvertKey_Click;
             // ---- 第3行: 私钥存储标准 (SEC1 / PKCS#8) ----
-            // 
-            // panelPrivateKeyStandardRow
-            // 
-            panelPrivateKeyStandardRow.AutoSize = true;
-            panelPrivateKeyStandardRow.Controls.Add(labelPrivateKeyStandard);
-            panelPrivateKeyStandardRow.Controls.Add(comboPrivateKeyStandard);
-            panelPrivateKeyStandardRow.Controls.Add(btnConvertPrivateKeyStandard);
-            panelPrivateKeyStandardRow.Location = new Point(3, 93);
-            panelPrivateKeyStandardRow.Name = "panelPrivateKeyStandardRow";
-            panelPrivateKeyStandardRow.Padding = new Padding(6, 0, 6, 0);
-            panelPrivateKeyStandardRow.Size = new Size(450, 38);
-            panelPrivateKeyStandardRow.TabIndex = 7;
-            // 
-            // labelPrivateKeyStandard
-            // 
-            labelPrivateKeyStandard.AutoSize = true;
-            labelPrivateKeyStandard.Location = new Point(9, 7);
-            labelPrivateKeyStandard.Margin = new Padding(3, 7, 3, 3);
-            labelPrivateKeyStandard.Name = "labelPrivateKeyStandard";
-            labelPrivateKeyStandard.Size = new Size(118, 24);
-            labelPrivateKeyStandard.TabIndex = 0;
-            labelPrivateKeyStandard.Text = "私钥存储标准：";
-            // 
-            // comboPrivateKeyStandard
-            // 
-            comboPrivateKeyStandard.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboPrivateKeyStandard.FormattingEnabled = true;
-            comboPrivateKeyStandard.Location = new Point(133, 3);
-            comboPrivateKeyStandard.Margin = new Padding(0, 3, 8, 3);
-            comboPrivateKeyStandard.Name = "comboPrivateKeyStandard";
-            comboPrivateKeyStandard.Size = new Size(420, 32);
-            comboPrivateKeyStandard.TabIndex = 1;
-            // 
-            // btnConvertPrivateKeyStandard
-            // 
-            btnConvertPrivateKeyStandard.AutoSize = true;
-            btnConvertPrivateKeyStandard.Location = new Point(361, 3);
-            btnConvertPrivateKeyStandard.Margin = new Padding(0, 3, 4, 3);
-            btnConvertPrivateKeyStandard.MinimumSize = new Size(80, 26);
-            btnConvertPrivateKeyStandard.Name = "btnConvertPrivateKeyStandard";
-            btnConvertPrivateKeyStandard.Size = new Size(80, 34);
-            btnConvertPrivateKeyStandard.TabIndex = 2;
-            btnConvertPrivateKeyStandard.Text = "转换";
-            btnConvertPrivateKeyStandard.Click += BtnConvertPrivateKeyStandard_Click;
             // ---- 第3.5行: 公钥存储标准 (RFC 5480/namedCurve / specifiedCurve) ----
-            // 
-            // panelPublicKeyStandardRow
-            // 
-            panelPublicKeyStandardRow.AutoSize = true;
-            panelPublicKeyStandardRow.Controls.Add(labelPublicKeyStandard);
-            panelPublicKeyStandardRow.Controls.Add(comboPublicKeyStandard);
-            panelPublicKeyStandardRow.Controls.Add(btnConvertPublicKeyStandard);
-            panelPublicKeyStandardRow.Location = new Point(3, 93);
-            panelPublicKeyStandardRow.Name = "panelPublicKeyStandardRow";
-            panelPublicKeyStandardRow.Padding = new Padding(6, 0, 6, 0);
-            panelPublicKeyStandardRow.Size = new Size(450, 38);
-            panelPublicKeyStandardRow.TabIndex = 8;
-            // 
-            // labelPublicKeyStandard
-            // 
-            labelPublicKeyStandard.AutoSize = true;
-            labelPublicKeyStandard.Location = new Point(9, 7);
-            labelPublicKeyStandard.Margin = new Padding(3, 7, 3, 3);
-            labelPublicKeyStandard.Name = "labelPublicKeyStandard";
-            labelPublicKeyStandard.Size = new Size(118, 24);
-            labelPublicKeyStandard.TabIndex = 0;
-            labelPublicKeyStandard.Text = "公钥存储标准：";
-            // 
-            // comboPublicKeyStandard
-            // 
-            comboPublicKeyStandard.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboPublicKeyStandard.FormattingEnabled = true;
-            comboPublicKeyStandard.Location = new Point(133, 3);
-            comboPublicKeyStandard.Margin = new Padding(0, 3, 8, 3);
-            comboPublicKeyStandard.Name = "comboPublicKeyStandard";
-            comboPublicKeyStandard.Size = new Size(420, 32);
-            comboPublicKeyStandard.TabIndex = 1;
-            // 
-            // btnConvertPublicKeyStandard
-            // 
-            btnConvertPublicKeyStandard.AutoSize = true;
-            btnConvertPublicKeyStandard.Location = new Point(361, 3);
-            btnConvertPublicKeyStandard.Margin = new Padding(0, 3, 4, 3);
-            btnConvertPublicKeyStandard.MinimumSize = new Size(80, 26);
-            btnConvertPublicKeyStandard.Name = "btnConvertPublicKeyStandard";
-            btnConvertPublicKeyStandard.Size = new Size(80, 34);
-            btnConvertPublicKeyStandard.TabIndex = 2;
-            btnConvertPublicKeyStandard.Text = "转换";
-            btnConvertPublicKeyStandard.Click += BtnConvertPublicKeyStandard_Click;
             // ---- 第4行: 椭圆曲线选择 (类别 → 曲线名) ----
-            // 
-            // panelCurveContainer
-            // 
-            panelCurveContainer.Controls.Add(panelCurveRow);
-            panelCurveContainer.Location = new Point(3, 93);
-            panelCurveContainer.Name = "panelCurveContainer";
-            panelCurveContainer.Padding = new Padding(6, 0, 6, 0);
-            panelCurveContainer.Size = new Size(920, 38);
-            panelCurveContainer.TabIndex = 2;
-            // 
-            // panelCurveRow
-            // 
-            panelCurveRow.Controls.Add(labelCurve);
-            panelCurveRow.Controls.Add(comboCategory);
-            panelCurveRow.Controls.Add(lblArrow);
-            panelCurveRow.Controls.Add(comboCurve);
-            panelCurveRow.Location = new Point(6, 0);
-            panelCurveRow.Name = "panelCurveRow";
-            panelCurveRow.Padding = new Padding(0, 2, 0, 2);
-            panelCurveRow.Size = new Size(900, 38);
-            panelCurveRow.TabIndex = 1;
-            panelCurveRow.WrapContents = false;
-            // 
-            // labelCurve
-            // 
-            labelCurve.Location = new Point(34, 5);
-            labelCurve.Margin = new Padding(34, 3, 2, 3);
-            labelCurve.Name = "labelCurve";
-            labelCurve.Size = new Size(200, 32);
-            labelCurve.TabIndex = 0;
-            labelCurve.Text = "椭圆曲线：";
-            labelCurve.TextAlign = ContentAlignment.MiddleLeft;
-            labelCurve.Click += LabelCurve_Click;
-            // 
-            // comboCategory
-            // 
-            comboCategory.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboCategory.FormattingEnabled = true;
-            comboCategory.Location = new Point(136, 5);
-            comboCategory.Margin = new Padding(0, 3, 4, 3);
-            comboCategory.Name = "comboCategory";
-            comboCategory.Size = new Size(183, 32);
-            comboCategory.TabIndex = 1;
-            comboCategory.SelectedIndexChanged += ComboCategory_SelectedIndexChanged;
-            // 
-            // lblArrow
-            // 
-            lblArrow.Location = new Point(327, 5);
-            lblArrow.Margin = new Padding(4, 3, 4, 3);
-            lblArrow.Name = "lblArrow";
-            lblArrow.Padding = new Padding(4, 0, 4, 0);
-            lblArrow.Size = new Size(36, 32);
-            lblArrow.TabIndex = 2;
-            lblArrow.Text = "→";
-            lblArrow.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // comboCurve
-            // 
-            comboCurve.DisplayMember = "Value";
-            comboCurve.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboCurve.FormattingEnabled = true;
-            comboCurve.Location = new Point(367, 5);
-            comboCurve.Margin = new Padding(0, 3, 4, 3);
-            comboCurve.Name = "comboCurve";
-            comboCurve.Size = new Size(330, 32);
-            comboCurve.TabIndex = 3;
-            comboCurve.ValueMember = "Key";
+            // 以上三行初始化已拆分到 EcdsaTabControl.CurveAndStandard.cs
+            InitializeEcdsaCurveAndStandardRows();
             // ==================================================
             // 结果显示区 - tableKeyActions 第2行
             //   left (groupComputeResult): 计算结果文本框

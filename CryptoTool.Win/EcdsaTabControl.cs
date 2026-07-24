@@ -20,12 +20,6 @@ namespace CryptoTool.Win
         private string _publicKeyPem = string.Empty;
         private string _lastSignHashAlgorithm = string.Empty;
 
-        private const string PrivateKeyStandardSec1 = "SEC1/RFC 5915（长编码 / specifiedCurve）";
-        private const string PrivateKeyStandardPkcs8 = "PKCS#8 / RFC 5958（短编码 / namedCurve）";
-
-        private const string PublicKeyStandardNamedCurve = "RFC 5480/namedCurve";
-        private const string PublicKeyStandardSpecifiedCurve = "RFC 5480/specifiedCurve";
-
         private Dictionary<string, (string Icon, List<KeyValuePair<string, string>> Curves)> _allCurveData = [];
 
 
@@ -343,131 +337,13 @@ namespace CryptoTool.Win
             SetStatus("ECDH 输入/输出已清空");
         }
 
-        private void BtnConvertEcdhPrivateKeyStandard_Click(object? sender, EventArgs e)
-        {
-            try
-            {
-                string standard = comboEcdhPrivateKeyStandard.SelectedItem?.ToString() ?? PrivateKeyStandardPkcs8;
-                int convertedCount = 0;
-                if (ConvertEcdhPrivateKey(textEcdhAlicePrivate, standard)) convertedCount++;
-                if (ConvertEcdhPrivateKey(textEcdhBobPrivate, standard)) convertedCount++;
-
-                if (convertedCount == 0)
-                {
-                    MessageBox.Show("当前没有 Alice 或 Bob 的私钥内容可转换，请先生成或导入私钥。", "提示",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-
-                AppendValidationResult($"✅ {convertedCount} 组私钥已转换为 {standard}", Color.Gray);
-                SetStatus($"Alice/Bob 私钥存储标准转换完成 - {standard}");
-            }
-            catch (Exception ex)
-            {
-                AppendValidationResult($"❌ ECDH 私钥标准转换失败: {ex.Message}", Color.Red);
-                SetStatus("ECDH 私钥标准转换失败");
-            }
-        }
-
-        private bool ConvertEcdhPrivateKey(TextBox textBox, string standard)
-        {
-            if (string.IsNullOrWhiteSpace(textBox.Text))
-                return false;
-
-            string pem = ConvertDisplayToPem(textBox.Text.Trim(), true);
-            var priv = EcdsaKeyHelper.ImportPrivateKeyPem(pem);
-            string converted = ExportPrivateKeyByStandard(priv, standard);
-            textBox.Text = FormatKeyForDisplay(converted, UIOutputFormat.PEM);
-            return true;
-        }
-
-        private void BtnConvertEcdhPublicKeyStandard_Click(object? sender, EventArgs e)
-        {
-            try
-            {
-                string standard = comboEcdhPublicKeyStandard.SelectedItem?.ToString() ?? PublicKeyStandardNamedCurve;
-                int convertedCount = 0;
-                if (ConvertEcdhPublicKey(textEcdhAlicePublic, standard)) convertedCount++;
-                if (ConvertEcdhPublicKey(textEcdhBobPublic, standard)) convertedCount++;
-
-                if (convertedCount == 0)
-                {
-                    MessageBox.Show("当前没有 Alice 或 Bob 的公钥内容可转换，请先生成或导入公钥。", "提示",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-
-                AppendValidationResult($"✅ {convertedCount} 组公钥已转换为 {standard}", Color.Gray);
-                SetStatus($"Alice/Bob 公钥存储标准转换完成 - {standard}");
-            }
-            catch (Exception ex)
-            {
-                AppendValidationResult($"❌ ECDH 公钥标准转换失败: {ex.Message}", Color.Red);
-                SetStatus("ECDH 公钥标准转换失败");
-            }
-        }
-
-        private bool ConvertEcdhPublicKey(TextBox textBox, string standard)
-        {
-            if (string.IsNullOrWhiteSpace(textBox.Text))
-                return false;
-
-            string pem = ConvertDisplayToPem(textBox.Text.Trim(), false);
-            var pub = EcdsaKeyHelper.ImportPublicKeyPem(pem);
-            string converted = ExportPublicKeyByStandard(pub, standard);
-            textBox.Text = FormatKeyForDisplay(converted, UIOutputFormat.PEM);
-            return true;
-        }
-
-        private void ComboEcdhPrivateKeyStandard_SelectedIndexChanged(object? sender, EventArgs e)
-        {
-            try
-            {
-                string standard = comboEcdhPrivateKeyStandard.SelectedItem?.ToString() ?? PrivateKeyStandardPkcs8;
-                ConvertEcdhPrivateKey(textEcdhAlicePrivate, standard);
-                ConvertEcdhPrivateKey(textEcdhBobPrivate, standard);
-            }
-            catch
-            {
-                // 下拉框选项变化时仅静默转换已存在的密钥，避免弹窗干扰操作
-            }
-        }
-
-        private void ComboEcdhPublicKeyStandard_SelectedIndexChanged(object? sender, EventArgs e)
-        {
-            try
-            {
-                string standard = comboEcdhPublicKeyStandard.SelectedItem?.ToString() ?? PublicKeyStandardNamedCurve;
-                ConvertEcdhPublicKey(textEcdhAlicePublic, standard);
-                ConvertEcdhPublicKey(textEcdhBobPublic, standard);
-            }
-            catch
-            {
-                // 下拉框选项变化时仅静默转换已存在的密钥，避免弹窗干扰操作
-            }
-        }
-
         #endregion
 
 
-        #region 初始化与级联下拉框逻辑
+        #region 初始化默认值
         private void InitializeDefaults()
         {
-            _allCurveData = EcdsaCurveNames.GetAllCurvesByCategory();
-
-            comboCategory.DisplayMember = "Text";
-            comboCategory.ValueMember = "Value";
-            foreach (var cat in _allCurveData)
-            {
-                comboCategory.Items.Add(new
-                {
-                    Text = $"{cat.Value.Icon} {cat.Key}",
-                    Value = cat.Key
-                });
-            }
-
-            if (comboCategory.Items.Count > 0)
-                comboCategory.SelectedIndex = 0;
+            InitializeEcdsaCurveAndStandardControls();
 
             comboHashAlgorithm.Items.Clear();
             comboHashAlgorithm.Items.AddRange(["SHA-224", "SHA-256", "SHA-384", "SHA-512", "SHA3-224", "SHA3-256", "SHA3-384", "SHA3-512"]);
@@ -481,14 +357,6 @@ namespace CryptoTool.Win
             comboSignatureFormat.Items.AddRange(["Base64", "Hex"]);
             comboSignatureFormat.SelectedIndex = 0;
 
-            comboPrivateKeyStandard.Items.Clear();
-            comboPrivateKeyStandard.Items.AddRange([PrivateKeyStandardPkcs8, PrivateKeyStandardSec1]);
-            comboPrivateKeyStandard.SelectedIndex = 0;
-
-            comboPublicKeyStandard.Items.Clear();
-            comboPublicKeyStandard.Items.AddRange([PublicKeyStandardNamedCurve, PublicKeyStandardSpecifiedCurve]);
-            comboPublicKeyStandard.SelectedIndex = 0;
-
             radioPrivateKey.Checked = true;
 
             InitializeEncryptDefaults();
@@ -497,75 +365,6 @@ namespace CryptoTool.Win
             textKeyResult.Text = "从私钥提取/曲线检测：\n等待操作...";
             textKeyResult.ForeColor = Color.Gray;
         }
-
-        private void ComboCategory_SelectedIndexChanged(object? sender, EventArgs e)
-        {
-            if (sender == null || comboCategory.SelectedItem == null)
-                return;
-
-            dynamic selectedItem = comboCategory.SelectedItem;
-            string categoryKey = selectedItem.Value;
-
-            if (!_allCurveData.TryGetValue(categoryKey, out var categoryData))
-                return;
-
-            comboCurve.Items.Clear();
-            foreach (var c in categoryData.Curves)
-                comboCurve.Items.Add(c);
-
-            if (comboCurve.Items.Count > 0)
-                comboCurve.SelectedIndex = 0;
-        }
-
-        private string GetSelectedCurve()
-        {
-            if (comboCurve.SelectedItem is KeyValuePair<string, string> sel && !string.IsNullOrEmpty(sel.Key))
-                return sel.Key;
-            return "prime256v1";
-        }
-
-        /// <summary>
-        /// 根据下拉框选项将 EC 私钥导出为 SEC1 或 PKCS#8
-        /// </summary>
-        private string ExportPrivateKeyByStandard(ECPrivateKeyParameters priv)
-        {
-            string standard = comboPrivateKeyStandard.SelectedItem?.ToString() ?? PrivateKeyStandardSec1;
-            return ExportPrivateKeyByStandard(priv, standard);
-        }
-
-        private string ExportPrivateKeyByStandard(ECPrivateKeyParameters priv, string standard)
-        {
-            if (standard == PrivateKeyStandardPkcs8)
-                return EcdsaKeyHelper.ExportPrivateKeyPemPkcs8(priv);
-
-            // SEC1/RFC 5915: 强制使用显式参数 (specifiedCurve)，避免 namedCurve 私钥被输出为短编码
-            var explicitParams = new ECDomainParameters(
-                priv.Parameters.Curve, priv.Parameters.G, priv.Parameters.N, priv.Parameters.H, priv.Parameters.GetSeed());
-            var explicitPriv = new ECPrivateKeyParameters(priv.D, explicitParams);
-            return EcdsaKeyHelper.ExportPrivateKeyPem(explicitPriv);
-        }
-
-        /// <summary>
-        /// 根据下拉框选项将 EC 公钥导出为 namedCurve 或 specifiedCurve
-        /// </summary>
-        private string ExportPublicKeyByStandard(ECPublicKeyParameters pub)
-        {
-            string standard = comboPublicKeyStandard.SelectedItem?.ToString() ?? PublicKeyStandardSpecifiedCurve;
-            return ExportPublicKeyByStandard(pub, standard);
-        }
-
-        private string ExportPublicKeyByStandard(ECPublicKeyParameters pub, string standard)
-        {
-            if (standard == PublicKeyStandardNamedCurve)
-                return EcdsaKeyHelper.ExportPublicKeyPemNamedCurve(pub);
-
-            // specifiedCurve: 强制使用显式参数，避免 namedCurve 导入后又被输出为 OID 格式
-            var explicitParams = new ECDomainParameters(
-                pub.Parameters.Curve, pub.Parameters.G, pub.Parameters.N, pub.Parameters.H, pub.Parameters.GetSeed());
-            var explicitPub = new ECPublicKeyParameters(pub.Q, explicitParams);
-            return EcdsaKeyHelper.ExportPublicKeyPem(explicitPub);
-        }
-
         #endregion
 
         #region 公共状态通知
@@ -853,62 +652,6 @@ namespace CryptoTool.Win
             {
                 MessageBox.Show($"格式转换失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 SetStatus("格式转换失败");
-            }
-        }
-
-        private void BtnConvertPrivateKeyStandard_Click(object? sender, EventArgs e)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(_privateKeyPem))
-                {
-                    MessageBox.Show("当前没有私钥内容可转换，请先生成或导入私钥。", "提示",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-
-                string pem = ConvertDisplayToPem(_privateKeyPem, true);
-                ECPrivateKeyParameters priv = EcdsaKeyHelper.ImportPrivateKeyPem(pem);
-                _privateKeyPem = ExportPrivateKeyByStandard(priv);
-                textPrivateKey.Text = FormatKeyForDisplay(_privateKeyPem, GetCurrentOutputFormat());
-
-                string standard = comboPrivateKeyStandard.SelectedItem?.ToString() ?? PrivateKeyStandardSec1;
-                AppendValidationResult($"私钥已转换为 {standard}", Color.Gray);
-                SetStatus($"私钥存储标准转换完成 - {standard}");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"转换私钥存储标准失败：{ex.Message}", "错误",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                SetStatus("私钥存储标准转换失败");
-            }
-        }
-
-        private void BtnConvertPublicKeyStandard_Click(object? sender, EventArgs e)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(_publicKeyPem))
-                {
-                    MessageBox.Show("当前没有公钥内容可转换，请先生成或导入公钥。", "提示",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-
-                string pem = ConvertDisplayToPem(_publicKeyPem, false);
-                ECPublicKeyParameters pub = EcdsaKeyHelper.ImportPublicKeyPem(pem);
-                _publicKeyPem = ExportPublicKeyByStandard(pub);
-                textPublicKey.Text = FormatKeyForDisplay(_publicKeyPem, GetCurrentOutputFormat());
-
-                string standard = comboPublicKeyStandard.SelectedItem?.ToString() ?? PublicKeyStandardSpecifiedCurve;
-                AppendValidationResult($"公钥已转换为 {standard}", Color.Gray);
-                SetStatus($"公钥存储标准转换完成 - {standard}");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"转换公钥存储标准失败：{ex.Message}", "错误",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                SetStatus("公钥存储标准转换失败");
             }
         }
 
@@ -1338,16 +1081,5 @@ namespace CryptoTool.Win
             return sb.ToString();
         }
         #endregion
-
-
-        private void LabelCurveHeader_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void LabelCurve_Click(object sender, EventArgs e)
-        {
-
-        }
     }
 }
