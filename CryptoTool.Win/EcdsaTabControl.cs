@@ -20,8 +20,8 @@ namespace CryptoTool.Win
         private string _publicKeyPem = string.Empty;
         private string _lastSignHashAlgorithm = string.Empty;
 
-        private const string PrivateKeyStandardSec1 = "SEC1/RFC 5915";
-        private const string PrivateKeyStandardPkcs8 = "PKCS#8 / RFC 5958";
+        private const string PrivateKeyStandardSec1 = "SEC1/RFC 5915（长编码 / specifiedCurve）";
+        private const string PrivateKeyStandardPkcs8 = "PKCS#8 / RFC 5958（短编码 / namedCurve）";
 
         private const string PublicKeyStandardNamedCurve = "RFC 5480/namedCurve";
         private const string PublicKeyStandardSpecifiedCurve = "RFC 5480/specifiedCurve";
@@ -377,7 +377,7 @@ namespace CryptoTool.Win
             comboSignatureFormat.SelectedIndex = 0;
 
             comboPrivateKeyStandard.Items.Clear();
-            comboPrivateKeyStandard.Items.AddRange([PrivateKeyStandardSec1, PrivateKeyStandardPkcs8]);
+            comboPrivateKeyStandard.Items.AddRange([PrivateKeyStandardPkcs8, PrivateKeyStandardSec1]);
             comboPrivateKeyStandard.SelectedIndex = 0;
 
             comboPublicKeyStandard.Items.Clear();
