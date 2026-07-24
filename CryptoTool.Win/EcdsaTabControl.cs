@@ -23,6 +23,9 @@ namespace CryptoTool.Win
         private const string PrivateKeyStandardSec1 = "SEC1/RFC 5915";
         private const string PrivateKeyStandardPkcs8 = "PKCS#8 / RFC 5958";
 
+        private const string PublicKeyStandardNamedCurve = "RFC 5480/namedCurve";
+        private const string PublicKeyStandardSpecifiedCurve = "RFC 5480/specifiedCurve";
+
         private Dictionary<string, (string Icon, List<KeyValuePair<string, string>> Curves)> _allCurveData = [];
 
 
@@ -377,6 +380,10 @@ namespace CryptoTool.Win
             comboPrivateKeyStandard.Items.AddRange([PrivateKeyStandardSec1, PrivateKeyStandardPkcs8]);
             comboPrivateKeyStandard.SelectedIndex = 0;
 
+            comboPublicKeyStandard.Items.Clear();
+            comboPublicKeyStandard.Items.AddRange([PublicKeyStandardNamedCurve, PublicKeyStandardSpecifiedCurve]);
+            comboPublicKeyStandard.SelectedIndex = 1;
+
             radioPrivateKey.Checked = true;
 
             InitializeEncryptDefaults();
@@ -422,6 +429,21 @@ namespace CryptoTool.Win
                 : EcdsaKeyHelper.ExportPrivateKeyPem(priv);
         }
 
+        /// <summary>
+        /// 根据下拉框选项将 EC 公钥导出为 namedCurve 或 specifiedCurve
+        /// </summary>
+        private string ExportPublicKeyByStandard(ECPublicKeyParameters pub)
+        {
+            if (comboPublicKeyStandard.SelectedItem?.ToString() == PublicKeyStandardNamedCurve)
+                return EcdsaKeyHelper.ExportPublicKeyPemNamedCurve(pub);
+
+            // specifiedCurve: 强制使用显式参数，避免 namedCurve 导入后又被输出为 OID 格式
+            var explicitParams = new ECDomainParameters(
+                pub.Parameters.Curve, pub.Parameters.G, pub.Parameters.N, pub.Parameters.H, pub.Parameters.GetSeed());
+            var explicitPub = new ECPublicKeyParameters(pub.Q, explicitParams);
+            return EcdsaKeyHelper.ExportPublicKeyPem(explicitPub);
+        }
+
         #endregion
 
         #region 公共状态通知
@@ -459,7 +481,7 @@ namespace CryptoTool.Win
                 var pub = (ECPublicKeyParameters)kp.Public;
 
                 _privateKeyPem = ExportPrivateKeyByStandard(priv);
-                _publicKeyPem = EcdsaKeyHelper.ExportPublicKeyPem(pub);
+                _publicKeyPem = ExportPublicKeyByStandard(pub);
 
                 RefreshKeyDisplay();
                 SetGenerateResult(curveName, "密钥对匹配（新生成）");
@@ -503,7 +525,7 @@ namespace CryptoTool.Win
                 var pub = EcdsaAlgorithm.GetPublicKey(priv);
 
                 _privateKeyPem = ExportPrivateKeyByStandard(priv);
-                _publicKeyPem = EcdsaKeyHelper.ExportPublicKeyPem(pub);
+                _publicKeyPem = ExportPublicKeyByStandard(pub);
 
                 RefreshKeyDisplay();
                 AppendKeyResult("✅ 密钥对匹配（从私钥提取）", Color.Green, GetSelectedCurve());
@@ -740,6 +762,34 @@ namespace CryptoTool.Win
             }
         }
 
+        private void BtnConvertPublicKeyStandard_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(_publicKeyPem))
+                {
+                    MessageBox.Show("当前没有公钥内容可转换，请先生成或导入公钥。", "提示",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                string pem = ConvertDisplayToPem(_publicKeyPem, false);
+                ECPublicKeyParameters pub = EcdsaKeyHelper.ImportPublicKeyPem(pem);
+                _publicKeyPem = ExportPublicKeyByStandard(pub);
+                textPublicKey.Text = FormatKeyForDisplay(_publicKeyPem, GetCurrentOutputFormat());
+
+                string standard = comboPublicKeyStandard.SelectedItem?.ToString() ?? PublicKeyStandardSpecifiedCurve;
+                AppendValidationResult($"公钥已转换为 {standard}", Color.Gray);
+                SetStatus($"公钥存储标准转换完成 - {standard}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"转换公钥存储标准失败：{ex.Message}", "错误",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                SetStatus("公钥存储标准转换失败");
+            }
+        }
+
         private static string DetectKeyFormat(string input)
         {
             if (input.Contains("BEGIN", StringComparison.OrdinalIgnoreCase) || input.Contains("END", StringComparison.OrdinalIgnoreCase))
@@ -828,7 +878,7 @@ namespace CryptoTool.Win
                 else
                 {
                     var pub = EcdsaKeyHelper.ImportPublicKeyPem(pem);
-                    _publicKeyPem = EcdsaKeyHelper.ExportPublicKeyPem(pub);
+                    _publicKeyPem = ExportPublicKeyByStandard(pub);
                     textPublicKey.Text = FormatKeyForDisplay(_publicKeyPem, fmt);
                 }
                 AppendValidationResult("新密钥已导入", Color.Gray);
@@ -926,7 +976,7 @@ namespace CryptoTool.Win
             {
                 string pem = ConvertDisplayToPem(c, false);
                 var pub = EcdsaKeyHelper.ImportPublicKeyPem(pem);
-                _publicKeyPem = EcdsaKeyHelper.ExportPublicKeyPem(pub);
+                _publicKeyPem = ExportPublicKeyByStandard(pub);
                 textPublicKey.Text = FormatKeyForDisplay(_publicKeyPem, GetCurrentOutputFormat());
                 SetStatus("公钥已从剪贴板粘贴");
             }
@@ -1127,7 +1177,7 @@ namespace CryptoTool.Win
             string t = keyText.Trim();
             if (t.Contains("-----BEGIN")) return t;
 
-            string stripped = new string(t.Where(c => !char.IsWhiteSpace(c)).ToArray());
+            string stripped = string.Concat(t.Where(c => !char.IsWhiteSpace(c)));
 
             // 尝试 Hex 解码
             if (stripped.Length % 2 == 0 && stripped.All(c => "0123456789abcdefABCDEF".Contains(c)))

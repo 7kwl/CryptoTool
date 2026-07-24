@@ -113,6 +113,10 @@ namespace CryptoTool.Win
             labelPrivateKeyStandard = new Label();
             comboPrivateKeyStandard = new ComboBox();
             btnConvertPrivateKeyStandard = new Button();
+            panelPublicKeyStandardRow = new FlowLayoutPanel();
+            labelPublicKeyStandard = new Label();
+            comboPublicKeyStandard = new ComboBox();
+            btnConvertPublicKeyStandard = new Button();
             panelCurveContainer = new Panel();
             panelCurveRow = new FlowLayoutPanel();
             labelCurve = new Label();
@@ -219,6 +223,7 @@ namespace CryptoTool.Win
             panelFormatRow.SuspendLayout();
             panelKeyTypeRow.SuspendLayout();
             panelPrivateKeyStandardRow.SuspendLayout();
+            panelPublicKeyStandardRow.SuspendLayout();
             radioPanel.SuspendLayout();
             panelCurveContainer.SuspendLayout();
             panelCurveRow.SuspendLayout();
@@ -780,8 +785,8 @@ namespace CryptoTool.Win
             btnClearAll.Text = "清空全部";
             btnClearAll.Click += BtnClearAll_Click;
             // --------------------------------------------------
-            // 右侧设置面板 (panelRightSettings) - 5行网格布局
-            //   输出格式行 | 密钥类型转换行 | 私钥存储标准行 | 曲线分类行 | 降级曲线行
+            // 右侧设置面板 (panelRightSettings) - 6行网格布局
+            //   输出格式行 | 密钥类型转换行 | 私钥存储标准行 | 公钥存储标准行 | 曲线分类行 | 降级曲线行
             // --------------------------------------------------
             // 
             // panelRightSettings
@@ -790,6 +795,7 @@ namespace CryptoTool.Win
             panelRightSettings.Controls.Add(panelFormatRow);
             panelRightSettings.Controls.Add(panelKeyTypeRow);
             panelRightSettings.Controls.Add(panelPrivateKeyStandardRow);
+            panelRightSettings.Controls.Add(panelPublicKeyStandardRow);
             panelRightSettings.Controls.Add(panelCurveContainer);
             panelRightSettings.Dock = DockStyle.Top;
             panelRightSettings.FlowDirection = FlowDirection.TopDown;
@@ -945,6 +951,51 @@ namespace CryptoTool.Win
             btnConvertPrivateKeyStandard.TabIndex = 2;
             btnConvertPrivateKeyStandard.Text = "转换";
             btnConvertPrivateKeyStandard.Click += BtnConvertPrivateKeyStandard_Click;
+            // ---- 第3.5行: 公钥存储标准 (RFC 5480/namedCurve / specifiedCurve) ----
+            // 
+            // panelPublicKeyStandardRow
+            // 
+            panelPublicKeyStandardRow.AutoSize = true;
+            panelPublicKeyStandardRow.Controls.Add(labelPublicKeyStandard);
+            panelPublicKeyStandardRow.Controls.Add(comboPublicKeyStandard);
+            panelPublicKeyStandardRow.Controls.Add(btnConvertPublicKeyStandard);
+            panelPublicKeyStandardRow.Location = new Point(3, 93);
+            panelPublicKeyStandardRow.Name = "panelPublicKeyStandardRow";
+            panelPublicKeyStandardRow.Padding = new Padding(6, 0, 6, 0);
+            panelPublicKeyStandardRow.Size = new Size(450, 38);
+            panelPublicKeyStandardRow.TabIndex = 8;
+            // 
+            // labelPublicKeyStandard
+            // 
+            labelPublicKeyStandard.AutoSize = true;
+            labelPublicKeyStandard.Location = new Point(9, 7);
+            labelPublicKeyStandard.Margin = new Padding(3, 7, 3, 3);
+            labelPublicKeyStandard.Name = "labelPublicKeyStandard";
+            labelPublicKeyStandard.Size = new Size(118, 24);
+            labelPublicKeyStandard.TabIndex = 0;
+            labelPublicKeyStandard.Text = "公钥存储标准：";
+            // 
+            // comboPublicKeyStandard
+            // 
+            comboPublicKeyStandard.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboPublicKeyStandard.FormattingEnabled = true;
+            comboPublicKeyStandard.Location = new Point(133, 3);
+            comboPublicKeyStandard.Margin = new Padding(0, 3, 8, 3);
+            comboPublicKeyStandard.Name = "comboPublicKeyStandard";
+            comboPublicKeyStandard.Size = new Size(220, 32);
+            comboPublicKeyStandard.TabIndex = 1;
+            // 
+            // btnConvertPublicKeyStandard
+            // 
+            btnConvertPublicKeyStandard.AutoSize = true;
+            btnConvertPublicKeyStandard.Location = new Point(361, 3);
+            btnConvertPublicKeyStandard.Margin = new Padding(0, 3, 4, 3);
+            btnConvertPublicKeyStandard.MinimumSize = new Size(80, 26);
+            btnConvertPublicKeyStandard.Name = "btnConvertPublicKeyStandard";
+            btnConvertPublicKeyStandard.Size = new Size(80, 34);
+            btnConvertPublicKeyStandard.TabIndex = 2;
+            btnConvertPublicKeyStandard.Text = "转换";
+            btnConvertPublicKeyStandard.Click += BtnConvertPublicKeyStandard_Click;
             // ---- 第4行: 椭圆曲线选择 (类别 → 曲线名) ----
             // 
             // panelCurveContainer
@@ -1779,6 +1830,8 @@ namespace CryptoTool.Win
             panelKeyTypeRow.PerformLayout();
             panelPrivateKeyStandardRow.ResumeLayout(false);
             panelPrivateKeyStandardRow.PerformLayout();
+            panelPublicKeyStandardRow.ResumeLayout(false);
+            panelPublicKeyStandardRow.PerformLayout();
             radioPanel.ResumeLayout(false);
             radioPanel.PerformLayout();
             panelCurveContainer.ResumeLayout(false);
@@ -1872,6 +1925,10 @@ namespace CryptoTool.Win
         private System.Windows.Forms.Label labelPrivateKeyStandard;
         private System.Windows.Forms.ComboBox comboPrivateKeyStandard;
         private System.Windows.Forms.Button btnConvertPrivateKeyStandard;
+        private System.Windows.Forms.FlowLayoutPanel panelPublicKeyStandardRow;
+        private System.Windows.Forms.Label labelPublicKeyStandard;
+        private System.Windows.Forms.ComboBox comboPublicKeyStandard;
+        private System.Windows.Forms.Button btnConvertPublicKeyStandard;
         private System.Windows.Forms.Panel panelKeyControlsContainer;
         private System.Windows.Forms.FlowLayoutPanel panelRightSettings;
         private System.Windows.Forms.FlowLayoutPanel panelKeyControls;
