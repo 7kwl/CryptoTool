@@ -1,6 +1,8 @@
+using CryptoTool.Algorithm.Algorithms.ECDSA;
 using CryptoTool.Algorithm.Enums;
 using CryptoTool.Algorithm.Factory;
 using CryptoTool.Algorithm.Interfaces;
+using Org.BouncyCastle.Crypto.Parameters;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -69,5 +71,20 @@ public class AlgorithmSmokeTests
         Assert.True(md5.VerifyHash(payload, md5Hash));
         Assert.Equal(32, sm3Hash.Length);
         Assert.True(sm3.VerifyHash(payload, sm3Hash));
+    }
+
+    [Fact]
+    public void EcdsaShouldSupportSignAndVerifyRoundTrip()
+    {
+        var payload = Encoding.UTF8.GetBytes("ECDSA roundtrip payload");
+        var keyPair = EcdsaAlgorithm.GenerateKeyPair("secp256r1");
+        var privateKey = (ECPrivateKeyParameters)keyPair.Private;
+        var publicKey = (ECPublicKeyParameters)keyPair.Public;
+
+        var signature = EcdsaAlgorithm.Sign(payload, privateKey, "SHA-256");
+        var isValid = EcdsaAlgorithm.Verify(payload, signature, publicKey, "SHA-256");
+
+        Assert.True(isValid);
+        Assert.NotEmpty(signature);
     }
 }

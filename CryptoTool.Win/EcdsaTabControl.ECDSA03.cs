@@ -59,8 +59,8 @@ namespace CryptoTool.Win
             labelEncMode.Text = "加密模式：";
             labelEncInputFormat.Text = "明文格式：";
             labelEncOutputFormat.Text = "密文格式：";
-            labelEncKey.Text = "对称密钥 (HEX，留空自动派生)：";
-            labelEncIV.Text = "IV/Nonce (HEX，留空随机生成)：";
+            labelEncKey.Text = "对称密钥：";
+            labelEncIV.Text = "初始向量(IV)：";
             labelEncBobPublic.Text = "Bob 公钥 (接收方)：";
             labelEncTest.Text = "测试：";
             labelEncInput.Text = "明文输入：";
@@ -343,7 +343,7 @@ namespace CryptoTool.Win
                 // 操作区使用左侧按钮列 + 右侧配置行的布局，参考密钥操作区 tableRightActions
                 var actionGroup = new GroupBox
                 {
-                    Text = "操作",
+                    Text = "操作-椭圆曲线集成加密方案",
                     Dock = DockStyle.Fill,
                     Padding = new Padding(6)
                 };

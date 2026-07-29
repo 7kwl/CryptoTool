@@ -341,3 +341,6 @@ healthchecksdb
 /installer
 # 备用代码 - 排除在项目外
 **/.案例代码【腾讯元宝整理】/
+
+# 临时/实验目录
+App1/
