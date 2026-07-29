@@ -1,91 +1,177 @@
 <Page x:Class="App6.Pages.EcdsaPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      mc:Ignorable="d">
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Grid Padding="20" RowSpacing="16">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-            <TextBlock Grid.Row="0" Text="密钥生成" FontSize="16" FontWeight="SemiBold"/>
+  <!-- 全局紧凑字体，模拟 WinForms 风格 -->
+  <Page.Resources>
+    <Style x:Key="CompactLabel" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="13"/>
+      <Setter Property="FontFamily" Value="Consolas,SimSun,Microsoft YaHei"/>
+      <Setter Property="Margin" Value="0,0,0,2"/>
+    </Style>
+    <Style x:Key="CompactBox" TargetType="TextBox">
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="FontFamily" Value="Consolas"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="BorderBrush" Value="Gray"/>
+      <Setter Property="Padding" Value="4,2"/>
+      <Setter Property="CornerRadius" Value="0"/>
+      <Setter Property="MinHeight" Value="22"/>
+    </Style>
+    <Style x:Key="CompactBtn" TargetType="Button">
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="FontFamily" Value="Consolas,SimSun,Microsoft YaHei"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="BorderBrush" Value="Gray"/>
+      <Setter Property="Padding" Value="8,3"/>
+      <Setter Property="CornerRadius" Value="0"/>
+      <Setter Property="MinHeight" Value="24"/>
+      <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    </Style>
+    <Style x:Key="CompactCombo" TargetType="ComboBox">
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="FontFamily" Value="Consolas,SimSun,Microsoft YaHei"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="BorderBrush" Value="Gray"/>
+      <Setter Property="Padding" Value="4,2"/>
+      <Setter Property="CornerRadius" Value="0"/>
+      <Setter Property="MinHeight" Value="22"/>
+    </Style>
+    <Style x:Key="CompactRadio" TargetType="RadioButton">
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="FontFamily" Value="Consolas,SimSun,Microsoft YaHei"/>
+      <Setter Property="MinHeight" Value="22"/>
+    </Style>
+  </Page.Resources>
 
-            <!-- Main 3-column layout -->
-            <Grid Grid.Row="1" ColumnSpacing="16" RowSpacing="12">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="2*"/>
-                </Grid.ColumnDefinitions>
+  <Grid Background="White">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>   <!-- 标题 -->
+      <RowDefinition Height="*"/>      <!-- 主三列 -->
+      <RowDefinition Height="Auto"/>   <!-- 底部结果 -->
+    </Grid.RowDefinitions>
 
-                <!-- Left: Keys -->
-                <StackPanel Grid.Column="0" Spacing="8">
-                    <TextBlock Text="私钥 (PEM):" FontWeight="SemiBold"/>
-                    <TextBox x:Name="PrivateKeyBox" AcceptsReturn="True" MinHeight="140"
-                             FontFamily="Consolas" FontSize="12" TextWrapping="Wrap"/>
-                    <TextBlock Text="公钥 (PEM):" FontWeight="SemiBold"/>
-                    <TextBox x:Name="PublicKeyBox" AcceptsReturn="True" MinHeight="140"
-                             FontFamily="Consolas" FontSize="12" TextWrapping="Wrap"/>
-                </StackPanel>
+    <!-- 顶部标题 -->
+    <TextBlock Grid.Row="0" Text="密钥生成" FontSize="14" FontWeight="Bold"
+               FontFamily="Consolas,SimSun,Microsoft YaHei"
+               Margin="8,6,0,4"/>
 
-                <!-- Middle: Operations -->
-                <StackPanel Grid.Column="1" Spacing="6" Width="140">
-                    <TextBlock Text="密钥操作" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                    <Button x:Name="GenerateBtn" Content="生成密钥对" HorizontalAlignment="Stretch"/>
-                    <Button x:Name="VerifyKeyBtn" Content="验证密钥对" HorizontalAlignment="Stretch"/>
-                    <Button x:Name="ExtractPubBtn" Content="提取公钥" HorizontalAlignment="Stretch"/>
-                    <Button x:Name="GetCurveBtn" Content="获取曲线" HorizontalAlignment="Stretch"/>
-                    <Button x:Name="ClearAllBtn" Content="清空全部" HorizontalAlignment="Stretch"/>
-                </StackPanel>
+    <!-- ====== 主三列 ====== -->
+    <Grid Grid.Row="1" Margin="8,0,8,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="2.5*"/>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="2*"/>
+      </Grid.ColumnDefinitions>
 
-                <!-- Right: Settings -->
-                <StackPanel Grid.Column="2" Spacing="10" Width="220">
-                    <TextBlock Text="输出格式:" FontWeight="SemiBold"/>
-                    <ComboBox x:Name="OutputFormatBox" SelectedIndex="0" HorizontalAlignment="Stretch">
-                        <ComboBoxItem Content="PEM"/>
-                        <ComboBoxItem Content="DER"/>
-                    </ComboBox>
-                    <TextBlock Text="密钥类型:" FontWeight="SemiBold"/>
-                    <StackPanel Orientation="Horizontal" Spacing="12">
-                        <RadioButton x:Name="PrivateKeyRadio" Content="私钥" IsChecked="True"/>
-                        <RadioButton x:Name="PublicKeyRadio" Content="公钥"/>
-                    </StackPanel>
-                    <TextBlock Text="椭圆曲线:" FontWeight="SemiBold"/>
-                    <ComboBox x:Name="CurveBox" SelectedIndex="0" HorizontalAlignment="Stretch">
-                        <ComboBoxItem Content="P-256 (secp256r1)"/>
-                        <ComboBoxItem Content="P-384 (secp384r1)"/>
-                        <ComboBoxItem Content="P-521 (secp521r1)"/>
-                    </ComboBox>
-                </StackPanel>
-            </Grid>
+      <!-- 左列：密钥 PEM -->
+      <StackPanel Grid.Column="0" Spacing="4">
+        <!-- 私钥 -->
+        <TextBlock Text="私钥 (PEM):" Style="{StaticResource CompactLabel}"/>
+        <Border BorderThickness="1" BorderBrush="Gray">
+          <TextBox x:Name="PrivateKeyBox" Style="{StaticResource CompactBox}"
+                   AcceptsReturn="True" MinHeight="160"
+                   TextWrapping="Wrap" IsReadOnly="True"/>
+        </Border>
 
-            <!-- Bottom: Results -->
-            <Grid Grid.Row="2" ColumnSpacing="16" Margin="0,8,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0" Spacing="6">
-                    <TextBlock Text="计算结果" FontWeight="SemiBold"/>
-                    <Border Background="{ThemeResource CardBackgroundFillColorDefault}"
-                            BorderBrush="{ThemeResource CardStrokeColorDefault}"
-                            BorderThickness="1" Padding="8" CornerRadius="4">
-                        <TextBlock x:Name="ComputeResultText" Text="等待操作..." Opacity="0.6"/>
-                    </Border>
-                </StackPanel>
-                <StackPanel Grid.Column="1" Spacing="6">
-                    <TextBlock Text="运行结果" FontWeight="SemiBold"/>
-                    <Border Background="{ThemeResource CardBackgroundFillColorDefault}"
-                            BorderBrush="{ThemeResource CardStrokeColorDefault}"
-                            BorderThickness="1" Padding="8" CornerRadius="4">
-                        <TextBlock x:Name="RunResultText" Text="验证结果: 未验证" Opacity="0.6"/>
-                    </Border>
-                </StackPanel>
-            </Grid>
-        </Grid>
-    </ScrollViewer>
+        <!-- 公钥 -->
+        <TextBlock Text="公钥 (PEM):" Style="{StaticResource CompactLabel}"
+                   Margin="0,10,0,2"/>
+        <Border BorderThickness="1" BorderBrush="Gray">
+          <TextBox x:Name="PublicKeyBox" Style="{StaticResource CompactBox}"
+                   AcceptsReturn="True" MinHeight="160"
+                   TextWrapping="Wrap" IsReadOnly="True"/>
+        </Border>
+      </StackPanel>
+
+      <!-- 中列：操作按钮 -->
+      <StackPanel Grid.Column="1" Spacing="2" Width="140" Margin="8,0,8,0">
+        <!-- 私钥操作 -->
+        <TextBlock Text="私钥操作" Foreground="Red" FontWeight="Bold"
+                   FontFamily="Consolas,SimSun,Microsoft YaHei" FontSize="12"
+                   HorizontalAlignment="Center" Margin="0,0,0,2"/>
+        <Button x:Name="CopyPrivBtn"  Content="复制私钥" Style="{StaticResource CompactBtn}"/>
+        <Button x:Name="PastePrivBtn" Content="粘贴私钥" Style="{StaticResource CompactBtn}"/>
+        <Button x:Name="ImportPrivBtn" Content="导入私钥" Style="{StaticResource CompactBtn}"/>
+        <Button x:Name="SavePrivBtn"  Content="保存私钥" Style="{StaticResource CompactBtn}"/>
+        <Button x:Name="ClearPrivBtn" Content="清空私钥" Style="{StaticResource CompactBtn}"/>
+
+        <!-- 公钥操作 -->
+        <TextBlock Text="公钥操作" Foreground="Blue" FontWeight="Bold"
+                   FontFamily="Consolas,SimSun,Microsoft YaHei" FontSize="12"
+                   HorizontalAlignment="Center" Margin="0,10,0,2"/>
+        <Button x:Name="CopyPubBtn"  Content="复制公钥" Style="{StaticResource CompactBtn}"/>
+        <Button x:Name="PastePubBtn" Content="粘贴公钥" Style="{StaticResource CompactBtn}"/>
+        <Button x:Name="ImportPubBtn" Content="导入公钥" Style="{StaticResource CompactBtn}"/>
+        <Button x:Name="SavePubBtn"  Content="保存公钥" Style="{StaticResource CompactBtn}"/>
+        <Button x:Name="ClearPubBtn" Content="清空公钥" Style="{StaticResource CompactBtn}"/>
+      </StackPanel>
+
+      <!-- 右列：密钥操作 + 设置 -->
+      <StackPanel Grid.Column="2" Spacing="4">
+        <!-- 密钥操作按钮 -->
+        <TextBlock Text="密钥操作" Style="{StaticResource CompactLabel}"/>
+        <Button x:Name="GenerateKeyBtn" Content="生成密钥对" Style="{StaticResource CompactBtn}"/>
+        <Button x:Name="VerifyKeyBtn"    Content="验证密钥对" Style="{StaticResource CompactBtn}"/>
+        <Button x:Name="ExtractPubBtn"  Content="从私钥提取公钥" Style="{StaticResource CompactBtn}"/>
+        <Button x:Name="GetCurveBtn"    Content="获取私钥曲线类" Style="{StaticResource CompactBtn}"/>
+        <Button x:Name="ClearAllBtn"    Content="清空全部" Style="{StaticResource CompactBtn}"/>
+
+        <!-- 分隔 -->
+        <Border BorderThickness="0,1,0,0" BorderBrush="LightGray" Margin="0,6,0,4"/>
+
+        <!-- 输出格式 -->
+        <TextBlock Text="输出格式:" Style="{StaticResource CompactLabel}"/>
+        <ComboBox x:Name="OutputFormatBox" Style="{StaticResource CompactCombo}"
+                  SelectedIndex="0" HorizontalAlignment="Stretch">
+          <ComboBoxItem Content="PEM" FontSize="12" FontFamily="Consolas"/>
+          <ComboBoxItem Content="DER" FontSize="12" FontFamily="Consolas"/>
+        </ComboBox>
+
+        <!-- 密钥类型 -->
+        <TextBlock Text="密钥类型:" Style="{StaticResource CompactLabel}" Margin="0,6,0,2"/>
+        <StackPanel Orientation="Horizontal" Spacing="12">
+          <RadioButton x:Name="PrivRadio" Content="私钥" Style="{StaticResource CompactRadio}" IsChecked="True"/>
+          <RadioButton x:Name="PubRadio"  Content="公钥" Style="{StaticResource CompactRadio}"/>
+        </StackPanel>
+
+        <!-- 椭圆曲线 -->
+        <TextBlock Text="椭圆曲线:" Style="{StaticResource CompactLabel}" Margin="0,6,0,2"/>
+        <ComboBox x:Name="CurveBox" Style="{StaticResource CompactCombo}"
+                  SelectedIndex="0" HorizontalAlignment="Stretch">
+          <ComboBoxItem Content="NIST Curves (F) →" FontSize="12" FontFamily="Consolas"/>
+          <ComboBoxItem Content="P-256 (secp256r1) - 128位安全" FontSize="12" FontFamily="Consolas"/>
+          <ComboBoxItem Content="P-384 (secp384r1) - 192位安全" FontSize="12" FontFamily="Consolas"/>
+          <ComboBoxItem Content="P-521 (secp521r1) - 256位安全" FontSize="12" FontFamily="Consolas"/>
+        </ComboBox>
+      </StackPanel>
+    </Grid>
+
+    <!-- ====== 底部结果区 ====== -->
+    <Grid Grid.Row="2" Margin="8,6,8,8" ColumnSpacing="8">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+
+      <StackPanel Grid.Column="0" Spacing="2">
+        <TextBlock Text="计算结果" Style="{StaticResource CompactLabel}"/>
+        <Border BorderThickness="1" BorderBrush="Gray" Padding="4,2">
+          <TextBlock x:Name="ComputeResultText" Text="等待操作..."
+                     FontSize="12" FontFamily="Consolas"
+                     Foreground="Gray" TextWrapping="Wrap"/>
+        </Border>
+      </StackPanel>
+
+      <StackPanel Grid.Column="1" Spacing="2">
+        <TextBlock Text="运行结果" Style="{StaticResource CompactLabel}"/>
+        <Border BorderThickness="1" BorderBrush="Gray" Padding="4,2">
+          <TextBlock x:Name="RunResultText" Text="验证结果: 未验证"
+                     FontSize="12" FontFamily="Consolas"
+                     Foreground="Gray" TextWrapping="Wrap"/>
+        </Border>
+      </StackPanel>
+    </Grid>
+
+  </Grid>
 </Page>
