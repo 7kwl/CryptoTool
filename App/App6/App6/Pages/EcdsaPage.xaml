@@ -1,0 +1,91 @@
+<Page x:Class="App6.Pages.EcdsaPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Padding="20" RowSpacing="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="密钥生成" FontSize="16" FontWeight="SemiBold"/>
+
+            <!-- Main 3-column layout -->
+            <Grid Grid.Row="1" ColumnSpacing="16" RowSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Left: Keys -->
+                <StackPanel Grid.Column="0" Spacing="8">
+                    <TextBlock Text="私钥 (PEM):" FontWeight="SemiBold"/>
+                    <TextBox x:Name="PrivateKeyBox" AcceptsReturn="True" MinHeight="140"
+                             FontFamily="Consolas" FontSize="12" TextWrapping="Wrap"/>
+                    <TextBlock Text="公钥 (PEM):" FontWeight="SemiBold"/>
+                    <TextBox x:Name="PublicKeyBox" AcceptsReturn="True" MinHeight="140"
+                             FontFamily="Consolas" FontSize="12" TextWrapping="Wrap"/>
+                </StackPanel>
+
+                <!-- Middle: Operations -->
+                <StackPanel Grid.Column="1" Spacing="6" Width="140">
+                    <TextBlock Text="密钥操作" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                    <Button x:Name="GenerateBtn" Content="生成密钥对" HorizontalAlignment="Stretch"/>
+                    <Button x:Name="VerifyKeyBtn" Content="验证密钥对" HorizontalAlignment="Stretch"/>
+                    <Button x:Name="ExtractPubBtn" Content="提取公钥" HorizontalAlignment="Stretch"/>
+                    <Button x:Name="GetCurveBtn" Content="获取曲线" HorizontalAlignment="Stretch"/>
+                    <Button x:Name="ClearAllBtn" Content="清空全部" HorizontalAlignment="Stretch"/>
+                </StackPanel>
+
+                <!-- Right: Settings -->
+                <StackPanel Grid.Column="2" Spacing="10" Width="220">
+                    <TextBlock Text="输出格式:" FontWeight="SemiBold"/>
+                    <ComboBox x:Name="OutputFormatBox" SelectedIndex="0" HorizontalAlignment="Stretch">
+                        <ComboBoxItem Content="PEM"/>
+                        <ComboBoxItem Content="DER"/>
+                    </ComboBox>
+                    <TextBlock Text="密钥类型:" FontWeight="SemiBold"/>
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <RadioButton x:Name="PrivateKeyRadio" Content="私钥" IsChecked="True"/>
+                        <RadioButton x:Name="PublicKeyRadio" Content="公钥"/>
+                    </StackPanel>
+                    <TextBlock Text="椭圆曲线:" FontWeight="SemiBold"/>
+                    <ComboBox x:Name="CurveBox" SelectedIndex="0" HorizontalAlignment="Stretch">
+                        <ComboBoxItem Content="P-256 (secp256r1)"/>
+                        <ComboBoxItem Content="P-384 (secp384r1)"/>
+                        <ComboBoxItem Content="P-521 (secp521r1)"/>
+                    </ComboBox>
+                </StackPanel>
+            </Grid>
+
+            <!-- Bottom: Results -->
+            <Grid Grid.Row="2" ColumnSpacing="16" Margin="0,8,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Spacing="6">
+                    <TextBlock Text="计算结果" FontWeight="SemiBold"/>
+                    <Border Background="{ThemeResource CardBackgroundFillColorDefault}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefault}"
+                            BorderThickness="1" Padding="8" CornerRadius="4">
+                        <TextBlock x:Name="ComputeResultText" Text="等待操作..." Opacity="0.6"/>
+                    </Border>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Spacing="6">
+                    <TextBlock Text="运行结果" FontWeight="SemiBold"/>
+                    <Border Background="{ThemeResource CardBackgroundFillColorDefault}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefault}"
+                            BorderThickness="1" Padding="8" CornerRadius="4">
+                        <TextBlock x:Name="RunResultText" Text="验证结果: 未验证" Opacity="0.6"/>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</Page>

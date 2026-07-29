@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="App6.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="加密解密工具">
+
+    <NavigationView x:Name="MainNav"
+                    PaneDisplayMode="Top"
+                    IsBackButtonVisible="Collapsed"
+                    IsSettingsVisible="False"
+                    SelectionChanged="MainNav_SelectionChanged"
+                    Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
+        <NavigationView.MenuItems>
+            <NavigationViewItem Content="ECDSA" Tag="EcdsaPage"/>
+            <NavigationViewItem Content="RSA算法" Tag="RsaPage"/>
+            <NavigationViewItem Content="RSA格式转换" Tag="RsaFormatPage"/>
+            <NavigationViewItem Content="AES算法" Tag="AesPage"/>
+            <NavigationViewItem Content="DES算法" Tag="DesPage"/>
+            <NavigationViewItem Content="SM4算法" Tag="Sm4Page"/>
+            <NavigationViewItem Content="SM2算法" Tag="Sm2Page"/>
+            <NavigationViewItem Content="SM3算法" Tag="Sm3Page"/>
+            <NavigationViewItem Content="MD5算法" Tag="Md5Page"/>
+            <NavigationViewItem Content="医保接口" Tag="MedicalPage"/>
+            <NavigationViewItem Content="关于" Tag="AboutPage"/>
+        </NavigationView.MenuItems>
+        <Frame x:Name="ContentFrame" IsTabStop="True"/>
+    </NavigationView>
+</Window>

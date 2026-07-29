@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="App2.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:App2"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="ECDSA 签名验签工具">
+
+    <Window.SystemBackdrop>
+        <MicaBackdrop />
+    </Window.SystemBackdrop>
+
+    <!-- ========== 主布局 ========== -->
+    <Grid Margin="24" RowDefinitions="Auto,Auto,*,Auto,Auto">
+
+        <!-- 第一行：标题 -->
+        <TextBlock Grid.Row="0"
+                   Text="ECDSA 签名"
+                   Style="{StaticResource TitleTextBlockStyle}"
+                   Margin="0,0,0,16" />
+
+        <!-- 第二行：设置面板（曲线 + 哈希） -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="12" Margin="0,0,0,12">
+            <TextBlock Text="曲线：" VerticalAlignment="Center" />
+            <ComboBox x:Name="CurveCombo"
+                      SelectedIndex="0"
+                      Width="150"
+                      SelectionChanged="OnParameterChanged">
+                <ComboBoxItem>secp256r1</ComboBoxItem>
+                <ComboBoxItem>secp384r1</ComboBoxItem>
+                <ComboBoxItem>secp521r1</ComboBoxItem>
+            </ComboBox>
+
+            <TextBlock Text="哈希：" VerticalAlignment="Center" Margin="24,0,0,0" />
+            <ComboBox x:Name="HashCombo"
+                      SelectedIndex="0"
+                      Width="120"
+                      SelectionChanged="OnParameterChanged">
+                <ComboBoxItem>SHA-256</ComboBoxItem>
+                <ComboBoxItem>SHA-384</ComboBoxItem>
+                <ComboBoxItem>SHA-512</ComboBoxItem>
+            </ComboBox>
+
+            <Button x:Name="GenerateKeyBtn"
+                    Content="生成密钥对"
+                    Click="OnGenerateKeyPair"
+                    Margin="24,0,0,0" />
+        </StackPanel>
+
+        <!-- 第三行：签名/验签输入区 -->
+        <StackPanel Grid.Row="2" Spacing="10">
+
+            <!-- 私钥输入 -->
+            <TextBlock Text="私钥 (PEM)：" />
+            <TextBox x:Name="PrivateKeyBox"
+                     Height="100"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"
+                     PlaceholderText="在此粘贴 PEM 格式私钥..."
+                     IsReadOnly="True" />
+
+            <!-- 公钥输入 -->
+            <TextBlock Text="公钥 (PEM)：" />
+            <TextBox x:Name="PublicKeyBox"
+                     Height="80"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"
+                     PlaceholderText="在此粘贴 PEM 格式公钥..."
+                     IsReadOnly="True" />
+
+            <!-- 原始数据 -->
+            <TextBlock Text="待签名数据：" />
+            <TextBox x:Name="PlainDataBox"
+                     Height="80"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"
+                     PlaceholderText="在此输入待签名的文本数据..." />
+
+            <!-- 签名按钮 -->
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <Button x:Name="SignBtn"
+                        Content="签名"
+                        Click="OnSign"
+                        IsEnabled="False" />
+                <Button x:Name="VerifyBtn"
+                        Content="验签"
+                        Click="OnVerify"
+                        IsEnabled="False" />
+            </StackPanel>
+
+            <!-- 签名结果 -->
+            <TextBlock Text="签名结果：" />
+            <TextBox x:Name="SignatureBox"
+                     Height="60"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"
+                     IsReadOnly="True"
+                     PlaceholderText="签名结果将显示在这里..." />
+        </StackPanel>
+
+        <!-- 第四行：操作结果 -->
+        <TextBlock Grid.Row="3"
+                   x:Name="ResultBlock"
+                   FontSize="14"
+                   FontWeight="SemiBold"
+                   Margin="0,12,0,0" />
+
+        <!-- 第五行：状态栏 -->
+        <TextBlock Grid.Row="4"
+                   x:Name="StatusBlock"
+                   Text="就绪"
+                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                   Margin="0,8,0,0" />
+    </Grid>
+</Window>
