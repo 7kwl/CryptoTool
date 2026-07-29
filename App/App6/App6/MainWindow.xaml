@@ -6,214 +6,27 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Title="ECDSA Digital Signature Tool">
+    Title="加密解密工具">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Grid Margin="32" RowSpacing="20">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-
-            <!-- ========== 标题 ========== -->
-            <StackPanel Grid.Row="0" Spacing="4">
-                <TextBlock Text="ECDSA Digital Signature Tool"
-                           FontSize="24" FontWeight="SemiBold" />
-                <TextBlock Text="Generate keys, sign data, and verify signatures using ECDSA (Elliptic Curve DSA)"
-                           FontSize="13" Opacity="0.7" TextWrapping="Wrap" />
-            </StackPanel>
-
-            <!-- ========== 1. 密钥生成 ========== -->
-            <StackPanel Grid.Row="1" Spacing="12"
-                        Padding="20" Background="{ThemeResource CardBackgroundFillColorDefault}"
-                        CornerRadius="8" BorderBrush="{ThemeResource CardStrokeColorDefault}" BorderThickness="1">
-
-                <TextBlock Text="1. Key Generation"
-                           FontSize="16" FontWeight="SemiBold" />
-
-                <Grid ColumnSpacing="12" RowSpacing="8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-
-                    <!-- Curve Selection -->
-                    <StackPanel Grid.Row="0" Grid.Column="0" Spacing="4">
-                        <TextBlock Text="Elliptic Curve" FontSize="13" Opacity="0.7" />
-                        <ComboBox x:Name="CurveComboBox"
-                                  SelectedIndex="0"
-                                  PlaceholderText="Select Curve">
-                            <ComboBoxItem Content="P-256 (secp256r1)" Tag="P-256" />
-                            <ComboBoxItem Content="P-384 (secp384r1)" Tag="P-384" />
-                            <ComboBoxItem Content="P-521 (secp521r1)" Tag="P-521" />
-                        </ComboBox>
-                    </StackPanel>
-
-                    <!-- Hash Algorithm -->
-                    <StackPanel Grid.Row="0" Grid.Column="1" Spacing="4">
-                        <TextBlock Text="Hash Algorithm" FontSize="13" Opacity="0.7" />
-                        <ComboBox x:Name="HashComboBox"
-                                  SelectedIndex="0"
-                                  PlaceholderText="Select Hash">
-                            <ComboBoxItem Content="SHA-256" Tag="SHA-256" />
-                            <ComboBoxItem Content="SHA-384" Tag="SHA-384" />
-                            <ComboBoxItem Content="SHA-512" Tag="SHA-512" />
-                        </ComboBox>
-                    </StackPanel>
-
-                    <!-- Generate Button -->
-                    <Button x:Name="GenerateKeyPairButton"
-                            Grid.Row="1" Grid.Column="0"
-                            Content="Generate Key Pair"
-                            Style="{StaticResource AccentButtonStyle}"
-                            HorizontalAlignment="Stretch" />
-                </Grid>
-            </StackPanel>
-
-            <!-- ========== 2. 密钥展示 ========== -->
-            <StackPanel Grid.Row="2" Spacing="12"
-                        Padding="20" Background="{ThemeResource CardBackgroundFillColorDefault}"
-                        CornerRadius="8" BorderBrush="{ThemeResource CardStrokeColorDefault}" BorderThickness="1">
-
-                <TextBlock Text="2. Keys (PEM Format)"
-                           FontSize="16" FontWeight="SemiBold" />
-
-                <!-- Private Key -->
-                <StackPanel Spacing="4">
-                    <TextBlock Text="Private Key (PEM)" FontSize="13" Opacity="0.7" />
-                    <TextBox x:Name="PrivateKeyTextBox"
-                             IsReadOnly="True"
-                             AcceptsReturn="True"
-                             FontFamily="Consolas"
-                             FontSize="12"
-                             MinHeight="80"
-                             MaxHeight="120"
-                             PlaceholderText="Generated private key will appear here..."
-                             TextWrapping="Wrap" />
-                </StackPanel>
-
-                <!-- Public Key -->
-                <StackPanel Spacing="4">
-                    <TextBlock Text="Public Key (PEM)" FontSize="13" Opacity="0.7" />
-                    <TextBox x:Name="PublicKeyTextBox"
-                             IsReadOnly="True"
-                             AcceptsReturn="True"
-                             FontFamily="Consolas"
-                             FontSize="12"
-                             MinHeight="80"
-                             MaxHeight="120"
-                             PlaceholderText="Generated public key will appear here..."
-                             TextWrapping="Wrap" />
-                </StackPanel>
-            </StackPanel>
-
-            <!-- ========== 3. 签名 ========== -->
-            <StackPanel Grid.Row="3" Spacing="12"
-                        Padding="20" Background="{ThemeResource CardBackgroundFillColorDefault}"
-                        CornerRadius="8" BorderBrush="{ThemeResource CardStrokeColorDefault}" BorderThickness="1">
-
-                <TextBlock Text="3. Sign Data"
-                           FontSize="16" FontWeight="SemiBold" />
-
-                <!-- Data Input -->
-                <StackPanel Spacing="4">
-                    <TextBlock Text="Data to Sign" FontSize="13" Opacity="0.7" />
-                    <TextBox x:Name="DataToSignTextBox"
-                             AcceptsReturn="True"
-                             FontFamily="Consolas"
-                             FontSize="13"
-                             MinHeight="60"
-                             MaxHeight="100"
-                             PlaceholderText="Enter the text or data you want to sign..."
-                             TextWrapping="Wrap" />
-                </StackPanel>
-
-                <!-- Sign Button -->
-                <Button x:Name="SignButton"
-                        Content="Sign"
-                        Style="{StaticResource AccentButtonStyle}"
-                        HorizontalAlignment="Stretch" />
-
-                <!-- Signature Output -->
-                <StackPanel Spacing="4">
-                    <TextBlock Text="Signature (Hex)" FontSize="13" Opacity="0.7" />
-                    <TextBox x:Name="SignatureTextBox"
-                             IsReadOnly="True"
-                             AcceptsReturn="True"
-                             FontFamily="Consolas"
-                             FontSize="12"
-                             MinHeight="50"
-                             MaxHeight="80"
-                             PlaceholderText="Generated signature will appear here..."
-                             TextWrapping="Wrap" />
-                </StackPanel>
-            </StackPanel>
-
-            <!-- ========== 4. 验签 ========== -->
-            <StackPanel Grid.Row="4" Spacing="12"
-                        Padding="20" Background="{ThemeResource CardBackgroundFillColorDefault}"
-                        CornerRadius="8" BorderBrush="{ThemeResource CardStrokeColorDefault}" BorderThickness="1">
-
-                <TextBlock Text="4. Verify Signature"
-                           FontSize="16" FontWeight="SemiBold" />
-
-                <!-- Signature Input -->
-                <StackPanel Spacing="4">
-                    <TextBlock Text="Signature (Hex)" FontSize="13" Opacity="0.7" />
-                    <TextBox x:Name="VerifySignatureTextBox"
-                             FontFamily="Consolas"
-                             FontSize="12"
-                             PlaceholderText="Paste hex signature to verify..."
-                             TextWrapping="Wrap" />
-                </StackPanel>
-
-                <!-- Date to Verify -->
-                <StackPanel Spacing="4">
-                    <TextBlock Text="Original Data" FontSize="13" Opacity="0.7" />
-                    <TextBox x:Name="VerifyDataTextBox"
-                             AcceptsReturn="True"
-                             FontFamily="Consolas"
-                             FontSize="13"
-                             MinHeight="50"
-                             MaxHeight="80"
-                             PlaceholderText="Enter the original data to verify..."
-                             TextWrapping="Wrap" />
-                </StackPanel>
-
-                <!-- Verify Button -->
-                <Button x:Name="VerifyButton"
-                        Content="Verify"
-                        HorizontalAlignment="Stretch" />
-
-                <!-- Result -->
-                <StackPanel x:Name="VerifyResultPanel"
-                            Padding="12" CornerRadius="6"
-                            Background="{ThemeResource CardBackgroundFillColorSecondary}"
-                            Visibility="Collapsed">
-                    <TextBlock x:Name="VerifyResultText"
-                               FontSize="14" FontWeight="SemiBold"
-                               TextWrapping="Wrap" />
-                </StackPanel>
-            </StackPanel>
-
-            <!-- ========== 5. 状态栏 ========== -->
-            <Border Grid.Row="5"
-                    Padding="12" CornerRadius="6"
-                    Background="{ThemeResource CardBackgroundFillColorSecondary}">
-                <TextBlock x:Name="StatusBlock"
-                           Text="Ready - Select curve and generate key pair to begin"
-                           FontSize="12" Opacity="0.7"
-                           TextWrapping="Wrap" />
-            </Border>
-
-        </Grid>
-    </ScrollViewer>
+    <NavigationView x:Name="MainNav"
+                    PaneDisplayMode="Top"
+                    IsBackButtonVisible="Collapsed"
+                    IsSettingsVisible="False"
+                    SelectionChanged="MainNav_SelectionChanged"
+                    Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
+        <NavigationView.MenuItems>
+            <NavigationViewItem Content="ECDSA" Tag="EcdsaPage"/>
+            <NavigationViewItem Content="RSA算法" Tag="RsaPage"/>
+            <NavigationViewItem Content="RSA格式转换" Tag="RsaFormatPage"/>
+            <NavigationViewItem Content="AES算法" Tag="AesPage"/>
+            <NavigationViewItem Content="DES算法" Tag="DesPage"/>
+            <NavigationViewItem Content="SM4算法" Tag="Sm4Page"/>
+            <NavigationViewItem Content="SM2算法" Tag="Sm2Page"/>
+            <NavigationViewItem Content="SM3算法" Tag="Sm3Page"/>
+            <NavigationViewItem Content="MD5算法" Tag="Md5Page"/>
+            <NavigationViewItem Content="医保接口" Tag="MedicalPage"/>
+            <NavigationViewItem Content="关于" Tag="AboutPage"/>
+        </NavigationView.MenuItems>
+        <Frame x:Name="ContentFrame" IsTabStop="True"/>
+    </NavigationView>
 </Window>
