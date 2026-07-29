@@ -344,3 +344,6 @@ healthchecksdb
 
 # 临时/实验目录
 App1/
+ClassLibrary1/
+App2/
+App4/
