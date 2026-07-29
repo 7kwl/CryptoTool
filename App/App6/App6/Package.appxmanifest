@@ -9,14 +9,14 @@
   IgnorableNamespaces="uap rescap systemai">
 
   <Identity
-    Name="5163a06b-900d-4179-becc-e56f68e8516b"
+    Name="eae13530-233a-4782-a8c9-3a69fa38a65b"
     Publisher="CN=Administrator"
     Version="1.0.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="5163a06b-900d-4179-becc-e56f68e8516b" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="eae13530-233a-4782-a8c9-3a69fa38a65b" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>App6</DisplayName>
+    <DisplayName>App6 - ECDSA Tool</DisplayName>
     <PublisherDisplayName>Administrator</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -35,8 +35,8 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="App6"
-        Description="App6"
+        DisplayName="ECDSA Tool"
+        Description="ECDSA Signature Tool"
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png">
