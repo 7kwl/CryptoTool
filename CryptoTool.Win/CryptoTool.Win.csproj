@@ -99,4 +99,23 @@
     </None>
   </ItemGroup>
 
+  <!-- 将 EcdsaTabControl 的分部类文件折叠到主文件下 -->
+  <ItemGroup>
+    <Compile Update="EcdsaTabControl.ECDSA01.Designer.cs">
+      <DependentUpon>EcdsaTabControl.cs</DependentUpon>
+    </Compile>
+    <Compile Update="EcdsaTabControl.ECDSA02.Designer.cs">
+      <DependentUpon>EcdsaTabControl.cs</DependentUpon>
+    </Compile>
+    <Compile Update="EcdsaTabControl.ECDSA03.Designer.cs">
+      <DependentUpon>EcdsaTabControl.cs</DependentUpon>
+    </Compile>
+    <Compile Update="EcdsaTabControl.ECDSA04.Designer.cs">
+      <DependentUpon>EcdsaTabControl.cs</DependentUpon>
+    </Compile>
+    <None Update="EcdsaTabControl.ECDSA02.resx">
+      <DependentUpon>EcdsaTabControl.cs</DependentUpon>
+    </None>
+  </ItemGroup>
+
 </Project>
