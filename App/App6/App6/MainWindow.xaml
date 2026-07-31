@@ -13,7 +13,14 @@
                     IsBackButtonVisible="Collapsed"
                     IsSettingsVisible="False"
                     SelectionChanged="MainNav_SelectionChanged"
+                    UseLayoutRounding="True"
                     Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
+        <NavigationView.Resources>
+            <Style TargetType="NavigationViewItem">
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="FontFamily" Value="SimSun"/>
+            </Style>
+        </NavigationView.Resources>
         <NavigationView.MenuItems>
             <NavigationViewItem Content="ECDSA" Tag="EcdsaPage"/>
             <NavigationViewItem Content="RSA算法" Tag="RsaPage"/>
