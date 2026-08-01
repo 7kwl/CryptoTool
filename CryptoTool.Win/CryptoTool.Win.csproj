@@ -99,17 +99,5 @@
     </None>
   </ItemGroup>
 
-</Project>
-    </Compile>
-    <Compile Update="EcdsaTabControl.ECDSA03.Designer.cs">
-      <DependentUpon>EcdsaTabControl.cs</DependentUpon>
-    </Compile>
-    <Compile Update="EcdsaTabControl.ECDSA04.Designer.cs">
-      <DependentUpon>EcdsaTabControl.cs</DependentUpon>
-    </Compile>
-    <None Update="EcdsaTabControl.ECDSA02.resx">
-      <DependentUpon>EcdsaTabControl.cs</DependentUpon>
-    </None>
-  </ItemGroup>
 
 </Project>
