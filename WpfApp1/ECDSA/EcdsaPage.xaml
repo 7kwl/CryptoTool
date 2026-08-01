@@ -1,0 +1,70 @@
+<UserControl x:Class="WpfApp1.ECDSA.EcdsaPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:WpfApp1.ECDSA"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="1000"
+             Background="White">
+    <UserControl.Resources>
+        <!-- 二级导航按钮样式 -->
+        <Style x:Key="NavButtonStyle" TargetType="ToggleButton">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontFamily" Value="Microsoft YaHei UI Light"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Background" Value="#FF20E60E"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF20E60E"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 二级菜单栏 -->
+        <Border Grid.Row="1" BorderBrush="#FF20E60E" BorderThickness="0,0,0,1" Margin="0,0,0,8" >
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0">
+                <ToggleButton x:Name="BtnKeyGen" Style="{StaticResource NavButtonStyle}"
+                              Content="密钥生成" Click="SubNavButton_Click" Tag="KeyGen" />
+                <ToggleButton x:Name="BtnEcdh" Style="{StaticResource NavButtonStyle}"
+                              Content="ECDH加密解密" Click="SubNavButton_Click" Tag="Ecdh" FontFamily="Microsoft Tai Le"/>
+                <ToggleButton x:Name="BtnEcies" Style="{StaticResource NavButtonStyle}"
+                              Content="ECIES签名验签" Click="SubNavButton_Click" Tag="Ecies"/>
+                <ToggleButton x:Name="BtnFileSign" Style="{StaticResource NavButtonStyle}"
+                              Content="文件签名/验签" Click="SubNavButton_Click" Tag="FileSign"/>
+            </StackPanel>
+        </Border>
+
+        <!-- 内容区域 -->
+        <ContentControl x:Name="SubContent" Grid.Row="2" Content="6576574657"/>
+
+        <ContentControl Content="ContentControl" HorizontalAlignment="Left"  Margin="4,4,0,0" VerticalAlignment="Top" Width="986"/>
+    </Grid>
+</UserControl>

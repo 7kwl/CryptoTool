@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using WpfApp1.ECDSA;
 
 namespace WpfApp1
 {
@@ -38,7 +39,7 @@ namespace WpfApp1
             switch (tag)
             {
                 case "Ecdsa":
-                    MainContent.Content = new Views.EcdsaView();
+                    MainContent.Content = new EcdsaPage();
                     break;
                 case "Rsa":
                     MainContent.Content = new Views.RsaView();

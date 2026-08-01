@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="加密工具" Height="800" Width="1200"
+        Title="加密工具" Height="1200" Width="1800"
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <!-- 导航按钮样式 -->
@@ -32,11 +32,11 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsChecked" Value="True">
-                    <Setter Property="Background" Value="#FF0078D4"/>
-                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="Background" Value="#FF5FD824"/>
+                    <Setter Property="Foreground" Value="#FFCE3030"/>
                 </Trigger>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FFE5F1FB"/>
+                    <Setter Property="Background" Value="#FF328CD6"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -52,7 +52,7 @@
         <Border Grid.Row="0" Background="#FFF0F0F0" BorderBrush="#FFD0D0D0" BorderThickness="0,0,0,1">
             <StackPanel Orientation="Horizontal">
                 <ToggleButton x:Name="BtnEcdsa" Style="{StaticResource NavButtonStyle}"
-                              Content="ECDSA" Click="NavButton_Click" Tag="Ecdsa"/>
+                              Content="ECDSA" Click="NavButton_Click" Tag="Ecdsa" Foreground="#FFDF0F0F" FontFamily="MS UI Gothic"/>
                 <ToggleButton x:Name="BtnRsa" Style="{StaticResource NavButtonStyle}"
                               Content="RSA算法" Click="NavButton_Click" Tag="Rsa"/>
                 <ToggleButton x:Name="BtnRsaFmt" Style="{StaticResource NavButtonStyle}"
@@ -78,7 +78,7 @@
 
         <!-- 内容区域 -->
         <Border Grid.Row="1" Background="White">
-            <ContentControl x:Name="MainContent" Margin="0"/>
+            <ContentControl x:Name="MainContent" Margin="0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
         </Border>
     </Grid>
 </Window>
