@@ -90,9 +90,6 @@
     <Compile Remove=".案例代码【腾讯元宝整理】\**\*.cs" />
     <None Remove=".案例代码【腾讯元宝整理】\**\*" />
     <Compile Remove="publish\*.cs" />
-    <Compile Remove="临时存放\**" />
-    <EmbeddedResource Remove="临时存放\**" />
-    <None Remove="临时存放\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -102,13 +99,7 @@
     </None>
   </ItemGroup>
 
-  <!-- 将 EcdsaTabControl 的分部类文件折叠到主文件下 -->
-  <ItemGroup>
-    <Compile Update="EcdsaTabControl.ECDSA01.Designer.cs">
-      <DependentUpon>EcdsaTabControl.cs</DependentUpon>
-    </Compile>
-    <Compile Update="EcdsaTabControl.ECDSA02.Designer.cs">
-      <DependentUpon>EcdsaTabControl.cs</DependentUpon>
+</Project>
     </Compile>
     <Compile Update="EcdsaTabControl.ECDSA03.Designer.cs">
       <DependentUpon>EcdsaTabControl.cs</DependentUpon>

@@ -59,7 +59,10 @@ namespace CryptoTool.Win
             sm4TabControl.Dock = DockStyle.Fill;
             sm2TabControl.Dock = DockStyle.Fill;
             sm3TabControl.Dock = DockStyle.Fill;
+            ecdsaTabControl.TopLevel = false;
+            ecdsaTabControl.FormBorderStyle = FormBorderStyle.None;
             ecdsaTabControl.Dock = DockStyle.Fill;
+            ecdsaTabControl.Visible = true;
             md5TabControl.Dock = DockStyle.Fill;
             medicareTabControl.Dock = DockStyle.Fill;
             aboutTabControl.Dock = DockStyle.Fill;
@@ -85,14 +88,8 @@ namespace CryptoTool.Win
             tabSM3.Controls.Clear();
             tabSM3.Controls.Add(sm3TabControl);
 
-            // ECDSA TabPage - 使用索引避免命名问题
-            // 放在首位第一个（索引 0）
-            if (tabControl1.TabPages.Count >= 1)
-            {
-                tabControl1.TabPages[0].Controls.Clear();
-                tabControl1.TabPages[0].Controls.Add(ecdsaTabControl);
-                tabControl1.TabPages[0].Text = "ECDSA";
-            }
+            tabEcdsa.Controls.Clear();
+            tabEcdsa.Controls.Add(ecdsaTabControl);
 
             tabMD5.Controls.Clear();
             tabMD5.Controls.Add(md5TabControl);
@@ -168,7 +165,7 @@ namespace CryptoTool.Win
 
         private void SetStatus(string message)
         {
-            toolStripStatusLabel1.Text = message;
+            // toolStripStatusLabel1.Text = message;
             System.Windows.Forms.Application.DoEvents();
         }
 

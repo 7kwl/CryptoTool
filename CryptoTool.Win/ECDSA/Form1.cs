@@ -8,11 +8,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace CryptoTool.Win
+namespace CryptoTool.Win.ECDSA
 {
-    public partial class EcdsaTabControl : Form
+    public partial class Form1 : Form
     {
-        public EcdsaTabControl()
+        public Form1()
         {
             InitializeComponent();
         }
