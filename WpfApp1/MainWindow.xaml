@@ -1,0 +1,84 @@
+﻿<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="加密工具" Height="800" Width="1200"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <!-- 导航按钮样式 -->
+        <Style x:Key="NavButtonStyle" TargetType="ToggleButton">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontFamily" Value="Microsoft YaHei UI Light"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Background" Value="#FF0078D4"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FFE5F1FB"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 顶部菜单栏 -->
+        <Border Grid.Row="0" Background="#FFF0F0F0" BorderBrush="#FFD0D0D0" BorderThickness="0,0,0,1">
+            <StackPanel Orientation="Horizontal">
+                <ToggleButton x:Name="BtnEcdsa" Style="{StaticResource NavButtonStyle}"
+                              Content="ECDSA" Click="NavButton_Click" Tag="Ecdsa"/>
+                <ToggleButton x:Name="BtnRsa" Style="{StaticResource NavButtonStyle}"
+                              Content="RSA算法" Click="NavButton_Click" Tag="Rsa"/>
+                <ToggleButton x:Name="BtnRsaFmt" Style="{StaticResource NavButtonStyle}"
+                              Content="RSA格式转换" Click="NavButton_Click" Tag="RsaFmt"/>
+                <ToggleButton x:Name="BtnAes" Style="{StaticResource NavButtonStyle}"
+                              Content="AES算法" Click="NavButton_Click" Tag="Aes"/>
+                <ToggleButton x:Name="BtnDes" Style="{StaticResource NavButtonStyle}"
+                              Content="DES算法" Click="NavButton_Click" Tag="Des"/>
+                <ToggleButton x:Name="BtnSm4" Style="{StaticResource NavButtonStyle}"
+                              Content="SM4算法" Click="NavButton_Click" Tag="Sm4"/>
+                <ToggleButton x:Name="BtnSm2" Style="{StaticResource NavButtonStyle}"
+                              Content="SM2算法" Click="NavButton_Click" Tag="Sm2"/>
+                <ToggleButton x:Name="BtnSm3" Style="{StaticResource NavButtonStyle}"
+                              Content="SM3算法" Click="NavButton_Click" Tag="Sm3"/>
+                <ToggleButton x:Name="BtnMd5" Style="{StaticResource NavButtonStyle}"
+                              Content="MD5算法" Click="NavButton_Click" Tag="Md5"/>
+                <ToggleButton x:Name="BtnYb" Style="{StaticResource NavButtonStyle}"
+                              Content="医保接口" Click="NavButton_Click" Tag="Yb"/>
+                <ToggleButton x:Name="BtnAbout" Style="{StaticResource NavButtonStyle}"
+                              Content="关于" Click="NavButton_Click" Tag="About"/>
+            </StackPanel>
+        </Border>
+
+        <!-- 内容区域 -->
+        <Border Grid.Row="1" Background="White">
+            <ContentControl x:Name="MainContent" Margin="0"/>
+        </Border>
+    </Grid>
+</Window>

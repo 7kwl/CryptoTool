@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36414.22
+# Visual Studio Version 18
+VisualStudioVersion = 18.8.12023.21 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoTool.UnitTests", "CryptoTool.UnitTests\CryptoTool.UnitTests.csproj", "{C8EDB0DE-E46D-41D1-8BEE-BECC7F25A302}"
 EndProject
@@ -10,6 +10,10 @@ EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "CryptoTool.Pack", "CryptoTool.Pack\CryptoTool.Pack.vdproj", "{9B42FFDC-3796-7CF2-6D67-0DE8E4EB5DD3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoTool.Algorithm", "CryptoTool.Algorithm\CryptoTool.Algorithm.csproj", "{BC842F09-3F99-4233-B1D8-26457A2A497B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WDF", "WDF", "{01CEBB90-1CFF-4C6E-A5BB-A372FCF31EFF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp1", "WpfApp1\WpfApp1.csproj", "{74AC902D-FA38-4CC1-AEE8-8085C04ED3BD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,9 +35,16 @@ Global
 		{BC842F09-3F99-4233-B1D8-26457A2A497B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC842F09-3F99-4233-B1D8-26457A2A497B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC842F09-3F99-4233-B1D8-26457A2A497B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74AC902D-FA38-4CC1-AEE8-8085C04ED3BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74AC902D-FA38-4CC1-AEE8-8085C04ED3BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74AC902D-FA38-4CC1-AEE8-8085C04ED3BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74AC902D-FA38-4CC1-AEE8-8085C04ED3BD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{74AC902D-FA38-4CC1-AEE8-8085C04ED3BD} = {01CEBB90-1CFF-4C6E-A5BB-A372FCF31EFF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4D6B1906-F1DF-4299-8019-60AC72E681E5}
