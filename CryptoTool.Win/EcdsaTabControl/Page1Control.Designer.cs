@@ -1,4 +1,4 @@
-namespace WinFormsApp2;
+namespace CryptoTool.Win;
 
 partial class Page1Control
 {

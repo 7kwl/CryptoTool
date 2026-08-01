@@ -90,6 +90,9 @@
     <Compile Remove=".案例代码【腾讯元宝整理】\**\*.cs" />
     <None Remove=".案例代码【腾讯元宝整理】\**\*" />
     <Compile Remove="publish\*.cs" />
+    <Compile Remove="临时存放\**" />
+    <EmbeddedResource Remove="临时存放\**" />
+    <None Remove="临时存放\**" />
   </ItemGroup>
 
   <ItemGroup>
