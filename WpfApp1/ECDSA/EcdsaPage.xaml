@@ -49,6 +49,14 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+
+
+        <!-- 内容区域1 -->
+
+        <mainControl:EcdsaMainPage HorizontalAlignment="Left" Margin="4,4,0,0" VerticalAlignment="Top" Width="986"/>
+
+
+
         <!-- 二级菜单栏 -->
         <Border Grid.Row="1" BorderBrush="#FF20E60E" BorderThickness="0,0,0,1" Margin="0,0,0,8" >
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0">
@@ -63,9 +71,11 @@
             </StackPanel>
         </Border>
 
-        <!-- 内容区域 -->
+
+        <!-- 内容区域2 -->
+
         <ContentControl x:Name="SubContent" Grid.Row="2" Content="6576574657"/>
 
-        <mainControl:EcdsaMainPage HorizontalAlignment="Left" Margin="4,4,0,0" VerticalAlignment="Top" Width="986"/>
+
     </Grid>
 </UserControl>
