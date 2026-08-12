@@ -1,8 +1,7 @@
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Media;
-using WpfApp1.ECDSA.EcdsaTabControl;
 
 namespace WpfApp1.ECDSA
 {
@@ -11,8 +10,13 @@ namespace WpfApp1.ECDSA
         public EcdsaPage()
         {
             InitializeComponent();
+
+            // 避免在设计器中初始化子页面导致设计器崩溃
+            if (DesignerProperties.GetIsInDesignMode(this))
+                return;
+
             BtnKeyGen.IsChecked = true;
-            ShowSubPage("KeyGen");
+            TabHost.ShowSubPage("KeyGen");
         }
 
         private void SubNavButton_Click(object sender, RoutedEventArgs e)
@@ -29,26 +33,7 @@ namespace WpfApp1.ECDSA
             }
 
             clicked.IsChecked = true;
-            ShowSubPage(clicked.Tag?.ToString() ?? "");
-        }
-
-        private void ShowSubPage(string tag)
-        {
-            switch (tag)
-            {
-                case "KeyGen":
-                    SubContent.Content = new Ecdsa01();
-                    break;
-                case "Ecdh":
-                    SubContent.Content = new Ecdsa02();
-                    break;
-                case "Ecies":
-                    SubContent.Content = new Ecdsa03();
-                    break;
-                case "FileSign":
-                    SubContent.Content = new Ecdsa04();
-                    break;
-            }
+            TabHost.ShowSubPage(clicked.Tag?.ToString() ?? "");
         }
     }
 }
