@@ -8,11 +8,4 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="ECDSA\新文件夹\**" />
-    <EmbeddedResource Remove="ECDSA\新文件夹\**" />
-    <None Remove="ECDSA\新文件夹\**" />
-    <Page Remove="ECDSA\新文件夹\**" />
-  </ItemGroup>
-
 </Project>

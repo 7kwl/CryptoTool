@@ -9,6 +9,10 @@
 
     <Grid>
         <Button Content="Button" HorizontalAlignment="Left" Height="59" Margin="118,129,0,0" VerticalAlignment="Top" Width="96" Background="#FFB12121"/>
+        <Button Content="Button" HorizontalAlignment="Left" Height="59" Margin="703,19,0,0" VerticalAlignment="Top" Width="75"/>
+        <Button Content="Button" HorizontalAlignment="Left" Height="68" Margin="10,10,0,0" VerticalAlignment="Top" Width="112"/>
+        <Button Content="Button" HorizontalAlignment="Left" Height="93" Margin="647,339,0,0" VerticalAlignment="Top" Width="131"/>
+        <Button Content="Button" HorizontalAlignment="Left" Height="123" Margin="10,309,0,0" VerticalAlignment="Top" Width="156"/>
 
     </Grid>
 </UserControl>
