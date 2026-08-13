@@ -131,27 +131,27 @@
                     <ColumnDefinition Width="*"/>   <!-- 右：参数设置 -->
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <!-- 5 行设置项（各 35 高）+ 2 行弹性空间 -->
-                    <RowDefinition Height="35"/>
-                    <RowDefinition Height="35"/>
-                    <RowDefinition Height="35"/>
-                    <RowDefinition Height="35"/>
-                    <RowDefinition Height="35"/>
+                    <!-- 5 行设置项（各 32 高）+ 2 行弹性空间 -->
+                    <RowDefinition Height="32"/>
+                    <RowDefinition Height="32"/>
+                    <RowDefinition Height="32"/>
+                    <RowDefinition Height="32"/>
+                    <RowDefinition Height="32"/>
                     <RowDefinition Height="50*"/>
                     <RowDefinition Height="50*"/>
                 </Grid.RowDefinitions>
 
-                <!-- 左列：8 个操作按钮，各占 35 高的行，按钮本身 30 高并垂直居中 -->
+                <!-- 左列：8 个操作按钮，各占 32 高的行，按钮本身 30 高并垂直居中 -->
                 <Grid Grid.Column="0" Grid.RowSpan="7" Margin="0,0,5,4">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="35"/>
-                        <RowDefinition Height="35"/>
-                        <RowDefinition Height="35"/>
-                        <RowDefinition Height="35"/>
-                        <RowDefinition Height="35"/>
-                        <RowDefinition Height="35"/>
-                        <RowDefinition Height="35"/>
-                        <RowDefinition Height="35"/>
+                        <RowDefinition Height="32"/>
+                        <RowDefinition Height="32"/>
+                        <RowDefinition Height="32"/>
+                        <RowDefinition Height="32"/>
+                        <RowDefinition Height="32"/>
+                        <RowDefinition Height="32"/>
+                        <RowDefinition Height="32"/>
+                        <RowDefinition Height="32"/>
                         <RowDefinition Height="*"/> <!-- 吸收剩余空间 -->
                     </Grid.RowDefinitions>
                     <Button x:Name="btnGenerateEcdhKeys" Content="生成 EC 密钥对" Grid.Row="0" Height="30" VerticalAlignment="Center" Margin="0,0"/>
@@ -165,30 +165,30 @@
                 </Grid>
 
                 <!-- 右列：第 1 行 —— 私钥编码标准 -->
-                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Margin="50,0,0,0" VerticalAlignment="Center">
-                    <TextBlock Text="私钥编码标准2：" Width="150" TextAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Margin="10,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="私钥编码标准2：" Width="90" TextAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0"/>
                     <ComboBox x:Name="comboEcdhPrivateKeyStandard" Width="300" IsReadOnly="True" VerticalAlignment="Center"/>
                     <Button x:Name="btnConvertEcdhPrivateKeyStandard" Content="转换" Width="60" Height="24" Margin="4,0,0,0" VerticalAlignment="Center"/>
                 </StackPanel>
 
                 <!-- 右列：第 2 行 —— 公钥编码标准 -->
-                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="50,0,0,0" VerticalAlignment="Center">
-                    <TextBlock Text="公钥编码标准2：" Width="150" TextAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="10,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="公钥编码标准2：" Width="90" TextAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0"/>
                     <ComboBox x:Name="comboEcdhPublicKeyStandard" Width="300" IsReadOnly="True" VerticalAlignment="Center"/>
                     <Button x:Name="btnConvertEcdhPublicKeyStandard" Content="转换" Width="60" Height="24" Margin="4,0,0,0" VerticalAlignment="Center"/>
                 </StackPanel>
 
                 <!-- 右列：第 3 行 —— 椭圆曲线（类别 → 曲线） -->
-                <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="50,0,0,0" VerticalAlignment="Center">
-                    <TextBlock Text="椭圆曲线：" Width="150" TextAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="10,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="椭圆曲线：" Width="90" TextAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0"/>
                     <ComboBox x:Name="comboEcdhCategory" Width="183" IsReadOnly="True" VerticalAlignment="Center"/>
                     <TextBlock Text="→" Width="36" TextAlignment="Center" FontSize="16" VerticalAlignment="Center" Margin="4,0"/>
                     <ComboBox x:Name="comboEcdhCurve" Width="330" IsReadOnly="True" VerticalAlignment="Center"/>
                 </StackPanel>
 
                 <!-- 右列：第 4 行 —— 密钥模型 -->
-                <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Margin="50,0,0,0" VerticalAlignment="Center">
-                    <TextBlock Text="密钥模型：" Width="150" TextAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Margin="10,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="密钥模型：" Width="90" TextAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0"/>
                     <ComboBox x:Name="comboEcdhMode" Width="160" IsReadOnly="True" VerticalAlignment="Center">
                         <ComboBoxItem Content="8gwifi.org"/>
                         <ComboBoxItem Content="CryptoTool"/>
@@ -200,8 +200,8 @@
                 </StackPanel>
 
                 <!-- 右列：第 5 行 —— 明文编码 -->
-                <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Margin="50,0,0,0" VerticalAlignment="Center">
-                    <TextBlock Text="明文编码：" Width="150" TextAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Margin="10,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="明文编码：" Width="90" TextAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0"/>
                     <ComboBox x:Name="comboEcdhEncoding" Width="120" IsReadOnly="True" VerticalAlignment="Center">
                         <ComboBoxItem Content="UTF-8"/>
                         <ComboBoxItem Content="GBK (GB2312)"/>
