@@ -348,3 +348,6 @@ ClassLibrary1/
 App2/
 App4/
 临时存放/
+
+# 临时文件（CryptoTool.Win 下的临时文件夹）
+CryptoTool.Win/临时文件1/

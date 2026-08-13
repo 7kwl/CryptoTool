@@ -59,8 +59,6 @@ namespace CryptoTool.Win
             sm4TabControl.Dock = DockStyle.Fill;
             sm2TabControl.Dock = DockStyle.Fill;
             sm3TabControl.Dock = DockStyle.Fill;
-            ecdsaTabControl.TopLevel = false;
-            ecdsaTabControl.FormBorderStyle = FormBorderStyle.None;
             ecdsaTabControl.Dock = DockStyle.Fill;
             ecdsaTabControl.Visible = true;
             md5TabControl.Dock = DockStyle.Fill;

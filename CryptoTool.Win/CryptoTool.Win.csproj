@@ -92,6 +92,19 @@
     <Compile Remove="publish\*.cs" />
   </ItemGroup>
 
+  <!-- 临时文件1 是废弃的临时文件夹，整体移出编译和资源打包，
+       避免其 EcdsaTabControl.resx 与 ECDSA\EcdsaTabControl.resx 冲突生成同一资源路径 -->
+  <ItemGroup>
+    <Compile Remove="临时文件1\**\*.cs" />
+    <EmbeddedResource Remove="临时文件1\**\*.resx" />
+    <None Remove="临时文件1\**\*" />
+  </ItemGroup>
+
+  <!-- ECDSA 下空壳 resx（无实际资源、无代码引用）移出资源打包，避免冲突 -->
+  <ItemGroup>
+    <EmbeddedResource Remove="ECDSA\EcdsaTabControl.ECDSA02.resx" />
+  </ItemGroup>
+
   <ItemGroup>
     <None Update="assets\三花猫.png">
       <Pack>True</Pack>
