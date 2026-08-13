@@ -89,7 +89,7 @@
 
 
         <!-- 内容区域1 -->
-        <mainControl:EcdsaMainPage Grid.Row="0" Margin="1,1,1,1"/>
+        <mainControl:EcdsaMainPage Grid.Row="0" Margin="1,1,1,1" Loaded="EcdsaMainPage_Loaded"/>
 
 
 

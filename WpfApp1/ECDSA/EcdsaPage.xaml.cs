@@ -35,5 +35,10 @@ namespace WpfApp1.ECDSA
             clicked.IsChecked = true;
             TabHost.ShowSubPage(clicked.Tag?.ToString() ?? "");
         }
+
+        private void EcdsaMainPage_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
