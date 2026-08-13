@@ -1,12 +1,8 @@
-using System;
-using System.Drawing;
-using System.IO;
+#nullable enable
+
 using System.Security.Cryptography;
 using System.Text;
-using System.Windows.Forms;
 using CryptoTool.Algorithm.Algorithms.ECDSA;
-using CryptoTool.Win.Enums;
-using CryptoTool.Win.Helpers;
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;

@@ -53,6 +53,9 @@
             <StackPanel Orientation="Horizontal">
                 <ToggleButton x:Name="BtnEcdsa" Style="{StaticResource NavButtonStyle}"
                               Content="ECDSA" Click="NavButton_Click" Tag="Ecdsa" Foreground="#FFDF0F0F" FontFamily="MS UI Gothic"/>
+
+
+                              
                 <ToggleButton x:Name="BtnRsa" Style="{StaticResource NavButtonStyle}"
                               Content="RSA算法" Click="NavButton_Click" Tag="Rsa"/>
                 <ToggleButton x:Name="BtnRsaFmt" Style="{StaticResource NavButtonStyle}"
@@ -77,7 +80,7 @@
         </Border>
 
         <!-- 内容区域 -->
-        <Border Grid.Row="1" Background="#FFCD8383">
+        <Border Grid.Row="1" Background="White">
             <ContentControl x:Name="MainContent" Margin="0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
         </Border>
     </Grid>

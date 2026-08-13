@@ -4,10 +4,10 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="1800"
+      d:DesignHeight="500" d:DesignWidth="1800"
       Background="White">
 
     <Grid>
-        <ContentControl x:Name="SubContent" Background="#FF67D075" />
+        <ContentControl x:Name="SubContent" />
     </Grid>
 </UserControl>
