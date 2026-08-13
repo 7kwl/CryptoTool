@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     Ecdsa01.xaml — ECDH 密钥交换页面（对应 WinForms 的 ECDSA01 视图）
     整体布局：三列（30% / 20% / 50%）两行（50% / 50%）
       ├─ 左列：爱丽丝 / 鲍勃 两把密钥对（私钥 + 公钥，PEM 文本框）
@@ -124,7 +124,10 @@
         </GroupBox>
 
         <!-- ==================== 右列：密钥操作 ==================== -->
-        <GroupBox Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Header="密钥操作" Margin="4,0,0,0">
+        <GroupBox Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Margin="4,0,0,0">
+            <GroupBox.Header>
+                <TextBlock Text="密钥操作" HorizontalAlignment="Stretch" TextAlignment="Center"/>
+            </GroupBox.Header>
             <Grid Margin="6">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="170"/> <!-- 左：操作按钮 -->

@@ -24,7 +24,10 @@
         </Grid.RowDefinitions>
 
         <!-- ==================== 左列：密钥生成 ==================== -->
-        <GroupBox Grid.Row="0" Grid.Column="0" Header="密钥生成" Margin="3">
+        <GroupBox Grid.Row="0" Grid.Column="0" Margin="3">
+            <GroupBox.Header>
+                <TextBlock Text="密钥生成" HorizontalAlignment="Stretch" TextAlignment="Center"/>
+            </GroupBox.Header>
             <Grid Margin="6">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>  <!-- 文本框 -->
@@ -68,7 +71,10 @@
         </GroupBox>
 
         <!-- ==================== 右列：密钥操作 ==================== -->
-        <GroupBox Grid.Row="0" Grid.Column="1" Header="密钥操作" Margin="3">
+        <GroupBox Grid.Row="0" Grid.Column="1" Margin="3">
+            <GroupBox.Header>
+                <TextBlock Text="密钥操作" HorizontalAlignment="Stretch" TextAlignment="Center"/>
+            </GroupBox.Header>
             <Grid Margin="6">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
