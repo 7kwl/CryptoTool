@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Org.BouncyCastle.Asn1;
+using Org.BouncyCastle.Asn1.Pkcs;
+using Org.BouncyCastle.Asn1.X509;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.OpenSsl;
+using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.Security;
 
 namespace CryptoTool.Algorithm.Algorithms.ECDSA 
@@ -38,6 +41,25 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
             using var sw = new StringWriter();
             var pemWriter = new PemWriter(sw);
             pemWriter.WriteObject(namedPriv);
+            pemWriter.Writer.Flush();
+            return sw.ToString();
+        }
+
+        /// <summary>
+        /// 将 EC 私钥导出为 PKCS#8（RFC 5958）格式 PEM（BEGIN PRIVATE KEY，现代应用推荐）
+        /// 注意：不能直接用 PemWriter.WriteObject(PrivateKeyInfo)——
+        /// BouncyCastle 的 MiscPemGenerator 会把 EC 的 PrivateKeyInfo 自动转回 SEC1 短编码，
+        /// 因此必须用 PemObject("PRIVATE KEY", der) 手工构造 PKCS#8 PEM 外壳。
+        /// </summary>
+        public static string ExportPrivateKeyPemPkcs8(ECPrivateKeyParameters privateKey)
+        {
+            var info = PrivateKeyInfoFactory.CreatePrivateKeyInfo(privateKey);
+            byte[] der = info.GetDerEncoded();
+
+            using var sw = new StringWriter();
+            var pemWriter = new PemWriter(sw);
+            // PemObject 全限定名，避免与 OpenSsl.PemWriter 冲突
+            pemWriter.WriteObject(new Org.BouncyCastle.Utilities.IO.Pem.PemObject("PRIVATE KEY", der));
             pemWriter.Writer.Flush();
             return sw.ToString();
         }
@@ -111,6 +133,21 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
             if (obj is AsymmetricCipherKeyPair kp)
                 return (ECPrivateKeyParameters)kp.Private;
 
+            // PKCS#8 (RFC 5958)：PrivateKeyInfo
+            if (obj is PrivateKeyInfo pkcs8Info)
+            {
+                var privateKey = PrivateKeyFactory.CreateKey(pkcs8Info) as ECPrivateKeyParameters
+                    ?? throw new ArgumentException("PKCS#8 私钥不是有效的 EC 私钥");
+                return privateKey;
+            }
+
+            // 兼容某些 PEM 直接读到 AsymmetricKeyParameter 的场景
+            if (obj is AsymmetricKeyParameter asymmetric && asymmetric.IsPrivate)
+            {
+                if (asymmetric is ECPrivateKeyParameters ecPriv2)
+                    return ecPriv2;
+            }
+
             throw new ArgumentException("无效的 EC 私钥 PEM");
         }
 
@@ -124,6 +161,14 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
                 return ecPub;
             if (obj is AsymmetricCipherKeyPair kp)
                 return (ECPublicKeyParameters)kp.Public;
+
+            // X.509 SubjectPublicKeyInfo (RFC 5280)
+            if (obj is SubjectPublicKeyInfo pubInfo)
+            {
+                var publicKey = PublicKeyFactory.CreateKey(pubInfo) as ECPublicKeyParameters
+                    ?? throw new ArgumentException("SubjectPublicKeyInfo 公钥不是有效的 EC 公钥");
+                return publicKey;
+            }
 
             throw new ArgumentException("无效的 EC 公钥 PEM");
         }
