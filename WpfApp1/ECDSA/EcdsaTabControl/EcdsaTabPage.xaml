@@ -8,6 +8,6 @@
       Background="White">
 
     <Grid>
-        <ContentControl x:Name="SubContent" />
+        <ContentControl x:Name="SubContent" Background="#FF67D075" />
     </Grid>
 </UserControl>

@@ -3,12 +3,10 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:WpfApp1.ECDSA.EcdsaTabControl"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="1800">
 
     <Grid>
-        <Label Content="Label" HorizontalAlignment="Left" Height="40" Margin="187,0,0,0" VerticalAlignment="Center" Width="65"/>
-
+        <Label Content="Label" HorizontalAlignment="Center" VerticalAlignment="Center"/>
     </Grid>
 </UserControl>
