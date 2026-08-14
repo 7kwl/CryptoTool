@@ -16,8 +16,8 @@ namespace WpfApp1.ECDSA
             if (DesignerProperties.GetIsInDesignMode(this))
                 return;
 
-            BtnKeyGen.IsChecked = true;
-            TabHost.ShowSubPage("KeyGen");
+            // 首次创建子页面延迟到 EcdsaTopPanel_Loaded 中（此时 ResultAppender/KeyResultAppender 桥接已就绪，
+            // 且 EcdsaTabPage 已加上 _subPages 缓存，重复进入 ECDSA 菜单会复用同一 Ecdsa01，不会清空记录）
         }
 
         private void SubNavButton_Click(object sender, RoutedEventArgs e)
@@ -46,7 +46,9 @@ namespace WpfApp1.ECDSA
             // AppendKeyResult 带可选参数 curveName，方法组不能直接转 Action<string,SolidColorBrush>，用 Lambda 包装
             TabHost.KeyResultAppender = (msg, brush) => TopPanel.AppendKeyResult(msg, brush);
 
-            // 当前默认在 KeyGen，已实例化过 Ecdsa01，需要重建以拿到刚设置的桥接
+            // 默认进入 KeyGen 子页面（首次创建；后续切走再回来会复用同一 Ecdsa01）
+            if (BtnKeyGen.IsChecked != true)
+                BtnKeyGen.IsChecked = true;
             TabHost.ShowSubPage("KeyGen");
         }
     }

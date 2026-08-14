@@ -23,16 +23,27 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
         /// </summary>
         public Action<string, SolidColorBrush>? KeyResultAppender { get; set; }
 
+        /// <summary>
+        /// 子页面实例缓存：切换菜单/重新附着时复用，避免清空各子页面已有记录
+        /// </summary>
+        private readonly Dictionary<string, UserControl> _subPages = [];
+
         public void ShowSubPage(string tag)
         {
-            UserControl? sub = tag switch
+            if (!_subPages.TryGetValue(tag, out var sub))
             {
-                "KeyGen" => new Ecdsa01 { AppendToHost = ResultAppender, AppendKeyToHost = KeyResultAppender },
-                "Ecdh" => new Ecdsa02(),
-                "Ecies" => new Ecdsa03(),
-                "FileSign" => new Ecdsa04(),
-                _ => null
-            };
+                sub = tag switch
+                {
+                    "KeyGen" => new Ecdsa01 { AppendToHost = ResultAppender, AppendKeyToHost = KeyResultAppender },
+                    "Ecdh" => new Ecdsa02(),
+                    "Ecies" => new Ecdsa03(),
+                    "FileSign" => new Ecdsa04(),
+                    _ => null
+                };
+                if (sub != null)
+                    _subPages[tag] = sub;
+            }
+
             SubContent.Content = sub;
         }
     }

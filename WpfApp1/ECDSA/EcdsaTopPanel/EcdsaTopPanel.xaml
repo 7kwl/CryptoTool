@@ -16,8 +16,10 @@
     <!-- ===== 根网格：两列 ===== -->
     <Grid Margin="8">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/> <!-- 左列：密钥生成 -->
-            <ColumnDefinition Width="*"/> <!-- 右列：密钥操作 -->
+            <ColumnDefinition Width="*"/>
+            <!-- 左列：密钥生成 -->
+            <ColumnDefinition Width="*"/>
+            <!-- 右列：密钥操作 -->
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -30,8 +32,10 @@
             </GroupBox.Header>
             <Grid Margin="6">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>  <!-- 文本框 -->
-                    <ColumnDefinition Width="100"/> <!-- 操作按钮 -->
+                    <ColumnDefinition Width="*"/>
+                    <!-- 文本框 -->
+                    <ColumnDefinition Width="100"/>
+                    <!-- 操作按钮 -->
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -81,15 +85,19 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/> <!-- 上：操作区（高度随内容，5 行 34 紧凑排列） -->
-                    <RowDefinition Height="*"/>   <!-- 下：结果区（各自内部滚动） -->
+                    <RowDefinition Height="Auto" MinHeight="191"/>
+                    <!-- 上：操作区（高度随内容，5 行 34 紧凑排列） -->
+                    <RowDefinition/>
+                    <!-- 下：结果区（各自内部滚动） -->
                 </Grid.RowDefinitions>
 
                 <!-- 上：操作区（左按钮 + 右设置），5 行一一对应保证行对齐 -->
                 <Grid x:Name="gridKeyOperations" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="150"/> <!-- 操作按钮 -->
-                        <ColumnDefinition Width="*"/>   <!-- 设置项 -->
+                        <ColumnDefinition Width="150"/>
+                        <!-- 操作按钮 -->
+                        <ColumnDefinition Width="*"/>
+                        <!-- 设置项 -->
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="34"/>
