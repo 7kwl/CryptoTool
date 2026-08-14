@@ -34,8 +34,8 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <!-- 文本框 -->
-                    <ColumnDefinition Width="100"/>
-                    <!-- 操作按钮 -->
+                    <ColumnDefinition Width="30"/>
+                    <!-- 操作图标 -->
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -49,62 +49,26 @@
                     <TextBox x:Name="textPrivateKey" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
                     <TextBlock Text="私钥 (PEM)" Margin="0,4,6,0" Foreground="#FF333333" HorizontalAlignment="Right" VerticalAlignment="Top"/>
                 </Grid>
-                <Grid Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Margin="6,0,0,6">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="20"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="&#x1F511; 私钥操作" FontWeight="Bold" Foreground="#FFC00000" Margin="0,0,0,4" TextAlignment="Center"/>
-                    <Image Grid.Row="1" Grid.Column="0" x:Name="imgCopyPrivateKey" Source="{StaticResource IconCopy}" Width="14" Height="14" Cursor="Hand" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <Button Grid.Row="1" Grid.Column="1" x:Name="btnCopyPrivateKey" Content="复制私钥" Height="30" Margin="0,2"/>
-                    <Image Grid.Row="2" Grid.Column="0" x:Name="imgPastePrivateKey" Source="{StaticResource IconPaste}" Width="14" Height="14" Cursor="Hand" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <Button Grid.Row="2" Grid.Column="1" x:Name="btnPastePrivateKey" Content="粘贴私钥" Height="30" Margin="0,2"/>
-                    <Image Grid.Row="3" Grid.Column="0" x:Name="imgClearPrivateKey" Source="{StaticResource IconClear}" Width="14" Height="14" Cursor="Hand" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <Button Grid.Row="3" Grid.Column="1" x:Name="btnClearPrivateKey" Content="清空私钥" Height="30" Margin="0,2"/>
-                    <Image Grid.Row="4" Grid.Column="0" x:Name="imgImportPrivateKey" Source="{StaticResource IconImport}" Width="14" Height="14" Cursor="Hand" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <Button Grid.Row="4" Grid.Column="1" x:Name="btnImportPrivateKey" Content="导入私钥" Height="30" Margin="0,2"/>
-                    <Image Grid.Row="5" Grid.Column="0" x:Name="imgExportPrivateKey" Source="{StaticResource IconExport}" Width="14" Height="14" Cursor="Hand" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <Button Grid.Row="5" Grid.Column="1" x:Name="btnSavePrivateKey" Content="保存私钥" Height="30" Margin="0,2"/>
-                </Grid>
+                <StackPanel Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Margin="6,0,0,6" HorizontalAlignment="Center">
+                    <Image x:Name="imgCopyPrivateKey" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,4"/>
+                    <Image x:Name="imgPastePrivateKey" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,4"/>
+                    <Image x:Name="imgClearPrivateKey" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,4"/>
+                    <Image x:Name="imgImportPrivateKey" Source="{StaticResource IconImport}" Width="16" Height="16" Cursor="Hand" Margin="0,4"/>
+                    <Image x:Name="imgExportPrivateKey" Source="{StaticResource IconExport}" Width="16" Height="16" Cursor="Hand" Margin="0,4"/>
+                </StackPanel>
 
                 <!-- 公钥区 -->
                 <Grid Grid.Row="2" Grid.Column="0" Grid.RowSpan="2" Margin="0,6,6,0">
                     <TextBox x:Name="textPublicKey" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
                     <TextBlock Text="公钥 (PEM)" Margin="0,4,6,0" Foreground="#FF333333" HorizontalAlignment="Right" VerticalAlignment="Top"/>
                 </Grid>
-                <Grid Grid.Row="2" Grid.Column="1" Grid.RowSpan="2" Margin="6,6,0,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="20"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="&#x1F513; 公钥操作" FontWeight="Bold" Foreground="#FF0064B4" Margin="0,0,0,4" TextAlignment="Center"/>
-                    <Image Grid.Row="1" Grid.Column="0" x:Name="imgCopyPublicKey" Source="{StaticResource IconCopy}" Width="14" Height="14" Cursor="Hand" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <Button Grid.Row="1" Grid.Column="1" x:Name="btnCopyPublicKey" Content="复制公钥" Height="30" Margin="0,2"/>
-                    <Image Grid.Row="2" Grid.Column="0" x:Name="imgPastePublicKey" Source="{StaticResource IconPaste}" Width="14" Height="14" Cursor="Hand" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <Button Grid.Row="2" Grid.Column="1" x:Name="btnPastePublicKey" Content="粘贴公钥" Height="30" Margin="0,2"/>
-                    <Image Grid.Row="3" Grid.Column="0" x:Name="imgClearPublicKey" Source="{StaticResource IconClear}" Width="14" Height="14" Cursor="Hand" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <Button Grid.Row="3" Grid.Column="1" x:Name="btnClearPublicKey" Content="清空公钥" Height="30" Margin="0,2"/>
-                    <Image Grid.Row="4" Grid.Column="0" x:Name="imgImportPublicKey" Source="{StaticResource IconImport}" Width="14" Height="14" Cursor="Hand" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <Button Grid.Row="4" Grid.Column="1" x:Name="btnImportPublicKey" Content="导入公钥" Height="30" Margin="0,2"/>
-                    <Image Grid.Row="5" Grid.Column="0" x:Name="imgExportPublicKey" Source="{StaticResource IconExport}" Width="14" Height="14" Cursor="Hand" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <Button Grid.Row="5" Grid.Column="1" x:Name="btnSavePublicKey" Content="保存公钥" Height="30" Margin="0,2"/>
-                </Grid>
+                <StackPanel Grid.Row="2" Grid.Column="1" Grid.RowSpan="2" Margin="6,6,0,0" HorizontalAlignment="Center">
+                    <Image x:Name="imgCopyPublicKey" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,4"/>
+                    <Image x:Name="imgPastePublicKey" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,4"/>
+                    <Image x:Name="imgClearPublicKey" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,4"/>
+                    <Image x:Name="imgImportPublicKey" Source="{StaticResource IconImport}" Width="16" Height="16" Cursor="Hand" Margin="0,4"/>
+                    <Image x:Name="imgExportPublicKey" Source="{StaticResource IconExport}" Width="16" Height="16" Cursor="Hand" Margin="0,4"/>
+                </StackPanel>
             </Grid>
         </GroupBox>
 

@@ -100,18 +100,6 @@ namespace WpfApp1.ECDSA.EcdsaTopPanel
             btnConvertPrivateKeyStandard.Click += BtnConvertPrivateKeyStandard_Click;
             btnConvertPublicKeyStandard.Click += BtnConvertPublicKeyStandard_Click;
 
-            btnCopyPrivateKey.Click += BtnCopyPrivateKey_Click;
-            btnPastePrivateKey.Click += BtnPastePrivateKey_Click;
-            btnImportPrivateKey.Click += BtnImportPrivateKey_Click;
-            btnSavePrivateKey.Click += BtnSavePrivateKey_Click;
-            btnClearPrivateKey.Click += BtnClearPrivateKey_Click;
-
-            btnCopyPublicKey.Click += BtnCopyPublicKey_Click;
-            btnPastePublicKey.Click += BtnPastePublicKey_Click;
-            btnImportPublicKey.Click += BtnImportPublicKey_Click;
-            btnSavePublicKey.Click += BtnSavePublicKey_Click;
-            btnClearPublicKey.Click += BtnClearPublicKey_Click;
-
             comboOutputFormat.SelectionChanged += ComboOutputFormat_SelectedIndexChanged;
             comboPrivateKeyStandard.SelectionChanged += ComboPrivateKeyStandard_SelectedIndexChanged;
             comboPublicKeyStandard.SelectionChanged += ComboPublicKeyStandard_SelectedIndexChanged;
