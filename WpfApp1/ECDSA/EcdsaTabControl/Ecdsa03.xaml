@@ -1,4 +1,4 @@
-<!--
+﻿<!--
     Ecdsa03.xaml — ECIES 加密解密页面（对应 WinForms 的 ECDSA03 视图）
     整体布局：三列（30% / 20% / 50%）
       ├─ 左列：加密 / 解密输入输出区（明文 / 密文 / 临时私钥 ePriv / 临时公钥 ePub）
@@ -28,7 +28,7 @@
             <Grid Margin="6">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>  <!-- 文本框 -->
-                    <ColumnDefinition Width="28"/>  <!-- 图标列 -->
+                    <ColumnDefinition Width="28"/> <!-- 图标列（在 TextBox 外面右侧） -->
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="25*"/>
@@ -42,43 +42,43 @@
                     <TextBox x:Name="textEncInput" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
                     <TextBlock Text="明文输入：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
                 </Grid>
-                <StackPanel Grid.Row="0" Grid.Column="1" Margin="4,4,0,0" HorizontalAlignment="Center">
-                    <Image x:Name="imgCopyEncInput" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="复制明文输入"/>
-                    <Image x:Name="imgPasteEncInput" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="粘贴明文输入"/>
-                    <Image x:Name="imgClearEncInput" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="清空明文输入"/>
+                <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,2,2,0" HorizontalAlignment="Center" VerticalAlignment="Top">
+                    <Image x:Name="imgCopyEncInput" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="复制明文输入"/>
+                    <Image x:Name="imgPasteEncInput" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="粘贴明文输入"/>
+                    <Image x:Name="imgClearEncInput" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="清空明文输入"/>
                 </StackPanel>
 
                 <!-- 密文结果 -->
                 <Grid Grid.Row="1" Grid.Column="0" Margin="0,2,4,2">
-                    <TextBox x:Name="textEncOutput" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4" local:SoftWrapTextBox.MaxChars="64"/>
+                    <TextBox x:Name="textEncOutput" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
                     <TextBlock Text="密文结果：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
                 </Grid>
-                <StackPanel Grid.Row="1" Grid.Column="1" Margin="4,4,0,0" HorizontalAlignment="Center">
-                    <Image x:Name="imgCopyEncOutput" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="复制密文结果"/>
-                    <Image x:Name="imgPasteEncOutput" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="粘贴密文结果"/>
-                    <Image x:Name="imgClearEncOutput" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="清空密文结果"/>
+                <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,2,2,0" HorizontalAlignment="Center" VerticalAlignment="Top">
+                    <Image x:Name="imgCopyEncOutput" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="复制密文结果"/>
+                    <Image x:Name="imgPasteEncOutput" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="粘贴密文结果"/>
+                    <Image x:Name="imgClearEncOutput" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="清空密文结果"/>
                 </StackPanel>
 
                 <!-- 临时私钥 ePriv -->
                 <Grid Grid.Row="2" Grid.Column="0" Margin="0,2,4,2">
-                    <TextBox x:Name="textEncExtra" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4" local:SoftWrapTextBox.MaxChars="64"/>
+                    <TextBox x:Name="textEncExtra" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
                     <TextBlock Text="临时私钥ePriv：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
                 </Grid>
-                <StackPanel Grid.Row="2" Grid.Column="1" Margin="4,4,0,0" HorizontalAlignment="Center">
-                    <Image x:Name="imgCopyEncExtra" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="复制临时私钥ePriv"/>
-                    <Image x:Name="imgPasteEncExtra" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="粘贴临时私钥ePriv"/>
-                    <Image x:Name="imgClearEncExtra" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="清空临时私钥ePriv"/>
+                <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,2,2,0" HorizontalAlignment="Center" VerticalAlignment="Top">
+                    <Image x:Name="imgCopyEncExtra" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="复制临时私钥ePriv"/>
+                    <Image x:Name="imgPasteEncExtra" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="粘贴临时私钥ePriv"/>
+                    <Image x:Name="imgClearEncExtra" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="清空临时私钥ePriv"/>
                 </StackPanel>
 
                 <!-- 临时公钥 ePub -->
                 <Grid Grid.Row="3" Grid.Column="0" Margin="0,2,4,0">
-                    <TextBox x:Name="textEncEphemeralPub" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4" local:SoftWrapTextBox.MaxChars="64"/>
+                    <TextBox x:Name="textEncEphemeralPub" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
                     <TextBlock Text="临时公钥ePub：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
                 </Grid>
-                <StackPanel Grid.Row="3" Grid.Column="1" Margin="4,4,0,0" HorizontalAlignment="Center">
-                    <Image x:Name="imgCopyEncEphemeralPub" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="复制临时公钥ePub"/>
-                    <Image x:Name="imgPasteEncEphemeralPub" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="粘贴临时公钥ePub"/>
-                    <Image x:Name="imgClearEncEphemeralPub" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="清空临时公钥ePub"/>
+                <StackPanel Grid.Row="3" Grid.Column="1" Margin="0,2,2,0" HorizontalAlignment="Center" VerticalAlignment="Top">
+                    <Image x:Name="imgCopyEncEphemeralPub" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="复制临时公钥ePub"/>
+                    <Image x:Name="imgPasteEncEphemeralPub" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="粘贴临时公钥ePub"/>
+                    <Image x:Name="imgClearEncEphemeralPub" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="清空临时公钥ePub"/>
                 </StackPanel>
             </Grid>
         </GroupBox>
@@ -86,6 +86,10 @@
         <!-- ==================== 中列：参数 ==================== -->
         <GroupBox Grid.Column="1" Header="参数" Margin="2,0,2,0">
             <Grid Margin="6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>  <!-- 文本框 -->
+                    <ColumnDefinition Width="24"/> <!-- 图标列（在 TextBox 外面右侧） -->
+                </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="25*"/>
                     <RowDefinition Height="25*"/>
@@ -94,64 +98,48 @@
                 </Grid.RowDefinitions>
 
                 <!-- 对称密钥 -->
-                <Grid Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="24"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBox x:Name="textEncKey" Grid.Column="0" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
+                <Grid Grid.Row="0" Grid.Column="0" Margin="0,0,4,2">
+                    <TextBox x:Name="textEncKey" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
                     <TextBlock Text="对称密钥：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
-                    <StackPanel Grid.Column="1" Margin="4,4,0,0" HorizontalAlignment="Center">
-                        <Image x:Name="imgCopyEncKey" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="复制对称密钥"/>
-                        <Image x:Name="imgPasteEncKey" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="粘贴对称密钥"/>
-                        <Image x:Name="imgClearEncKey" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="清空对称密钥"/>
-                    </StackPanel>
                 </Grid>
+                <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,2,2,0" HorizontalAlignment="Center" VerticalAlignment="Top">
+                    <Image x:Name="imgCopyEncKey" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="复制对称密钥"/>
+                    <Image x:Name="imgPasteEncKey" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="粘贴对称密钥"/>
+                    <Image x:Name="imgClearEncKey" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="清空对称密钥"/>
+                </StackPanel>
 
                 <!-- 初始向量(IV) -->
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="24"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBox x:Name="textEncIV" Grid.Column="0" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
+                <Grid Grid.Row="1" Grid.Column="0" Margin="0,2,4,2">
+                    <TextBox x:Name="textEncIV" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
                     <TextBlock Text="初始向量(IV)：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
-                    <StackPanel Grid.Column="1" Margin="4,4,0,0" HorizontalAlignment="Center">
-                        <Image x:Name="imgCopyEncIV" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="复制初始向量(IV)"/>
-                        <Image x:Name="imgPasteEncIV" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="粘贴初始向量(IV)"/>
-                        <Image x:Name="imgClearEncIV" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="清空初始向量(IV)"/>
-                    </StackPanel>
                 </Grid>
+                <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,2,2,0" HorizontalAlignment="Center" VerticalAlignment="Top">
+                    <Image x:Name="imgCopyEncIV" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="复制初始向量(IV)"/>
+                    <Image x:Name="imgPasteEncIV" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="粘贴初始向量(IV)"/>
+                    <Image x:Name="imgClearEncIV" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="清空初始向量(IV)"/>
+                </StackPanel>
 
                 <!-- Bob 公钥 -->
-                <Grid Grid.Row="2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="24"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBox x:Name="textEncBobPublic" Grid.Column="0" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
+                <Grid Grid.Row="2" Grid.Column="0" Margin="0,2,4,2">
+                    <TextBox x:Name="textEncBobPublic" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
                     <TextBlock Text="Bob 公钥 (接收方)：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
-                    <StackPanel Grid.Column="1" Margin="4,4,0,0" HorizontalAlignment="Center">
-                        <Image x:Name="imgCopyEncBobPublic" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="复制 Bob 公钥"/>
-                        <Image x:Name="imgPasteEncBobPublic" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="粘贴 Bob 公钥"/>
-                        <Image x:Name="imgClearEncBobPublic" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="清空 Bob 公钥"/>
-                    </StackPanel>
                 </Grid>
+                <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,2,2,0" HorizontalAlignment="Center" VerticalAlignment="Top">
+                    <Image x:Name="imgCopyEncBobPublic" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="复制 Bob 公钥"/>
+                    <Image x:Name="imgPasteEncBobPublic" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="粘贴 Bob 公钥"/>
+                    <Image x:Name="imgClearEncBobPublic" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="清空 Bob 公钥"/>
+                </StackPanel>
 
                 <!-- 测试 -->
-                <Grid Grid.Row="3">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="24"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBox x:Name="textEncTest" Grid.Column="0" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
+                <Grid Grid.Row="3" Grid.Column="0" Margin="0,2,4,0">
+                    <TextBox x:Name="textEncTest" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
                     <TextBlock Text="测试：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
-                    <StackPanel Grid.Column="1" Margin="4,4,0,0" HorizontalAlignment="Center">
-                        <Image x:Name="imgCopyEncTest" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="复制测试"/>
-                        <Image x:Name="imgPasteEncTest" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="粘贴测试"/>
-                        <Image x:Name="imgClearEncTest" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,3" ToolTip="清空测试"/>
-                    </StackPanel>
                 </Grid>
+                <StackPanel Grid.Row="3" Grid.Column="1" Margin="0,2,2,0" HorizontalAlignment="Center" VerticalAlignment="Top">
+                    <Image x:Name="imgCopyEncTest" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="复制测试"/>
+                    <Image x:Name="imgPasteEncTest" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="粘贴测试"/>
+                    <Image x:Name="imgClearEncTest" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="清空测试"/>
+                </StackPanel>
             </Grid>
         </GroupBox>
 
