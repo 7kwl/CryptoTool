@@ -46,6 +46,12 @@ namespace WpfApp1.ECDSA
             // AppendKeyResult 带可选参数 curveName，方法组不能直接转 Action<string,SolidColorBrush>，用 Lambda 包装
             TabHost.KeyResultAppender = (msg, brush) => TopPanel.AppendKeyResult(msg, brush);
 
+            // 把顶部 ECDSA 面板的当前私钥/公钥 PEM 也桥接到子页面容器。
+            // 注：EcdsaTopPanel 与 EcdsaTabPage 是 Grid 的兄弟节点，子页面内部用 FindAncestor 走不到，
+            //   所以必须由 EcdsaMainControl 显式注入到 TabHost，再随 ShowSubPage 转发到各子页面。
+            TabHost.PrivateKeyProvider = TopPanel.GetCurrentPrivateKeyPem;
+            TabHost.PublicKeyProvider = TopPanel.GetCurrentPublicKeyPem;
+
             // 默认进入 KeyGen 子页面（首次创建；后续切走再回来会复用同一 Ecdsa01）
             if (BtnKeyGen.IsChecked != true)
                 BtnKeyGen.IsChecked = true;

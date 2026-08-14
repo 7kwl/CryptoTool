@@ -32,6 +32,12 @@ namespace WpfApp1.ECDSA.EcdsaTopPanel
         /// <summary>缓存的标准 PEM 公钥（文本框可能显示为 Base64/Hex）</summary>
         private string _publicKeyPem = string.Empty;
 
+        /// <summary>返回当前标准 PEM 私钥（供子页面使用，可能为空）</summary>
+        public string GetCurrentPrivateKeyPem() => _privateKeyPem ?? string.Empty;
+
+        /// <summary>返回当前标准 PEM 公钥（供子页面使用，可能为空）</summary>
+        public string GetCurrentPublicKeyPem() => _publicKeyPem ?? string.Empty;
+
         /// <summary>曲线分类数据：分类Key → (图标, 曲线列表)</summary>
         private Dictionary<string, (string Icon, List<KeyValuePair<string, string>> Curves)> _allCurveData = [];
 
@@ -488,6 +494,7 @@ AttachComboBoxWheel(comboCurve);
                     var priv = EcdsaKeyHelper.ImportPrivateKeyPem(pem);
                     _privateKeyPem = ExportPrivateKeyByStandard(priv);
                     textPrivateKey.Text = FormatKeyForDisplay(_privateKeyPem, fmt);
+                    AppendHistory($"导入私钥成功 → {Path.GetFileName(d.FileName)}");
                 }
                 else
                 {
@@ -495,6 +502,7 @@ AttachComboBoxWheel(comboCurve);
                     var pub = EcdsaKeyHelper.ImportPublicKeyPem(pem);
                     _publicKeyPem = ExportPublicKeyByStandard(pub);
                     textPublicKey.Text = FormatKeyForDisplay(_publicKeyPem, fmt);
+                    AppendHistory($"导入公钥成功 → {Path.GetFileName(d.FileName)}");
                 }
 
                 AppendValidationResult("新密钥已导入", Brushes.Green);
@@ -530,6 +538,7 @@ AttachComboBoxWheel(comboCurve);
             {
                 File.WriteAllText(d.FileName, keyContent, Encoding.UTF8);
                 SetStatus($"{keyTypeName}保存成功");
+                AppendHistory($"保存{keyTypeName}成功 → {Path.GetFileName(d.FileName)}");
             }
         }
 
@@ -542,6 +551,7 @@ AttachComboBoxWheel(comboCurve);
             ResetValidationResult("未验证", Brushes.Gray);
             SetKeyResultPlaceholder();
             SetStatus("已清空所有内容");
+            AppendHistory("清空全部");
         }
 
         private void BtnPastePrivateKey_Click(object? sender, RoutedEventArgs e)
@@ -560,12 +570,14 @@ AttachComboBoxWheel(comboCurve);
                 _privateKeyPem = ExportPrivateKeyByStandard(priv);
                 textPrivateKey.Text = FormatKeyForDisplay(_privateKeyPem, GetCurrentOutputFormat());
                 SetStatus("私钥已从剪贴板粘贴");
+                AppendHistory("粘贴私钥成功");
             }
             catch
             {
                 _privateKeyPem = c;
                 textPrivateKey.Text = c;
                 SetStatus("私钥已从剪贴板粘贴");
+                AppendHistory("粘贴私钥成功（原文）");
             }
         }
 
@@ -574,6 +586,7 @@ AttachComboBoxWheel(comboCurve);
             textPrivateKey.Clear();
             _privateKeyPem = string.Empty;
             SetStatus("私钥已清空");
+            AppendHistory("清空私钥");
         }
 
         private void BtnPastePublicKey_Click(object? sender, RoutedEventArgs e)
@@ -592,12 +605,14 @@ AttachComboBoxWheel(comboCurve);
                 _publicKeyPem = ExportPublicKeyByStandard(pub);
                 textPublicKey.Text = FormatKeyForDisplay(_publicKeyPem, GetCurrentOutputFormat());
                 SetStatus("公钥已从剪贴板粘贴");
+                AppendHistory("粘贴公钥成功");
             }
             catch
             {
                 _publicKeyPem = c;
                 textPublicKey.Text = c;
                 SetStatus("公钥已从剪贴板粘贴");
+                AppendHistory("粘贴公钥成功（原文）");
             }
         }
 
@@ -606,6 +621,7 @@ AttachComboBoxWheel(comboCurve);
             textPublicKey.Clear();
             _publicKeyPem = string.Empty;
             SetStatus("公钥已清空");
+            AppendHistory("清空公钥");
         }
 
         /// <summary>
@@ -654,12 +670,14 @@ AttachComboBoxWheel(comboCurve);
 
         private void BtnCopyPrivateKey_Click(object? sender, RoutedEventArgs e)
         {
-            TrySetClipboardText(textPrivateKey.Text, "私钥已复制到剪贴板", "私钥为空，无法复制！");
+            if (TrySetClipboardText(textPrivateKey.Text, "私钥已复制到剪贴板", "私钥为空，无法复制！"))
+                AppendHistory("复制私钥成功");
         }
 
         private void BtnCopyPublicKey_Click(object? sender, RoutedEventArgs e)
         {
-            TrySetClipboardText(textPublicKey.Text, "公钥已复制到剪贴板", "公钥为空，无法复制！");
+            if (TrySetClipboardText(textPublicKey.Text, "公钥已复制到剪贴板", "公钥为空，无法复制！"))
+                AppendHistory("复制公钥成功");
         }
 
         #endregion
@@ -772,6 +790,18 @@ AttachComboBoxWheel(comboCurve);
                 blocks.Add(p);
 
             textKeyResult.ScrollToHome();
+        }
+
+        /// <summary>
+        /// 操作历史文本框顶部插入一条纯文本日志（上面新、下面旧）。
+        /// 用于记录复制/粘贴/导入/保存等关键操作的成功路径。
+        /// </summary>
+        private void AppendHistory(string message)
+        {
+            string line = $"[{DateTime.Now:HH:mm:ss}] {message}{Environment.NewLine}";
+            // 顶部插入：最新操作在上
+            textOperationHistory.Text = line + textOperationHistory.Text;
+            textOperationHistory.ScrollToHome();
         }
 
         /// <summary>

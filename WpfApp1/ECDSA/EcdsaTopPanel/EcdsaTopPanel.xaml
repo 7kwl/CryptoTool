@@ -87,8 +87,10 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" MinHeight="191"/>
                     <!-- 上：操作区（高度随内容，5 行 34 紧凑排列） -->
-                    <RowDefinition/>
-                    <!-- 下：结果区（各自内部滚动） -->
+                    <RowDefinition Height="2*" MinHeight="100"/>
+                    <!-- 中：结果区（计算结果 + 运行结果，占据剩余空间） -->
+                    <RowDefinition Height="60"/>
+                    <!-- 下：操作历史区（固定 60px，跨两列） -->
                 </Grid.RowDefinitions>
 
                 <!-- 上：操作区（左按钮 + 右设置），5 行一一对应保证行对齐 -->
@@ -160,15 +162,23 @@
                     </StackPanel>
                 </Grid>
 
-                <!-- 下：计算结果（RichTextBox 支持彩色运行日志） -->
+                <!-- 中：计算结果（RichTextBox 支持彩色运行日志） -->
                 <GroupBox Grid.Row="1" Grid.Column="0" Header="计算结果" Margin="0,6,3,0">
                     <RichTextBox x:Name="textKeyResult" IsReadOnly="True" VerticalScrollBarVisibility="Auto" Background="White" BorderThickness="0" FontFamily="Consolas" FontSize="12" MinHeight="100"/>
                 </GroupBox>
 
-                <!-- 下：运行结果（RichTextBox 支持彩色运行日志） -->
+                <!-- 中：运行结果（RichTextBox 支持彩色运行日志） -->
                 <GroupBox Grid.Row="1" Grid.Column="1" Header="运行结果" Margin="3,6,0,0">
                     <RichTextBox x:Name="labelValidationResult" IsReadOnly="True" VerticalScrollBarVisibility="Auto" Background="White" BorderThickness="0" FontFamily="Consolas" FontSize="12" MinHeight="100"/>
                 </GroupBox>
+
+                <!-- 下：操作历史（跨两列，所有按键操作的时间戳记录） -->
+                <TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" x:Name="textOperationHistory" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Background="White" Foreground="Purple" BorderThickness="1" BorderBrush="#888" FontFamily="Consolas" FontSize="12" MinHeight="40" Margin="0,6,0,0">
+                    <TextBox.Resources>
+                        <!-- 禁用系统主题将 IsReadOnly 状态映射为 Foreground 灰色（部分 Windows 主题下显示为紫色） -->
+                        <SolidColorBrush x:Key="{x:Static SystemColors.GrayTextBrushKey}" Color="blue"/>
+                    </TextBox.Resources>
+                </TextBox>
             </Grid>
         </GroupBox>
     </Grid>

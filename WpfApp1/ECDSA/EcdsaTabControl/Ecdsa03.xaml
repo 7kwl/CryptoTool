@@ -42,8 +42,8 @@
                     <TextBlock Text="明文输入：" Margin="0,4,6,0" Foreground="Red" HorizontalAlignment="Right" VerticalAlignment="Top"/>
                 </Grid>
                 <StackPanel Grid.Row="0" Grid.Column="1" Margin="4,0,0,2">
-                    <Button Content="复制" Foreground="Red" Margin="0,1"/>
-                    <Button Content="粘贴" Foreground="Red" Margin="0,1"/>
+                    <Button x:Name="btnEncInputCopy" Content="复制" Foreground="Red" Margin="0,1" Click="BtnEncInputCopy_Click"/>
+                    <Button x:Name="btnEncInputPaste" Content="粘贴" Foreground="Red" Margin="0,1" Click="BtnEncInputPaste_Click"/>
                 </StackPanel>
 
                 <!-- 密文结果 -->
@@ -52,8 +52,8 @@
                     <TextBlock Text="密文结果：" Margin="0,4,6,0" Foreground="Red" HorizontalAlignment="Right" VerticalAlignment="Top"/>
                 </Grid>
                 <StackPanel Grid.Row="1" Grid.Column="1" Margin="4,0,0,2">
-                    <Button Content="复制" Foreground="Red" Margin="0,1"/>
-                    <Button Content="粘贴" Foreground="Red" Margin="0,1"/>
+                    <Button x:Name="btnEncOutputCopy" Content="复制" Foreground="Red" Margin="0,1" Click="BtnEncOutputCopy_Click"/>
+                    <Button x:Name="btnEncOutputPaste" Content="粘贴" Foreground="Red" Margin="0,1" Click="BtnEncOutputPaste_Click"/>
                 </StackPanel>
 
                 <!-- 临时私钥 ePriv -->
@@ -62,8 +62,8 @@
                     <TextBlock Text="临时私钥ePriv：" Margin="0,4,6,0" Foreground="Red" HorizontalAlignment="Right" VerticalAlignment="Top"/>
                 </Grid>
                 <StackPanel Grid.Row="2" Grid.Column="1" Margin="4,0,0,2">
-                    <Button Content="复制" Foreground="Red" Margin="0,1"/>
-                    <Button Content="粘贴" Foreground="Red" Margin="0,1"/>
+                    <Button x:Name="btnEncExtraCopy" Content="复制" Foreground="Red" Margin="0,1" Click="BtnEncExtraCopy_Click"/>
+                    <Button x:Name="btnEncExtraPaste" Content="粘贴" Foreground="Red" Margin="0,1" Click="BtnEncExtraPaste_Click"/>
                 </StackPanel>
 
                 <!-- 临时公钥 ePub -->
@@ -72,8 +72,8 @@
                     <TextBlock Text="临时公钥ePub：" Margin="0,4,6,0" Foreground="Red" HorizontalAlignment="Right" VerticalAlignment="Top"/>
                 </Grid>
                 <StackPanel Grid.Row="3" Grid.Column="1" Margin="4,0,0,0">
-                    <Button Content="复制" Foreground="Red" Margin="0,1"/>
-                    <Button Content="粘贴" Foreground="Red" Margin="0,1"/>
+                    <Button x:Name="btnEncEphemeralPubCopy" Content="复制" Foreground="Red" Margin="0,1" Click="BtnEncEphemeralPubCopy_Click"/>
+                    <Button x:Name="btnEncEphemeralPubPaste" Content="粘贴" Foreground="Red" Margin="0,1" Click="BtnEncEphemeralPubPaste_Click"/>
                 </StackPanel>
             </Grid>
         </GroupBox>
@@ -131,19 +131,21 @@
                     <RowDefinition Height="50*"/>
                 </Grid.RowDefinitions>
 
-                <!-- 左列：4 个操作按钮，各占 35 高的行，按钮 30 高并垂直居中 -->
+                <!-- 左列：操作按钮组（加密/解密/清空/密文拼接标准 + 一键复制密钥对） -->
                 <Grid Grid.Column="0" Grid.RowSpan="7" Margin="0,0,5,4">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="35"/>
                         <RowDefinition Height="35"/>
                         <RowDefinition Height="35"/>
                         <RowDefinition Height="35"/>
+                        <RowDefinition Height="35"/>
                         <RowDefinition Height="*"/> <!-- 吸收剩余空间 -->
                     </Grid.RowDefinitions>
-                    <Button x:Name="btnEncrypt" Content="加密" Grid.Row="0" Height="30" VerticalAlignment="Center" Margin="0,0"/>
-                    <Button x:Name="btnDecrypt" Content="解密" Grid.Row="1" Height="30" VerticalAlignment="Center" Margin="0,0"/>
-                    <Button x:Name="btnEncClear" Content="清空" Grid.Row="2" Height="30" VerticalAlignment="Center" Margin="0,0"/>
-                    <Button x:Name="btnEncFormatInfo" Content="密文拼接标准" Grid.Row="3" Height="30" VerticalAlignment="Center" Margin="0,0"/>
+                    <Button x:Name="btnEncrypt" Content="加密" Grid.Row="0" Height="30" VerticalAlignment="Center" Margin="0,0" Click="BtnEncrypt_Click"/>
+                    <Button x:Name="btnDecrypt" Content="解密" Grid.Row="1" Height="30" VerticalAlignment="Center" Margin="0,0" Click="BtnDecrypt_Click"/>
+                    <Button x:Name="btnEncClear" Content="清空" Grid.Row="2" Height="30" VerticalAlignment="Center" Margin="0,0" Click="BtnEncClear_Click"/>
+                    <Button x:Name="btnEncFormatInfo" Content="密文拼接标准" Grid.Row="3" Height="30" VerticalAlignment="Center" Margin="0,0" Click="BtnEncFormatInfo_Click"/>
+                    <Button x:Name="btnCopyTopKeyPair" Content="一键复制密钥对" Grid.Row="4" Height="30" VerticalAlignment="Center" Margin="0,0" Foreground="Red" ToolTip="把顶部 ECDSA 私钥(PEM)写入下方 ePriv，公钥(PEM)写入 ePub" Click="BtnCopyTopKeyPair_Click"/>
                 </Grid>
 
                 <!-- 右列：第 1 行 —— 加密模式 -->
@@ -186,7 +188,7 @@
                         <ComboBoxItem Content="临时私钥 → Base64"/>
                         <ComboBoxItem Content="临时私钥 → PEM"/>
                     </ComboBox>
-                    <Button x:Name="btnEncKeyConvert" Content="转换" Width="60" Height="24" Margin="4,0,0,0" VerticalAlignment="Center"/>
+                    <Button x:Name="btnEncKeyConvert" Content="转换" Width="60" Height="24" Margin="4,0,0,0" VerticalAlignment="Center" Click="BtnEncKeyConvert_Click"/>
                 </StackPanel>
 
                 <!-- 右列：第 5 行 —— info 参数 -->

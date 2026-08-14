@@ -9,72 +9,33 @@
              d:DesignHeight="1200" d:DesignWidth="1800"
              Background="White">
     <UserControl.Resources>
-        <!--
-        ============================================================
-        二级导航按钮样式（NavButtonStyle）
-        作用：控制 EcdsaMainControl 里"密钥生成 / ECDH加密解密 / ECIES签名验签 / 文件签名验签"
-              这四个 ToggleButton 的外观。所有按钮共用此样式，改一处全局生效。
-        三态颜色：
-          - 默认（未选中、未悬停）：灰色背景 + 黑色文字
-          - 鼠标悬停（IsMouseOver）：蓝色背景 + 白色文字
-          - 选中（IsChecked）    ：紫色背景 + 白色文字
-        ============================================================
-        -->
+        <!-- 二级导航按钮样式（NavButtonStyle）：控制"密钥生成 / ECDH加密解密 / ECIES签名验签 / 文件签名验签"四个 ToggleButton 的外观。
+             默认（未选中）：灰底黑字；悬停：蓝底白字；选中：紫底白字。 -->
         <Style x:Key="NavButtonStyle" TargetType="ToggleButton">
-            <!-- ===== 按钮默认属性（所有状态的基础值） ===== -->
-
-            <!-- 背景色：默认灰色（未选中、未悬停时的底色） -->
             <Setter Property="Background" Value="#FF9E9E9E"/>
-
-            <!-- 前景色（文字颜色）：默认黑色 -->
             <Setter Property="Foreground" Value="Black"/>
-
-            <!-- 边框粗细：0 = 无边框（按钮是纯色块） -->
             <Setter Property="BorderThickness" Value="0"/>
-
-            <!-- 内边距：左12右12、上6下6，控制文字与按钮边缘的距离 -->
             <Setter Property="Padding" Value="12,6"/>
-
-            <!-- 字体大小：13 号字 -->
             <Setter Property="FontSize" Value="13"/>
-
-            <!-- 字体：微软雅黑 Light 细体 -->
             <Setter Property="FontFamily" Value="Microsoft YaHei UI Light"/>
-
-            <!-- 鼠标光标：悬停时显示小手（可点击） -->
             <Setter Property="Cursor" Value="Hand"/>
-
-            <!-- ===== 自定义控件模板（决定按钮内部长什么样） =====
-                 这里不用 WPF 默认的立体按钮外观，改为纯色 Border 包裹文字，
-                 这样背景色 / 边框 / 内边距才能按上面的属性精确控制。 -->
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ToggleButton">
-                        <!-- Border = 按钮的外壳，颜色跟随样式属性动态变化 -->
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                Padding="{TemplateBinding Padding}">
-                            <!-- ContentPresenter = 显示按钮文字（Content="密钥生成" 等）的位置 -->
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"/>
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-
-            <!-- ===== 状态触发器（按鼠标 / 选中状态改变颜色） ===== -->
             <Style.Triggers>
-                <!-- 鼠标悬停：变蓝底白字 -->
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FF2196F3"/>   <!-- 悬停蓝色 -->
-                    <Setter Property="Foreground" Value="White"/>       <!-- 文字变白 -->
+                    <Setter Property="Background" Value="#FF2196F3"/>
+                    <Setter Property="Foreground" Value="White"/>
                 </Trigger>
-
-                <!-- 选中：变紫底白字（紫色优先级最高，即使悬停也保持紫色） -->
                 <Trigger Property="IsChecked" Value="True">
-                    <Setter Property="Background" Value="#FF4B1C83"/>   <!-- 选中紫色 -->
-                    <Setter Property="Foreground" Value="White"/>       <!-- 文字变白 -->
+                    <Setter Property="Background" Value="#FF4B1C83"/>
+                    <Setter Property="Foreground" Value="White"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -85,32 +46,18 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-
-
         <!-- 内容区域1 -->
         <mainControl:EcdsaTopPanel x:Name="TopPanel" Grid.Row="0" Margin="1,1,1,1" Loaded="EcdsaTopPanel_Loaded"/>
-
-
-
         <!-- 二级菜单栏 -->
-        <Border Grid.Row="1" BorderBrush="#d742c50e" BorderThickness="0,0,0,1" Margin="1,1,1,1" >
+        <Border Grid.Row="1" BorderBrush="#d742c50e" BorderThickness="0,0,0,1" Margin="1,1,1,1">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0">
-                <ToggleButton x:Name="BtnKeyGen" Style="{StaticResource NavButtonStyle}"
-                              Content="密钥生成" Click="SubNavButton_Click" Tag="KeyGen" />
-                <ToggleButton x:Name="BtnEcdh" Style="{StaticResource NavButtonStyle}"
-                              Content="ECDH加密解密" Click="SubNavButton_Click" Tag="Ecdh"/>
-                <ToggleButton x:Name="BtnEcies" Style="{StaticResource NavButtonStyle}"
-                              Content="ECIES签名验签" Click="SubNavButton_Click" Tag="Ecies"/>
-                <ToggleButton x:Name="BtnFileSign" Style="{StaticResource NavButtonStyle}"
-                              Content="文件签名/验签" Click="SubNavButton_Click" Tag="FileSign"/>
+                <ToggleButton x:Name="BtnKeyGen" Style="{StaticResource NavButtonStyle}" Content="ECDH加密解密" Click="SubNavButton_Click" Tag="KeyGen"/>
+                <ToggleButton x:Name="BtnEcdh" Style="{StaticResource NavButtonStyle}" Content="ECIES签名验签" Click="SubNavButton_Click" Tag="Ecdh"/>
+                <ToggleButton x:Name="BtnEcies" Style="{StaticResource NavButtonStyle}" Content="ECIES加密解密" Click="SubNavButton_Click" Tag="Ecies"/>
+                <ToggleButton x:Name="BtnFileSign" Style="{StaticResource NavButtonStyle}" Content="文件签名/验签" Click="SubNavButton_Click" Tag="FileSign"/>
             </StackPanel>
         </Border>
-
-
         <!-- 内容区域2 -->
         <tabControl:EcdsaTabPage x:Name="TabHost" Grid.Row="2" Margin="1,1,1,1"/>
-
-
     </Grid>
 </UserControl>
