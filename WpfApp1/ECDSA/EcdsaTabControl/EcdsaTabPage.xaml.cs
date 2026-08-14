@@ -13,13 +13,13 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
 
         /// <summary>
         /// 子页面（ECDH/ECIES/文件签名）操作结果的桥接写入器 → 顶部"运行结果"框。
-        /// 由 EcdsaPage 在 EcdsaMainPage 加载完毕后赋值。
+        /// 由 EcdsaMainControl 在 EcdsaTopPanel 加载完毕后赋值。
         /// </summary>
         public Action<string, SolidColorBrush>? ResultAppender { get; set; }
 
         /// <summary>
         /// 子页面（ECDH/ECIES/文件签名）曲线/密钥检测结果的桥接写入器 → 顶部"计算结果"框。
-        /// 由 EcdsaPage 在 EcdsaMainPage 加载完毕后赋值。
+        /// 由 EcdsaMainControl 在 EcdsaTopPanel 加载完毕后赋值。
         /// </summary>
         public Action<string, SolidColorBrush>? KeyResultAppender { get; set; }
 

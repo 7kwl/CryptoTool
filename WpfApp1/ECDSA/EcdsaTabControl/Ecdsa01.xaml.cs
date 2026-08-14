@@ -24,13 +24,13 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
 
         /// <summary>
         /// 将 ECDH 操作结果同步推送到顶部"运行结果"框。
-        /// 由 EcdsaTabPage.ResultAppender 注入（最终指向 EcdsaMainPage.AppendValidationResult）。
+        /// 由 EcdsaTabPage.ResultAppender 注入（最终指向 EcdsaTopPanel.AppendValidationResult）。
         /// </summary>
         public Action<string, SolidColorBrush>? AppendToHost { get; set; }
 
         /// <summary>
         /// 将曲线/密钥检测结果同步推送到顶部"计算结果"框。
-        /// 由 EcdsaTabPage.KeyResultAppender 注入（最终指向 EcdsaMainPage.AppendKeyResult）。
+        /// 由 EcdsaTabPage.KeyResultAppender 注入（最终指向 EcdsaTopPanel.AppendKeyResult）。
         /// </summary>
         public Action<string, SolidColorBrush>? AppendKeyToHost { get; set; }
 

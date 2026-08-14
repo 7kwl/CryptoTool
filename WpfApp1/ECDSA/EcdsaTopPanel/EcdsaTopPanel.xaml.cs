@@ -15,13 +15,13 @@ using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
 
-namespace WpfApp1.ECDSA.MainControl
+namespace WpfApp1.ECDSA.EcdsaTopPanel
 {
     /// <summary>
     /// ECDSA 主页逻辑（由 CryptoTool.Win\ECDSA\EcdsaTabControl.cs 移植）
     /// 密钥生成 / 验证 / 提取 / 曲线检测 / 格式与存储标准转换 / 导入导出
     /// </summary>
-    public partial class EcdsaMainPage : UserControl
+    public partial class EcdsaTopPanel : UserControl
     {
         /// <summary>状态栏消息通知（供宿主订阅，可选）</summary>
         public event Action<string>? StatusChanged;
@@ -35,7 +35,7 @@ namespace WpfApp1.ECDSA.MainControl
         /// <summary>曲线分类数据：分类Key → (图标, 曲线列表)</summary>
         private Dictionary<string, (string Icon, List<KeyValuePair<string, string>> Curves)> _allCurveData = [];
 
-        public EcdsaMainPage()
+        public EcdsaTopPanel()
         {
             InitializeComponent();
             WireEvents();       // 挂接所有控件事件

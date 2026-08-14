@@ -1,10 +1,10 @@
 <!--
-    EcdsaMainPage.xaml — ECDSA 主页（密钥生成 + 密钥操作）
+    EcdsaTopPanel.xaml — ECDSA 主页（密钥生成 + 密钥操作）
     整体布局：两列（50% / 50%）
       ├─ 左列：密钥生成（私钥 / 公钥，各带复制/粘贴/导入/保存/清空操作）
       └─ 右列：密钥操作（生成/验证/提取等按钮 + 输出格式/存储标准/曲线设置 + 结果区）
 -->
-<UserControl x:Class="WpfApp1.ECDSA.MainControl.EcdsaMainPage"
+<UserControl x:Class="WpfApp1.ECDSA.EcdsaTopPanel.EcdsaTopPanel"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"

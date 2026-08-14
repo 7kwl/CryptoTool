@@ -5,13 +5,13 @@ using System.Windows.Media;
 using CryptoTool.Algorithm.Algorithms.ECDSA;
 using Org.BouncyCastle.Crypto.Parameters;
 
-namespace WpfApp1.ECDSA.MainControl
+namespace WpfApp1.ECDSA.EcdsaTopPanel
 {
     /// <summary>
-    /// ECDSA 主页 - 密钥存储标准独立分部文件（由 EcdsaMainPage.xaml.cs 拆出）
+    /// ECDSA 主页 - 密钥存储标准独立分部文件（由 EcdsaTopPanel.xaml.cs 拆出）
     /// 负责：存储标准常量、按标准导出、SEC1 短/长编码、namedCurve↔specifiedCurve 转换、下拉联动
     /// </summary>
-    public partial class EcdsaMainPage
+    public partial class EcdsaTopPanel
     {
         #region 密钥存储标准常量（与 WPF 下拉选项一一对应，与 WinForms 源版 EcdsaTabControl.CurveAndStandard.cs 一致）
 

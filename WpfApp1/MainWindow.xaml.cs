@@ -36,51 +36,29 @@ namespace WpfApp1
 
         private void ShowPage(string tag)
         {
-            switch (tag)
+            MainContent.Content = tag switch
             {
-                case "Ecdsa":
-                    MainContent.Content = new EcdsaPage();
-                    break;
-                case "Rsa":
-                    MainContent.Content = new Views.RsaView();
-                    break;
-                case "RsaFmt":
-                    MainContent.Content = new Views.RsaFormatView();
-                    break;
-                case "Aes":
-                    MainContent.Content = new Views.AesView();
-                    break;
-                case "Des":
-                    MainContent.Content = new Views.DesView();
-                    break;
-                case "Sm4":
-                    MainContent.Content = new Views.Sm4View();
-                    break;
-                case "Sm2":
-                    MainContent.Content = new Views.Sm2View();
-                    break;
-                case "Sm3":
-                    MainContent.Content = new Views.Sm3View();
-                    break;
-                case "Md5":
-                    MainContent.Content = new Views.Md5View();
-                    break;
-                case "Yb":
-                    MainContent.Content = new Views.YibaoView();
-                    break;
-                case "About":
-                    MainContent.Content = new Views.AboutView();
-                    break;
-                default:
-                    MainContent.Content = new TextBlock
-                    {
-                        Text = $"功能开发中: {tag}",
-                        FontSize = 24,
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        VerticalAlignment = VerticalAlignment.Center
-                    };
-                    break;
-            }
+                "Ecdsa"  => new EcdsaMainControl(),
+                "Rsa"    => new Views.RsaView(),
+                "RsaFmt" => new Views.RsaFormatView(),
+                "Aes"    => new Views.AesView(),
+                "Des"    => new Views.DesView(),
+                "Sm4"    => new Views.Sm4View(),
+                "Sm2"    => new Views.Sm2View(),
+                "Sm3"    => new Views.Sm3View(),
+                "Md5"    => new Views.Md5View(),
+                "Yb"     => new Views.YibaoView(),
+                "About"  => new Views.AboutView(),
+                _        => CreateDevelopView(tag)
+            };
         }
+
+        private static TextBlock CreateDevelopView(string tag) => new()
+        {
+            Text = $"功能开发中: {tag}",
+            FontSize = 24,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        };
     }
 }
