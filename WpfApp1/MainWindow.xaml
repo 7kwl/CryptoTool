@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
         Title="加密工具" Height="1200" Width="1800"
+        Icon="/icon/favicon.ico"
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <!-- 导航按钮样式 -->

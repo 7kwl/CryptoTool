@@ -16,7 +16,7 @@
     <!-- ===== 根网格：两列 ===== -->
     <Grid Margin="8">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="700"/>
             <!-- 左列：密钥生成 -->
             <ColumnDefinition Width="*"/>
             <!-- 右列：密钥操作 -->
@@ -176,7 +176,7 @@
                 <TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" x:Name="textOperationHistory" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Background="White" Foreground="Purple" BorderThickness="1" BorderBrush="#888" FontFamily="Consolas" FontSize="12" MinHeight="40" Margin="0,6,0,0">
                     <TextBox.Resources>
                         <!-- 禁用系统主题将 IsReadOnly 状态映射为 Foreground 灰色（部分 Windows 主题下显示为紫色） -->
-                        <SolidColorBrush x:Key="{x:Static SystemColors.GrayTextBrushKey}" Color="blue"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.GrayTextBrushKey}" Color="Purple"/>
                     </TextBox.Resources>
                 </TextBox>
             </Grid>

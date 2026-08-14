@@ -167,6 +167,12 @@ DocProject/Help/html
 # Click-Once directory
 publish/
 
+# WpfApp1 发布产物目录（不提交到 GitHub）
+/WpfApp1/publish/
+
+# 构建输出目录（不提交到 GitHub）
+/builds/
+
 # Publish Web Output
 *.[Pp]ublish.xml
 *.azurePubxml
