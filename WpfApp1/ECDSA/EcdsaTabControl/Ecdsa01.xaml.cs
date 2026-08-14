@@ -141,33 +141,39 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
             // 中列复制图标：点击复制左侧文本框内容，成功后结果写入顶部"计算结果"框
             imgCopyInput.MouseLeftButtonDown += (s, e) => CopyEcdhFieldToClipboard(textEcdhInput, "明文");
             imgCopyOutput.MouseLeftButtonDown += (s, e) => CopyEcdhFieldToClipboard(textEcdhOutput, "密文");
-            imgCopySharedKey.MouseLeftButtonDown += (s, e) => CopyEcdhFieldToClipboard(textEcdhSharedKey, "共享密钥");
+            imgCopySharedKeyAlice.MouseLeftButtonDown += (s, e) => CopyEcdhFieldToClipboard(textEcdhSharedKeyAlice, "共享密钥(Alice)");
+            imgCopySharedKeyBob.MouseLeftButtonDown += (s, e) => CopyEcdhFieldToClipboard(textEcdhSharedKeyBob, "共享密钥(Bob)");
             imgCopyIV.MouseLeftButtonDown += (s, e) => CopyEcdhFieldToClipboard(textEcdhIV, "IV");
 
             // 中列粘贴图标：点击把剪贴板文本粘贴到左侧文本框，结果写入顶部"计算结果"框
             imgPasteInput.MouseLeftButtonDown += (s, e) => PasteEcdhFieldFromClipboard(textEcdhInput, "明文");
             imgPasteOutput.MouseLeftButtonDown += (s, e) => PasteEcdhFieldFromClipboard(textEcdhOutput, "密文");
-            imgPasteSharedKey.MouseLeftButtonDown += (s, e) => PasteEcdhFieldFromClipboard(textEcdhSharedKey, "共享密钥");
+            imgPasteSharedKeyAlice.MouseLeftButtonDown += (s, e) => PasteEcdhFieldFromClipboard(textEcdhSharedKeyAlice, "共享密钥(Alice)");
+            imgPasteSharedKeyBob.MouseLeftButtonDown += (s, e) => PasteEcdhFieldFromClipboard(textEcdhSharedKeyBob, "共享密钥(Bob)");
             imgPasteIV.MouseLeftButtonDown += (s, e) => PasteEcdhFieldFromClipboard(textEcdhIV, "IV");
 
             // 中列清除图标：点击清空左侧文本框内容，结果写入顶部"计算结果"框
             imgClearInput.MouseLeftButtonDown += (s, e) => ClearEcdhField(textEcdhInput, "明文");
             imgClearOutput.MouseLeftButtonDown += (s, e) => ClearEcdhField(textEcdhOutput, "密文");
-            imgClearSharedKey.MouseLeftButtonDown += (s, e) => ClearEcdhField(textEcdhSharedKey, "共享密钥");
+            imgClearSharedKeyAlice.MouseLeftButtonDown += (s, e) => ClearEcdhField(textEcdhSharedKeyAlice, "共享密钥(Alice)");
+            imgClearSharedKeyBob.MouseLeftButtonDown += (s, e) => ClearEcdhField(textEcdhSharedKeyBob, "共享密钥(Bob)");
             imgClearIV.MouseLeftButtonDown += (s, e) => ClearEcdhField(textEcdhIV, "IV");
 
             // 复制/粘贴图标悬停提示：鼠标悬停时在旁边显示对应文字，移走自动消失
             SetIconToolTip(imgCopyInput, "复制明文");
             SetIconToolTip(imgCopyOutput, "复制密文");
-            SetIconToolTip(imgCopySharedKey, "复制共享密钥");
+            SetIconToolTip(imgCopySharedKeyAlice, "复制共享密钥(Alice)");
+            SetIconToolTip(imgCopySharedKeyBob, "复制共享密钥(Bob)");
             SetIconToolTip(imgCopyIV, "复制 IV");
             SetIconToolTip(imgPasteInput, "粘贴明文");
             SetIconToolTip(imgPasteOutput, "粘贴密文");
-            SetIconToolTip(imgPasteSharedKey, "粘贴共享密钥");
+            SetIconToolTip(imgPasteSharedKeyAlice, "粘贴共享密钥(Alice)");
+            SetIconToolTip(imgPasteSharedKeyBob, "粘贴共享密钥(Bob)");
             SetIconToolTip(imgPasteIV, "粘贴 IV");
             SetIconToolTip(imgClearInput, "清空明文");
             SetIconToolTip(imgClearOutput, "清空密文");
-            SetIconToolTip(imgClearSharedKey, "清空共享密钥");
+            SetIconToolTip(imgClearSharedKeyAlice, "清空共享密钥(Alice)");
+            SetIconToolTip(imgClearSharedKeyBob, "清空共享密钥(Bob)");
             SetIconToolTip(imgClearIV, "清空 IV");
         }
 
@@ -267,11 +273,15 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
                 textEcdhBobPublic.Text = ExportPublicKeyByStandard(bobPub, comboEcdhPublicKeyStandard.SelectedItem?.ToString() ?? PublicKeyStandardNamedCurve);
 
                 byte[] shared = EcdhAlgorithm.DeriveSharedSecret(alicePriv, bobPub);
-                textEcdhSharedKey.Text = Convert.ToBase64String(shared);
+                byte[] sharedBob = EcdhAlgorithm.DeriveSharedSecret(bobPriv, alicePub);
+                textEcdhSharedKeyAlice.Text = Convert.ToBase64String(shared);
+                textEcdhSharedKeyBob.Text = Convert.ToBase64String(sharedBob);
 
                 // 生成新密钥对后，旧密文/IV/输入与新的密钥不再匹配，清空避免误用
                 textEcdhInput.Clear();
                 textEcdhOutput.Clear();
+                textEcdhSharedKeyAlice.Clear();
+                textEcdhSharedKeyBob.Clear();
                 textEcdhIV.Clear();
                 _ecdhLastIV = null;
 
@@ -334,7 +344,16 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
                 }
 
                 textEcdhOutput.Text = output;
-                textEcdhSharedKey.Text = Convert.ToBase64String(shared);
+                textEcdhSharedKeyAlice.Text = Convert.ToBase64String(shared);
+                try
+                {
+                    // 同时计算 Bob 视角下的共享密钥(便于核对两侧是否一致)
+                    var alicePub = EcdsaKeyHelper.ImportPublicKeyPem(textEcdhAlicePublic.Text.Trim());
+                    var bobPriv = EcdsaKeyHelper.ImportPrivateKeyPem(textEcdhBobPrivate.Text.Trim());
+                    byte[] sharedBob = EcdhAlgorithm.DeriveSharedSecret(bobPriv, alicePub);
+                    textEcdhSharedKeyBob.Text = Convert.ToBase64String(sharedBob);
+                }
+                catch { textEcdhSharedKeyBob.Clear(); }
                 textEcdhIV.Text = EcdhAlgorithm.FormatIv(iv, mode);
                 _ecdhLastIV = iv;
                 SetStatus($"{GetComboSelectedText(comboEcdhMode)} 加密完成");
@@ -401,7 +420,8 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
                         SetStatus("密文结构错误");
                         return;
                     }
-                    textEcdhSharedKey.Text = Convert.ToBase64String(shared);
+                    textEcdhSharedKeyAlice.Text = Convert.ToBase64String(shared);
+                    textEcdhSharedKeyBob.Text = Convert.ToBase64String(shared);
                     textEcdhIV.Text = EcdhAlgorithm.FormatIv(iv, mode);
                     _ecdhLastIV = iv;
                     AppendValidationResult($"✅ ECIES 解密成功\n模式: {GetComboSelectedText(comboEcdhMode)}\n明文长度: {plain.Length} 字节", Brushes.Green);
@@ -426,7 +446,8 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
                         SetStatus("8gwifi.org 解密失败");
                         return;
                     }
-                    textEcdhSharedKey.Text = Convert.ToBase64String(shared);
+                    textEcdhSharedKeyAlice.Text = Convert.ToBase64String(shared);
+                    textEcdhSharedKeyBob.Text = Convert.ToBase64String(shared);
                     textEcdhIV.Text = EcdhAlgorithm.FormatIv(iv, mode);
                     _ecdhLastIV = iv;
                     AppendValidationResult($"✅ 8gwifi.org 解密成功\n模式: {GetComboSelectedText(comboEcdhMode)}\n明文长度: {plain.Length} 字节", Brushes.Green);
@@ -485,7 +506,8 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
         {
             textEcdhInput.Clear();
             textEcdhOutput.Clear();
-            textEcdhSharedKey.Clear();
+            textEcdhSharedKeyAlice.Clear();
+            textEcdhSharedKeyBob.Clear();
             textEcdhIV.Clear();
             _ecdhLastIV = null;
             SetStatus("ECDH 输入/输出已清空");

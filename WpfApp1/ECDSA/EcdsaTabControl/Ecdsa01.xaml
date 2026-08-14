@@ -78,11 +78,12 @@
                     <ColumnDefinition Width="24"/>  <!-- 图标（按钮外左侧） -->
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <!-- 4 组：标签叠层嵌入文本框内部顶部居中 -->
+                    <!-- 5 组：明文 / 密文 / 共享密钥(Alice) / 共享密钥(Bob) / IV -->
                     <RowDefinition Height="25*"/>
                     <RowDefinition Height="25*"/>
-                    <RowDefinition Height="25*"/>
-                    <RowDefinition Height="25*"/>
+                    <RowDefinition Height="20*"/>
+                    <RowDefinition Height="20*"/>
+                    <RowDefinition Height="10*"/>
                 </Grid.RowDefinitions>
 
                 <!-- 明文 -->
@@ -105,22 +106,34 @@
                     <Image x:Name="imgPasteOutput" Source="{StaticResource IconPaste}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,10,0,0" Cursor="Hand"/>
                     <Image x:Name="imgClearOutput" Source="{StaticResource IconClear}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,10,0,0" Cursor="Hand"/>
                 </StackPanel>
-                <!-- 共享密钥 -->
+                <!-- 共享密钥(Alice 视角：Alice 私钥 + Bob 公钥) -->
                 <Grid Grid.Row="2" Grid.Column="0" Margin="0,0,0,3">
-                    <TextBox x:Name="textEcdhSharedKey" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
+                    <TextBox x:Name="textEcdhSharedKeyAlice" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
                     <TextBlock Text="共享密钥 (Base64, 可编辑):" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,4,0,0" IsHitTestVisible="False"/>
+                    <TextBlock Text="(Alice)" Foreground="Red" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="4,4,0,0" IsHitTestVisible="False"/>
                 </Grid>
                 <StackPanel Grid.Row="2" Grid.Column="1" Margin="4,0,0,0">
-                    <Image x:Name="imgCopySharedKey" Source="{StaticResource IconCopy}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,8,0,0" Cursor="Hand"/>
-                    <Image x:Name="imgPasteSharedKey" Source="{StaticResource IconPaste}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,10,0,0" Cursor="Hand"/>
-                    <Image x:Name="imgClearSharedKey" Source="{StaticResource IconClear}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,10,0,0" Cursor="Hand"/>
+                    <Image x:Name="imgCopySharedKeyAlice" Source="{StaticResource IconCopy}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,8,0,0" Cursor="Hand"/>
+                    <Image x:Name="imgPasteSharedKeyAlice" Source="{StaticResource IconPaste}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,10,0,0" Cursor="Hand"/>
+                    <Image x:Name="imgClearSharedKeyAlice" Source="{StaticResource IconClear}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,10,0,0" Cursor="Hand"/>
+                </StackPanel>
+                <!-- 共享密钥(Bob 视角：Bob 私钥 + Alice 公钥) -->
+                <Grid Grid.Row="3" Grid.Column="0" Margin="0,0,0,3">
+                    <TextBox x:Name="textEcdhSharedKeyBob" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
+                    <TextBlock Text="共享密钥 (Base64, 可编辑):" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,4,0,0" IsHitTestVisible="False"/>
+                    <TextBlock Text="(Bob)" Foreground="Red" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="4,4,0,0" IsHitTestVisible="False"/>
+                </Grid>
+                <StackPanel Grid.Row="3" Grid.Column="1" Margin="4,0,0,0">
+                    <Image x:Name="imgCopySharedKeyBob" Source="{StaticResource IconCopy}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,8,0,0" Cursor="Hand"/>
+                    <Image x:Name="imgPasteSharedKeyBob" Source="{StaticResource IconPaste}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,10,0,0" Cursor="Hand"/>
+                    <Image x:Name="imgClearSharedKeyBob" Source="{StaticResource IconClear}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,10,0,0" Cursor="Hand"/>
                 </StackPanel>
                 <!-- IV -->
-                <Grid Grid.Row="3" Grid.Column="0">
+                <Grid Grid.Row="4" Grid.Column="0">
                     <TextBox x:Name="textEcdhIV" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
                     <TextBlock x:Name="lblEcdhIV" Text="IV (Base64，可编辑/留空随机):" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,4,0,0" IsHitTestVisible="False"/>
                 </Grid>
-                <StackPanel Grid.Row="3" Grid.Column="1" Margin="4,0,0,0">
+                <StackPanel Grid.Row="4" Grid.Column="1" Margin="4,0,0,0">
                     <Image x:Name="imgCopyIV" Source="{StaticResource IconCopy}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,8,0,0" Cursor="Hand"/>
                     <Image x:Name="imgPasteIV" Source="{StaticResource IconPaste}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,10,0,0" Cursor="Hand"/>
                     <Image x:Name="imgClearIV" Source="{StaticResource IconClear}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,10,0,0" Cursor="Hand"/>
