@@ -79,11 +79,11 @@
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <!-- 5 组：明文 / 密文 / 共享密钥(Alice) / 共享密钥(Bob) / IV -->
-                    <RowDefinition Height="25*"/>
-                    <RowDefinition Height="25*"/>
-                    <RowDefinition Height="20*"/>
-                    <RowDefinition Height="20*"/>
-                    <RowDefinition Height="10*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
                 <!-- 明文 -->
@@ -178,7 +178,7 @@
                     <Button x:Name="btnGenerateEcdhKeys" Content="生成 EC 密钥对" Grid.Row="0" Height="30" VerticalAlignment="Center" Margin="0,0"/>
                     <Button x:Name="btnEcdhEncrypt" Content="加密" Grid.Row="1" Height="30" VerticalAlignment="Center" Margin="0,0"/>
                     <Button x:Name="btnEcdhDecrypt" Content="解密" Grid.Row="2" Height="30" VerticalAlignment="Center" Margin="0,0"/>
-                    <Button x:Name="btnEcdhCopyResult" Content="复制结果" Grid.Row="3" Height="30" VerticalAlignment="Center" Margin="0,0"/>
+                    <Button x:Name="btnEcdhCalculateSharedKey" Content="计算共享密钥" Grid.Row="3" Height="30" VerticalAlignment="Center" Margin="0,0"/>
                     <Button x:Name="btnEcdhPasteInput" Content="粘贴输入" Grid.Row="4" Height="30" VerticalAlignment="Center" Margin="0,0"/>
                     <Button x:Name="btnEcdhClear" Content="清空" Grid.Row="5" Height="30" VerticalAlignment="Center" Margin="0,0"/>
                     <Button x:Name="btnEcdhAliceCurve" Content="私钥1曲线" Grid.Row="6" Height="30" VerticalAlignment="Center" Margin="0,0"/>

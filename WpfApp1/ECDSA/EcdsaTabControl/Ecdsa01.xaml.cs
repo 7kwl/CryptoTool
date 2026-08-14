@@ -118,7 +118,7 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
             btnGenerateEcdhKeys.Click += BtnGenerateEcdhKeys_Click;
             btnEcdhEncrypt.Click += BtnEcdhEncrypt_Click;
             btnEcdhDecrypt.Click += BtnEcdhDecrypt_Click;
-            btnEcdhCopyResult.Click += BtnEcdhCopyResult_Click;
+            btnEcdhCalculateSharedKey.Click += BtnCalculateSharedKey_Click;
             btnEcdhPasteInput.Click += BtnEcdhPasteInput_Click;
             btnEcdhClear.Click += BtnEcdhClear_Click;
             btnEcdhAliceCurve.Click += BtnEcdhAliceCurve_Click;
@@ -488,9 +488,30 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
             };
         }
 
-        private void BtnEcdhCopyResult_Click(object? sender, RoutedEventArgs e)
+        private void BtnCalculateSharedKey_Click(object? sender, RoutedEventArgs e)
         {
-            TrySetClipboardText(textEcdhOutput.Text, "ECDH 结果已复制");
+            try
+            {
+                var alicePriv = EcdsaKeyHelper.ImportPrivateKeyPem(textEcdhAlicePrivate.Text.Trim());
+                var alicePub = EcdsaKeyHelper.ImportPublicKeyPem(textEcdhAlicePublic.Text.Trim());
+                var bobPriv = EcdsaKeyHelper.ImportPrivateKeyPem(textEcdhBobPrivate.Text.Trim());
+                var bobPub = EcdsaKeyHelper.ImportPublicKeyPem(textEcdhBobPublic.Text.Trim());
+
+                byte[] sharedAlice = EcdhAlgorithm.DeriveSharedSecret(alicePriv, bobPub);
+                byte[] sharedBob = EcdhAlgorithm.DeriveSharedSecret(bobPriv, alicePub);
+
+                textEcdhSharedKeyAlice.Text = Convert.ToBase64String(sharedAlice);
+                textEcdhSharedKeyBob.Text = Convert.ToBase64String(sharedBob);
+
+                SetStatus($"已计算两种视角的共享密钥（共 {sharedAlice.Length} 字节）");
+            }
+            catch (Exception ex)
+            {
+                textEcdhSharedKeyAlice.Clear();
+                textEcdhSharedKeyBob.Clear();
+                SetStatus($"计算共享密钥失败：{ex.Message}");
+                MessageBox.Show($"计算共享密钥失败：{ex.Message}", "ECDH", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void BtnEcdhPasteInput_Click(object? sender, RoutedEventArgs e)
