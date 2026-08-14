@@ -86,31 +86,31 @@
                 </Grid.RowDefinitions>
 
                 <!-- 明文 -->
-                <Grid Grid.Row="0" Grid.Column="0">
+                <Grid Grid.Row="0" Grid.Column="0" Margin="0,0,0,3">
                     <TextBox x:Name="textEcdhInput" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
                     <TextBlock Text="明文:" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,4,0,0" IsHitTestVisible="False"/>
                 </Grid>
                 <StackPanel Grid.Row="0" Grid.Column="1" Margin="4,0,0,0">
-                    <Image x:Name="imgCopyInput" Source="{StaticResource IconCopy}" Width="14" Height="14" HorizontalAlignment="Center" Margin="0,8,0,0" Cursor="Hand" ToolTip="复制明文"/>
-                    <Image Source="{StaticResource IconPaste}" Width="14" Height="14" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                    <Image x:Name="imgCopyInput" Source="{StaticResource IconCopy}" Width="14" Height="14" HorizontalAlignment="Center" Margin="0,8,0,0" Cursor="Hand"/>
+                    <Image x:Name="imgPasteInput" Source="{StaticResource IconPaste}" Width="14" Height="14" HorizontalAlignment="Center" Margin="0,10,0,0" Cursor="Hand"/>
                 </StackPanel>
                 <!-- 密文 -->
-                <Grid Grid.Row="1" Grid.Column="0">
+                <Grid Grid.Row="1" Grid.Column="0" Margin="0,0,0,3">
                     <TextBox x:Name="textEcdhOutput" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
                     <TextBlock Text="密文（可编辑）:" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,4,0,0" IsHitTestVisible="False"/>
                 </Grid>
                 <StackPanel Grid.Row="1" Grid.Column="1" Margin="4,0,0,0">
-                    <Image x:Name="imgCopyOutput" Source="{StaticResource IconCopy}" Width="14" Height="14" HorizontalAlignment="Center" Margin="0,8,0,0" Cursor="Hand" ToolTip="复制密文"/>
-                    <Image Source="{StaticResource IconPaste}" Width="14" Height="14" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                    <Image x:Name="imgCopyOutput" Source="{StaticResource IconCopy}" Width="14" Height="14" HorizontalAlignment="Center" Margin="0,8,0,0" Cursor="Hand"/>
+                    <Image x:Name="imgPasteOutput" Source="{StaticResource IconPaste}" Width="14" Height="14" HorizontalAlignment="Center" Margin="0,10,0,0" Cursor="Hand"/>
                 </StackPanel>
                 <!-- 共享密钥 -->
-                <Grid Grid.Row="2" Grid.Column="0">
+                <Grid Grid.Row="2" Grid.Column="0" Margin="0,0,0,3">
                     <TextBox x:Name="textEcdhSharedKey" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
                     <TextBlock Text="共享密钥 (Base64, 可编辑):" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,4,0,0" IsHitTestVisible="False"/>
                 </Grid>
                 <StackPanel Grid.Row="2" Grid.Column="1" Margin="4,0,0,0">
-                    <Image x:Name="imgCopySharedKey" Source="{StaticResource IconCopy}" Width="14" Height="14" HorizontalAlignment="Center" Margin="0,8,0,0" Cursor="Hand" ToolTip="复制共享密钥"/>
-                    <Image Source="{StaticResource IconPaste}" Width="14" Height="14" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                    <Image x:Name="imgCopySharedKey" Source="{StaticResource IconCopy}" Width="14" Height="14" HorizontalAlignment="Center" Margin="0,8,0,0" Cursor="Hand"/>
+                    <Image x:Name="imgPasteSharedKey" Source="{StaticResource IconPaste}" Width="14" Height="14" HorizontalAlignment="Center" Margin="0,10,0,0" Cursor="Hand"/>
                 </StackPanel>
                 <!-- IV -->
                 <Grid Grid.Row="3" Grid.Column="0">
@@ -118,8 +118,8 @@
                     <TextBlock x:Name="lblEcdhIV" Text="IV (Base64，可编辑/留空随机):" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,4,0,0" IsHitTestVisible="False"/>
                 </Grid>
                 <StackPanel Grid.Row="3" Grid.Column="1" Margin="4,0,0,0">
-                    <Image x:Name="imgCopyIV" Source="{StaticResource IconCopy}" Width="14" Height="14" HorizontalAlignment="Center" Margin="0,8,0,0" Cursor="Hand" ToolTip="复制 IV"/>
-                    <Image Source="{StaticResource IconPaste}" Width="14" Height="14" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                    <Image x:Name="imgCopyIV" Source="{StaticResource IconCopy}" Width="14" Height="14" HorizontalAlignment="Center" Margin="0,8,0,0" Cursor="Hand"/>
+                    <Image x:Name="imgPasteIV" Source="{StaticResource IconPaste}" Width="14" Height="14" HorizontalAlignment="Center" Margin="0,10,0,0" Cursor="Hand"/>
                 </StackPanel>
             </Grid>
         </GroupBox>

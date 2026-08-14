@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using System.Windows.Threading;
 using CryptoTool.Algorithm.Algorithms.ECDSA;
 using CryptoTool.Win.Enums;
 using CryptoTool.Win.Helpers;
@@ -141,6 +143,22 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
             imgCopyOutput.MouseLeftButtonDown += (s, e) => CopyEcdhFieldToClipboard(textEcdhOutput, "密文");
             imgCopySharedKey.MouseLeftButtonDown += (s, e) => CopyEcdhFieldToClipboard(textEcdhSharedKey, "共享密钥");
             imgCopyIV.MouseLeftButtonDown += (s, e) => CopyEcdhFieldToClipboard(textEcdhIV, "IV");
+
+            // 中列粘贴图标：点击把剪贴板文本粘贴到左侧文本框，结果写入顶部"计算结果"框
+            imgPasteInput.MouseLeftButtonDown += (s, e) => PasteEcdhFieldFromClipboard(textEcdhInput, "明文");
+            imgPasteOutput.MouseLeftButtonDown += (s, e) => PasteEcdhFieldFromClipboard(textEcdhOutput, "密文");
+            imgPasteSharedKey.MouseLeftButtonDown += (s, e) => PasteEcdhFieldFromClipboard(textEcdhSharedKey, "共享密钥");
+            imgPasteIV.MouseLeftButtonDown += (s, e) => PasteEcdhFieldFromClipboard(textEcdhIV, "IV");
+
+            // 复制/粘贴图标悬停提示：鼠标悬停时在旁边显示对应文字，移走自动消失
+            SetIconToolTip(imgCopyInput, "复制明文");
+            SetIconToolTip(imgCopyOutput, "复制密文");
+            SetIconToolTip(imgCopySharedKey, "复制共享密钥");
+            SetIconToolTip(imgCopyIV, "复制 IV");
+            SetIconToolTip(imgPasteInput, "粘贴明文");
+            SetIconToolTip(imgPasteOutput, "粘贴密文");
+            SetIconToolTip(imgPasteSharedKey, "粘贴共享密钥");
+            SetIconToolTip(imgPasteIV, "粘贴 IV");
         }
 
         /// <summary>
@@ -707,6 +725,76 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
             {
                 AppendKeyToHost?.Invoke($"✅ {fieldLabel}已复制到剪贴板", Brushes.Green);
             }
+        }
+
+        /// <summary>
+        /// 点击中列粘贴图标：把剪贴板文本粘贴到左侧文本框，结果写入顶部"计算结果"框。
+        /// </summary>
+        private void PasteEcdhFieldFromClipboard(TextBox box, string fieldLabel)
+        {
+            if (!Clipboard.ContainsText())
+            {
+                SetStatus($"{fieldLabel}粘贴失败：剪贴板为空或不是文本");
+                AppendKeyToHost?.Invoke($"⚠️ {fieldLabel}粘贴失败：剪贴板为空或不是文本", Brushes.OrangeRed);
+                return;
+            }
+
+            string text = Clipboard.GetText().Trim();
+            if (string.IsNullOrEmpty(text))
+            {
+                SetStatus($"{fieldLabel}粘贴失败：剪贴板为空");
+                AppendKeyToHost?.Invoke($"⚠️ {fieldLabel}粘贴失败：剪贴板为空", Brushes.OrangeRed);
+                return;
+            }
+
+            box.Text = text;
+            SetStatus($"{fieldLabel}已从剪贴板粘贴");
+            AppendKeyToHost?.Invoke($"✅ {fieldLabel}已从剪贴板粘贴", Brushes.Green);
+        }
+
+        /// <summary>
+        /// 为图标设置悬停提示：鼠标悬停时在图标右侧显示红色文字，移走自动消失。
+        /// 使用 Popup + 延迟关闭实现：
+        ///  - 鼠标从图标移到气泡上时不会立即关闭（延迟 250ms 内移入气泡即取消关闭），避免闪烁；
+        ///  - Popup 不拦截图标的点击事件，复制/粘贴可正常触发。
+        /// </summary>
+        private static void SetIconToolTip(FrameworkElement icon, string text)
+        {
+            var popup = new Popup
+            {
+                PlacementTarget = icon,
+                Placement = PlacementMode.Right,
+                HorizontalOffset = 6,
+                AllowsTransparency = true,
+                StaysOpen = true,
+                IsOpen = false
+            };
+            popup.Child = new Border
+            {
+                BorderBrush = Brushes.Red,
+                BorderThickness = new Thickness(1),
+                Child = new TextBlock
+                {
+                    Text = text,
+                    Foreground = Brushes.Red,
+                    Background = Brushes.White,
+                    Padding = new Thickness(6, 2, 6, 2)
+                }
+            };
+
+            var closeTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
+            closeTimer.Tick += (s, e) =>
+            {
+                closeTimer.Stop();
+                popup.IsOpen = false;
+            };
+
+            icon.MouseEnter += (s, e) => { closeTimer.Stop(); popup.IsOpen = true; };
+            icon.MouseLeave += (s, e) => { closeTimer.Stop(); closeTimer.Start(); };
+            popup.MouseEnter += (s, e) => { closeTimer.Stop(); };
+            popup.MouseLeave += (s, e) => { closeTimer.Stop(); closeTimer.Start(); };
+            // 点击图标时立即关闭气泡，避免点击操作后残留
+            icon.MouseLeftButtonDown += (s, e) => { closeTimer.Stop(); popup.IsOpen = false; };
         }
 
         /// <summary>
