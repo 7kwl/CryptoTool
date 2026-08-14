@@ -150,6 +150,12 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
             imgPasteSharedKey.MouseLeftButtonDown += (s, e) => PasteEcdhFieldFromClipboard(textEcdhSharedKey, "共享密钥");
             imgPasteIV.MouseLeftButtonDown += (s, e) => PasteEcdhFieldFromClipboard(textEcdhIV, "IV");
 
+            // 中列清除图标：点击清空左侧文本框内容，结果写入顶部"计算结果"框
+            imgClearInput.MouseLeftButtonDown += (s, e) => ClearEcdhField(textEcdhInput, "明文");
+            imgClearOutput.MouseLeftButtonDown += (s, e) => ClearEcdhField(textEcdhOutput, "密文");
+            imgClearSharedKey.MouseLeftButtonDown += (s, e) => ClearEcdhField(textEcdhSharedKey, "共享密钥");
+            imgClearIV.MouseLeftButtonDown += (s, e) => ClearEcdhField(textEcdhIV, "IV");
+
             // 复制/粘贴图标悬停提示：鼠标悬停时在旁边显示对应文字，移走自动消失
             SetIconToolTip(imgCopyInput, "复制明文");
             SetIconToolTip(imgCopyOutput, "复制密文");
@@ -159,6 +165,10 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
             SetIconToolTip(imgPasteOutput, "粘贴密文");
             SetIconToolTip(imgPasteSharedKey, "粘贴共享密钥");
             SetIconToolTip(imgPasteIV, "粘贴 IV");
+            SetIconToolTip(imgClearInput, "清空明文");
+            SetIconToolTip(imgClearOutput, "清空密文");
+            SetIconToolTip(imgClearSharedKey, "清空共享密钥");
+            SetIconToolTip(imgClearIV, "清空 IV");
         }
 
         /// <summary>
@@ -750,6 +760,23 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
             box.Text = text;
             SetStatus($"{fieldLabel}已从剪贴板粘贴");
             AppendKeyToHost?.Invoke($"✅ {fieldLabel}已从剪贴板粘贴", Brushes.Green);
+        }
+
+        /// <summary>
+        /// 点击中列清除图标：清空左侧文本框内容，结果写入顶部"计算结果"框。
+        /// </summary>
+        private void ClearEcdhField(TextBox box, string fieldLabel)
+        {
+            if (string.IsNullOrEmpty(box.Text))
+            {
+                SetStatus($"{fieldLabel}已经为空，无需清空");
+                AppendKeyToHost?.Invoke($"ℹ️ {fieldLabel}已经为空，无需清空", Brushes.Gray);
+                return;
+            }
+
+            box.Clear();
+            SetStatus($"{fieldLabel}已清空");
+            AppendKeyToHost?.Invoke($"🧹 {fieldLabel}已清空", Brushes.Green);
         }
 
         /// <summary>
