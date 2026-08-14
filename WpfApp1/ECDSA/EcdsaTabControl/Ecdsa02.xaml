@@ -16,7 +16,7 @@
     <!-- ===== 根网格：两列 ===== -->
     <Grid Margin="4">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="50*"/> <!-- 左列：签名验签输入区 -->
+            <ColumnDefinition Width="600"/> <!-- 左列：签名验签输入区 -->
             <ColumnDefinition Width="50*"/> <!-- 右列：操作区 -->
         </Grid.ColumnDefinitions>
 
@@ -35,10 +35,10 @@
                 <!-- 原始数据区 -->
                 <Grid Grid.Row="0" Grid.Column="0" Margin="0,0,4,2">
                     <TextBox x:Name="textPlainData" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
-                    <TextBlock Text="原始数据：" Margin="0,4,6,0" Foreground="Red" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+                    <TextBlock Text="原始数据：" Margin="3,4,6,0" Foreground="Red" HorizontalAlignment="left" VerticalAlignment="Top"/>
                 </Grid>
                 <StackPanel Grid.Row="0" Grid.Column="1" Margin="4,0,0,2" HorizontalAlignment="Center" VerticalAlignment="Top">
-                    <TextBlock Text="数据操作" FontWeight="Bold" Foreground="#FFC00000" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                    
                     <Image x:Name="imgCopyPlainData" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0"/>
                     <Image x:Name="imgPastePlainData" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0"/>
                     <Image x:Name="imgClearPlainData" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0"/>
@@ -47,10 +47,10 @@
                 <!-- 签名区 -->
                 <Grid Grid.Row="1" Grid.Column="0" Margin="0,2,4,0">
                     <TextBox x:Name="textSignature" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
-                    <TextBlock Text="签名：" Margin="0,4,6,0" Foreground="Red" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+                    <TextBlock Text="签名：" Margin="3,4,6,0" Foreground="Red" HorizontalAlignment="left" VerticalAlignment="Top"/>
                 </Grid>
                 <StackPanel Grid.Row="1" Grid.Column="1" Margin="4,2,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">
-                    <TextBlock Text="签名操作" FontWeight="Bold" Foreground="#FFC00000" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                    
                     <Image x:Name="imgCopySignatureData" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="复制签名"/>
                     <Image x:Name="imgPasteSignatureData" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0"/>
                     <Image x:Name="imgClearSignatureData" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0"/>
