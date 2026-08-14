@@ -42,11 +42,11 @@
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0" Margin="0,0,4,0">
                         <TextBox x:Name="textEcdhAlicePrivate" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
-                        <TextBlock Text="私钥 (PEM)：" Margin="0,4,6,0" Foreground="Red" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+                        <TextBlock Text="私钥 (PEM)：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
                     </Grid>
                     <Grid Grid.Column="1" Margin="4,0,0,0">
                         <TextBox x:Name="textEcdhAlicePublic" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
-                        <TextBlock Text="公钥 (PEM)：" Margin="0,4,6,0" Foreground="Red" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+                        <TextBlock Text="公钥 (PEM)：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
                     </Grid>
                 </Grid>
             </GroupBox>
@@ -60,11 +60,11 @@
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0" Margin="0,0,4,0">
                         <TextBox x:Name="textEcdhBobPrivate" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
-                        <TextBlock Text="私钥 (PEM)：" Margin="0,4,6,0" Foreground="Red" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+                        <TextBlock Text="私钥 (PEM)：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
                     </Grid>
                     <Grid Grid.Column="1" Margin="4,0,0,0">
                         <TextBox x:Name="textEcdhBobPublic" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
-                        <TextBlock Text="公钥 (PEM)：" Margin="0,4,6,0" Foreground="Red" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+                        <TextBlock Text="公钥 (PEM)：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
                     </Grid>
                 </Grid>
             </GroupBox>
@@ -86,7 +86,7 @@
                 </Grid.RowDefinitions>
 
                 <!-- 明文 -->
-                <Grid Grid.Row="0" Grid.Column="0" Margin="0,0,0,3">
+                <Grid Grid.Row="0" Grid.Column="0" Margin="0,6,0,3">
                     <TextBox x:Name="textEcdhInput" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
                     <TextBlock Text="明文:" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,4,0,0" IsHitTestVisible="False"/>
                 </Grid>

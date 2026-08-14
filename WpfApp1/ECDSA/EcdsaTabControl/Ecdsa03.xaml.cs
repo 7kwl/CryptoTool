@@ -2,7 +2,9 @@
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using System.Windows.Threading;
 using CryptoTool.Algorithm.Algorithms.ECDSA;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
@@ -74,6 +76,61 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
                         LogInfo("未发现顶部 ECDSA 面板，请通过 PrivateKeyProvider/PublicKeyProvider 属性注入密钥，或在参数区手动填写 Bob 公钥。");
                     }
                 }
+
+                // ===== 图标栏点击事件（与按钮事件复用同一逻辑）=====
+                // 左列：加密/解密输入输出
+                imgCopyEncInput.MouseLeftButtonDown += (s, e) => BtnEncInputCopy_Click(s!, e!);
+                imgPasteEncInput.MouseLeftButtonDown += (s, e) => BtnEncInputPaste_Click(s!, e!);
+                imgClearEncInput.MouseLeftButtonDown += (s, e) => TryClear(textEncInput, "明文输入");
+                imgCopyEncOutput.MouseLeftButtonDown += (s, e) => BtnEncOutputCopy_Click(s!, e!);
+                imgPasteEncOutput.MouseLeftButtonDown += (s, e) => BtnEncOutputPaste_Click(s!, e!);
+                imgClearEncOutput.MouseLeftButtonDown += (s, e) => TryClear(textEncOutput, "密文结果");
+                imgCopyEncExtra.MouseLeftButtonDown += (s, e) => BtnEncExtraCopy_Click(s!, e!);
+                imgPasteEncExtra.MouseLeftButtonDown += (s, e) => BtnEncExtraPaste_Click(s!, e!);
+                imgClearEncExtra.MouseLeftButtonDown += (s, e) => TryClear(textEncExtra, "临时私钥ePriv");
+                imgCopyEncEphemeralPub.MouseLeftButtonDown += (s, e) => BtnEncEphemeralPubCopy_Click(s!, e!);
+                imgPasteEncEphemeralPub.MouseLeftButtonDown += (s, e) => BtnEncEphemeralPubPaste_Click(s!, e!);
+                imgClearEncEphemeralPub.MouseLeftButtonDown += (s, e) => TryClear(textEncEphemeralPub, "临时公钥ePub");
+
+                // 中列：参数
+                imgCopyEncKey.MouseLeftButtonDown += (s, e) => TryCopy(textEncKey?.Text, "对称密钥");
+                imgPasteEncKey.MouseLeftButtonDown += (s, e) => TryPaste(textEncKey);
+                imgClearEncKey.MouseLeftButtonDown += (s, e) => TryClear(textEncKey, "对称密钥");
+                imgCopyEncIV.MouseLeftButtonDown += (s, e) => TryCopy(textEncIV?.Text, "初始向量(IV)");
+                imgPasteEncIV.MouseLeftButtonDown += (s, e) => TryPaste(textEncIV);
+                imgClearEncIV.MouseLeftButtonDown += (s, e) => TryClear(textEncIV, "初始向量(IV)");
+                imgCopyEncBobPublic.MouseLeftButtonDown += (s, e) => TryCopy(textEncBobPublic?.Text, "Bob 公钥");
+                imgPasteEncBobPublic.MouseLeftButtonDown += (s, e) => TryPaste(textEncBobPublic);
+                imgClearEncBobPublic.MouseLeftButtonDown += (s, e) => TryClear(textEncBobPublic, "Bob 公钥");
+                imgCopyEncTest.MouseLeftButtonDown += (s, e) => TryCopy(textEncTest?.Text, "测试");
+                imgPasteEncTest.MouseLeftButtonDown += (s, e) => TryPaste(textEncTest);
+                imgClearEncTest.MouseLeftButtonDown += (s, e) => TryClear(textEncTest, "测试");
+
+                // ===== 图标悬停提示（红框白底 Popup）=====
+                SetIconToolTip(imgCopyEncInput, "复制明文输入");
+                SetIconToolTip(imgPasteEncInput, "粘贴明文输入");
+                SetIconToolTip(imgClearEncInput, "清空明文输入");
+                SetIconToolTip(imgCopyEncOutput, "复制密文结果");
+                SetIconToolTip(imgPasteEncOutput, "粘贴密文结果");
+                SetIconToolTip(imgClearEncOutput, "清空密文结果");
+                SetIconToolTip(imgCopyEncExtra, "复制临时私钥ePriv");
+                SetIconToolTip(imgPasteEncExtra, "粘贴临时私钥ePriv");
+                SetIconToolTip(imgClearEncExtra, "清空临时私钥ePriv");
+                SetIconToolTip(imgCopyEncEphemeralPub, "复制临时公钥ePub");
+                SetIconToolTip(imgPasteEncEphemeralPub, "粘贴临时公钥ePub");
+                SetIconToolTip(imgClearEncEphemeralPub, "清空临时公钥ePub");
+                SetIconToolTip(imgCopyEncKey, "复制对称密钥");
+                SetIconToolTip(imgPasteEncKey, "粘贴对称密钥");
+                SetIconToolTip(imgClearEncKey, "清空对称密钥");
+                SetIconToolTip(imgCopyEncIV, "复制初始向量(IV)");
+                SetIconToolTip(imgPasteEncIV, "粘贴初始向量(IV)");
+                SetIconToolTip(imgClearEncIV, "清空初始向量(IV)");
+                SetIconToolTip(imgCopyEncBobPublic, "复制 Bob 公钥");
+                SetIconToolTip(imgPasteEncBobPublic, "粘贴 Bob 公钥");
+                SetIconToolTip(imgClearEncBobPublic, "清空 Bob 公钥");
+                SetIconToolTip(imgCopyEncTest, "复制测试");
+                SetIconToolTip(imgPasteEncTest, "粘贴测试");
+                SetIconToolTip(imgClearEncTest, "清空测试");
             };
         }
 
@@ -199,6 +256,18 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
                 LogOk("已粘贴到文本框");
             }
             catch (Exception ex) { LogErr($"粘贴失败: {ex.Message}"); }
+        }
+
+        private void TryClear(TextBox? target, string label)
+        {
+            try
+            {
+                if (target == null) return;
+                if (string.IsNullOrEmpty(target.Text)) { LogInfo($"{label}已为空，无需清空"); return; }
+                target.Clear();
+                LogOk($"{label}已清空");
+            }
+            catch (Exception ex) { LogErr($"清空{label}失败: {ex.Message}"); }
         }
 
         #endregion
@@ -977,6 +1046,54 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
                 133 => "secp521r1",
                 _ => "secp256r1"
             };
+        }
+
+        #endregion
+
+        #region 图标悬停提示
+
+        /// <summary>
+        /// 为图标设置悬停提示：鼠标悬停时在图标右侧显示红色文字，移走自动消失。
+        /// 使用 Popup + 延迟关闭实现：
+        ///  - 鼠标从图标移到气泡上时不会立即关闭（延迟 250ms 内移入气泡即取消关闭），避免闪烁；
+        ///  - Popup 不拦截图标的点击事件，复制/粘贴可正常触发。
+        /// </summary>
+        private static void SetIconToolTip(FrameworkElement icon, string text)
+        {
+            var popup = new Popup
+            {
+                PlacementTarget = icon,
+                Placement = PlacementMode.Right,
+                HorizontalOffset = 6,
+                AllowsTransparency = true,
+                StaysOpen = true,
+                IsOpen = false
+            };
+            popup.Child = new Border
+            {
+                BorderBrush = Brushes.Red,
+                BorderThickness = new Thickness(1),
+                Child = new TextBlock
+                {
+                    Text = text,
+                    Foreground = Brushes.Red,
+                    Background = Brushes.White,
+                    Padding = new Thickness(6, 2, 6, 2)
+                }
+            };
+
+            var closeTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
+            closeTimer.Tick += (s, e) =>
+            {
+                closeTimer.Stop();
+                popup.IsOpen = false;
+            };
+
+            icon.MouseEnter += (s, e) => { closeTimer.Stop(); popup.IsOpen = true; };
+            icon.MouseLeave += (s, e) => { closeTimer.Stop(); closeTimer.Start(); };
+            popup.MouseEnter += (s, e) => { closeTimer.Stop(); };
+            popup.MouseLeave += (s, e) => { closeTimer.Stop(); closeTimer.Start(); };
+            icon.MouseLeftButtonDown += (s, e) => { closeTimer.Stop(); popup.IsOpen = false; };
         }
 
         #endregion
