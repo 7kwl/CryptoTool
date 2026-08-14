@@ -16,7 +16,7 @@
     <!-- ===== 根网格：两列 ===== -->
     <Grid Margin="8">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="700"/>
+            <ColumnDefinition Width="600"/>
             <!-- 左列：密钥生成 -->
             <ColumnDefinition Width="*"/>
             <!-- 右列：密钥操作 -->
@@ -85,12 +85,10 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" MinHeight="191"/>
-                    <!-- 上：操作区（高度随内容，5 行 34 紧凑排列） -->
-                    <RowDefinition Height="2*" MinHeight="100"/>
-                    <!-- 中：结果区（计算结果 + 运行结果，占据剩余空间） -->
-                    <RowDefinition Height="60"/>
-                    <!-- 下：操作历史区（固定 60px，跨两列） -->
+                    <RowDefinition Height="0.5*"/>
+                    <!-- 上：操作区（占 50%） -->
+                    <RowDefinition Height="0.5*"/>
+                    <!-- 中：结果区（计算结果 + 运行结果，占 50%） -->
                 </Grid.RowDefinitions>
 
                 <!-- 上：操作区（左按钮 + 右设置），5 行一一对应保证行对齐 -->
@@ -158,7 +156,7 @@
                         <TextBlock Text="曲线类别：" Width="90" TextAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0"/>
                         <ComboBox x:Name="comboCategory" Width="120" IsReadOnly="True" VerticalAlignment="Center"/>
                         <TextBlock Text="→" VerticalAlignment="Center" Margin="4,0" FontSize="16" FontWeight="Bold"/>
-                        <ComboBox x:Name="comboCurve" Width="160" IsReadOnly="True" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="comboCurve" Width="260" IsReadOnly="True" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Grid>
 
@@ -171,14 +169,6 @@
                 <GroupBox Grid.Row="1" Grid.Column="1" Header="运行结果" Margin="3,6,0,0">
                     <RichTextBox x:Name="labelValidationResult" IsReadOnly="True" VerticalScrollBarVisibility="Auto" Background="White" BorderThickness="0" FontFamily="Consolas" FontSize="12" MinHeight="100"/>
                 </GroupBox>
-
-                <!-- 下：操作历史（跨两列，所有按键操作的时间戳记录） -->
-                <TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" x:Name="textOperationHistory" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Background="White" Foreground="Purple" BorderThickness="1" BorderBrush="#888" FontFamily="Consolas" FontSize="12" MinHeight="40" Margin="0,6,0,0">
-                    <TextBox.Resources>
-                        <!-- 禁用系统主题将 IsReadOnly 状态映射为 Foreground 灰色（部分 Windows 主题下显示为紫色） -->
-                        <SolidColorBrush x:Key="{x:Static SystemColors.GrayTextBrushKey}" Color="Purple"/>
-                    </TextBox.Resources>
-                </TextBox>
             </Grid>
         </GroupBox>
     </Grid>

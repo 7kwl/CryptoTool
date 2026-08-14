@@ -78,45 +78,49 @@
                     <ColumnDefinition Width="80"/>  <!-- 复制/粘贴按钮 -->
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <!-- 4 组：标签(22) + 文本框(25*) 交替 -->
-                    <RowDefinition Height="22"/>
+                    <!-- 4 组：标签叠层嵌入文本框内部顶部居中 -->
                     <RowDefinition Height="25*"/>
-                    <RowDefinition Height="22"/>
                     <RowDefinition Height="25*"/>
-                    <RowDefinition Height="22"/>
                     <RowDefinition Height="25*"/>
-                    <RowDefinition Height="22"/>
                     <RowDefinition Height="25*"/>
                 </Grid.RowDefinitions>
 
                 <!-- 明文 -->
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="明文:" VerticalAlignment="Center"/>
-                <TextBox x:Name="textEcdhInput" Grid.Row="1" Grid.Column="0" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12"/>
-                <StackPanel Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Margin="4,0,0,0">
+                <Grid Grid.Row="0" Grid.Column="0">
+                    <TextBox x:Name="textEcdhInput" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
+                    <TextBlock Text="明文:" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,4,0,0" IsHitTestVisible="False"/>
+                </Grid>
+                <StackPanel Grid.Row="0" Grid.Column="1" Margin="4,0,0,0">
                     <Button Content="复制" Foreground="Red" Margin="0,1"/>
                     <Button Content="粘贴" Foreground="Red" Margin="0,1"/>
                 </StackPanel>
 
                 <!-- 密文 -->
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="密文（可编辑）:" VerticalAlignment="Center"/>
-                <TextBox x:Name="textEcdhOutput" Grid.Row="3" Grid.Column="0" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12"/>
-                <StackPanel Grid.Row="2" Grid.Column="1" Grid.RowSpan="2" Margin="4,0,0,0">
+                <Grid Grid.Row="1" Grid.Column="0">
+                    <TextBox x:Name="textEcdhOutput" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
+                    <TextBlock Text="密文（可编辑）:" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,4,0,0" IsHitTestVisible="False"/>
+                </Grid>
+                <StackPanel Grid.Row="1" Grid.Column="1" Margin="4,0,0,0">
                     <Button Content="复制" Foreground="Red" Margin="0,1"/>
                     <Button Content="粘贴" Foreground="Red" Margin="0,1"/>
                 </StackPanel>
 
                 <!-- 共享密钥 -->
-                <TextBlock Grid.Row="4" Grid.Column="0" Text="共享密钥 (Base64, 可编辑):" VerticalAlignment="Center"/>
-                <TextBox x:Name="textEcdhSharedKey" Grid.Row="5" Grid.Column="0" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12"/>
-                <StackPanel Grid.Row="4" Grid.Column="1" Grid.RowSpan="2" Margin="4,0,0,0">
+                <Grid Grid.Row="2" Grid.Column="0">
+                    <TextBox x:Name="textEcdhSharedKey" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
+                    <TextBlock Text="共享密钥 (Base64, 可编辑):" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,4,0,0" IsHitTestVisible="False"/>
+                </Grid>
+                <StackPanel Grid.Row="2" Grid.Column="1" Margin="4,0,0,0">
                     <Button Content="复制" Foreground="Red" Margin="0,1"/>
                     <Button Content="粘贴" Foreground="Red" Margin="0,1"/>
                 </StackPanel>
 
                 <!-- IV -->
-                <TextBlock Grid.Row="6" Grid.Column="0" x:Name="lblEcdhIV" Text="IV (Base64，可编辑/留空随机):" VerticalAlignment="Center"/>
-                <TextBox x:Name="textEcdhIV" Grid.Row="7" Grid.Column="0" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12"/>
-                <StackPanel Grid.Row="6" Grid.Column="1" Grid.RowSpan="2" Margin="4,0,0,0">
+                <Grid Grid.Row="3" Grid.Column="0">
+                    <TextBox x:Name="textEcdhIV" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
+                    <TextBlock x:Name="lblEcdhIV" Text="IV (Base64，可编辑/留空随机):" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,4,0,0" IsHitTestVisible="False"/>
+                </Grid>
+                <StackPanel Grid.Row="3" Grid.Column="1" Margin="4,0,0,0">
                     <Button Content="复制" Foreground="Red" Margin="0,1"/>
                     <Button Content="粘贴" Foreground="Red" Margin="0,1"/>
                 </StackPanel>

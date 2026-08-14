@@ -4,6 +4,7 @@
              xmlns:local="clr-namespace:WpfApp1"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <!-- 阿里云矢量图标库：iconfont.ttf 嵌入为程序集资源 -->
+        <FontFamily x:Key="IconfontFamily">/WpfApp1;component/font/iconfont.ttf#iconfont</FontFamily>
     </Application.Resources>
 </Application>

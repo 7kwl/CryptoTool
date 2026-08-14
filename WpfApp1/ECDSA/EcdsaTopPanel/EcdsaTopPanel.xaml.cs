@@ -793,15 +793,30 @@ AttachComboBoxWheel(comboCurve);
         }
 
         /// <summary>
-        /// 操作历史文本框顶部插入一条纯文本日志（上面新、下面旧）。
+        /// 操作历史顶部插入一条紫色日志（上面新、下面旧），统一并入"计算结果"框。
         /// 用于记录复制/粘贴/导入/保存等关键操作的成功路径。
         /// </summary>
         private void AppendHistory(string message)
         {
-            string line = $"[{DateTime.Now:HH:mm:ss}] {message}{Environment.NewLine}";
-            // 顶部插入：最新操作在上
-            textOperationHistory.Text = line + textOperationHistory.Text;
-            textOperationHistory.ScrollToHome();
+            string line = $"[{DateTime.Now:HH:mm:ss}] {message}";
+
+            // 如果当前还停留在"等待操作..."灰色占位，先清掉它
+            string current = new TextRange(textKeyResult.Document.ContentStart, textKeyResult.Document.ContentEnd).Text;
+            if (current.Contains("等待操作"))
+                textKeyResult.Document.Blocks.Clear();
+
+            var p = new Paragraph(new Run(line))
+            {
+                Foreground = Brushes.Purple,
+                Margin = new Thickness(0)
+            };
+            var blocks = textKeyResult.Document.Blocks;
+            if (blocks.FirstBlock != null)
+                blocks.InsertBefore(blocks.FirstBlock, p);
+            else
+                blocks.Add(p);
+
+            textKeyResult.ScrollToHome();
         }
 
         /// <summary>
