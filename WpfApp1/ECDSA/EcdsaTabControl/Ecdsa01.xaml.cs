@@ -135,6 +135,12 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
             AttachComboBoxWheel(comboEcdhEncoding);
             AttachComboBoxWheel(comboEcdhPrivateKeyStandard);
             AttachComboBoxWheel(comboEcdhPublicKeyStandard);
+
+            // 中列复制图标：点击复制左侧文本框内容，成功后结果写入顶部"计算结果"框
+            imgCopyInput.MouseLeftButtonDown += (s, e) => CopyEcdhFieldToClipboard(textEcdhInput, "明文");
+            imgCopyOutput.MouseLeftButtonDown += (s, e) => CopyEcdhFieldToClipboard(textEcdhOutput, "密文");
+            imgCopySharedKey.MouseLeftButtonDown += (s, e) => CopyEcdhFieldToClipboard(textEcdhSharedKey, "共享密钥");
+            imgCopyIV.MouseLeftButtonDown += (s, e) => CopyEcdhFieldToClipboard(textEcdhIV, "IV");
         }
 
         /// <summary>
@@ -690,6 +696,17 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
                 MessageBoxImage.Error);
             SetStatus("复制失败：剪贴板被占用");
             return false;
+        }
+
+        /// <summary>
+        /// 点击中列复制图标：复制左侧文本框内容，成功后结果写入顶部"计算结果"框。
+        /// </summary>
+        private void CopyEcdhFieldToClipboard(TextBox box, string fieldLabel)
+        {
+            if (TrySetClipboardText(box.Text, $"{fieldLabel}已复制到剪贴板", $"{fieldLabel}为空，无法复制"))
+            {
+                AppendKeyToHost?.Invoke($"✅ {fieldLabel}已复制到剪贴板", Brushes.Green);
+            }
         }
 
         /// <summary>
