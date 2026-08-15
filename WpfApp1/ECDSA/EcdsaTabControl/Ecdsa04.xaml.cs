@@ -87,9 +87,7 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
                 }
 
                 // ===== 按钮点击事件 =====
-                btnSelectFile.Click += (_, _) => SelectFileForSign();
                 btnSign.Click += async (_, _) => await SignFileAsync();
-                btnSaveSignature.Click += (_, _) => SaveSignatureFile();
                 btnSelectVerifyFile.Click += (_, _) => SelectVerifyFile();
                 btnSelectVerifySig.Click += (_, _) => SelectVerifySignature();
                 btnVerify.Click += async (_, _) => await VerifySignatureAsync();
@@ -97,9 +95,12 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
                 // ===== 图标按钮 =====
                 imgCopyFileHash.MouseLeftButtonDown += (s, e) => TryCopy(textFileHash.Text, "文件哈希");
                 imgCopySignature.MouseLeftButtonDown += (s, e) => TryCopy(textSignature.Text, "签名");
-                imgClearSignature.MouseLeftButtonDown += (s, e) => { textSignature.Text = ""; _lastSignature = null; btnSaveSignature.IsEnabled = false; };
+                imgClearSignature.MouseLeftButtonDown += (s, e) => { textSignature.Text = ""; _lastSignature = null; SetExportEnabled(false); };
                 imgCopyVerifySig.MouseLeftButtonDown += (s, e) => TryCopy(textVerifySigPreview.Text, "签名内容");
                 imgCopyVerifyResult.MouseLeftButtonDown += (s, e) => TryCopy(textVerifyResult.Text, "验签结果");
+
+                borderImportFile.MouseLeftButtonDown += (_, _) => SelectFileForSign();
+                borderExportSignature.MouseLeftButtonDown += (_, _) => SaveSignatureFile();
 
                 // 签名格式切换时重新呈现签名
                 if (comboSignatureFormat != null)
@@ -110,6 +111,11 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
                 IconToolTipHelper.SetIconToolTip(imgClearSignature, "清空签名");
                 IconToolTipHelper.SetIconToolTip(imgCopyVerifySig, "复制签名内容");
                 IconToolTipHelper.SetIconToolTip(imgCopyVerifyResult, "复制验签结果");
+                IconToolTipHelper.SetIconToolTip(borderImportFile, "选择要签名的文件");
+                IconToolTipHelper.SetIconToolTip(borderExportSignature, "另存签名文件 (.sig)");
+
+                // 初始状态：未生成签名时导出不可用
+                SetExportEnabled(false);
             };
         }
 
@@ -143,7 +149,7 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
             if (dlg.ShowDialog() != true) return;
 
             _signFilePath = dlg.FileName;
-            btnSaveSignature.IsEnabled = false;
+            SetExportEnabled(false);
             textSignature.Text = "（尚未生成签名）";
             _lastSignature = null;
             SetVerifyResult(null);
@@ -195,7 +201,7 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
 
                 _lastSignature = sig;
                 ReRenderSignature();
-                btnSaveSignature.IsEnabled = true;
+                SetExportEnabled(true);
                 LogInfo($"✅ 文件签名完成（{sig.Length} 字节 DER），可另存为 .sig 文件。");
             }
             catch (Exception ex)
@@ -208,10 +214,22 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
             }
         }
 
+        /// <summary>切换导出签名图标的可用状态（禁用时置灰）</summary>
+        private void SetExportEnabled(bool enabled)
+        {
+            double opacity = enabled ? 1.0 : 0.45;
+            borderExportSignature.Opacity = opacity;
+            imgExportSignature.Opacity = opacity;
+        }
+
         /// <summary>将签名按当前格式另存为 .sig 文件</summary>
         private void SaveSignatureFile()
         {
-            if (_lastSignature == null || string.IsNullOrEmpty(_signFilePath)) return;
+            if (_lastSignature == null || string.IsNullOrEmpty(_signFilePath))
+            {
+                LogInfo("⚠️ 请先生成签名后再导出。");
+                return;
+            }
 
             var dlg = new SaveFileDialog
             {
@@ -233,7 +251,7 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
                     string text = fmt == "Hex"
                         ? Convert.ToHexString(_lastSignature).ToUpperInvariant()
                         : Convert.ToBase64String(_lastSignature);
-                    File.WriteAllText(dlg.FileName, text, Encoding.UTF8);
+                    File.WriteAllText(dlg.FileName, text, new UTF8Encoding(false));
                 }
                 LogInfo($"✅ 签名已保存：{dlg.FileName}");
             }
@@ -269,10 +287,13 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
 
             try
             {
-                byte[] raw = File.ReadAllBytes(_verifySigPath);
-                string preview = Convert.ToHexString(raw).ToLowerInvariant();
+                byte[] sig = ReadSignatureBytes(_verifySigPath);
+                string fmt = GetSelectedSigFormat();
+                string preview = fmt == "Base64"
+                    ? Convert.ToBase64String(sig)
+                    : Convert.ToHexString(sig).ToLowerInvariant();
                 textVerifySigPreview.Text = StringUtil.WrapTextEvery(preview, 50);
-                LogInfo($"已选择签名文件：{_verifySigPath}（{raw.Length} 字节）");
+                LogInfo($"已选择签名文件：{_verifySigPath}（{sig.Length} 字节，{fmt}）");
             }
             catch (Exception ex)
             {
@@ -414,14 +435,17 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
             byte[] raw = File.ReadAllBytes(path);
             if (raw.Length == 0) throw new InvalidDataException("签名文件为空");
 
-            string text = Encoding.UTF8.GetString(raw).Trim();
+            string text = Encoding.UTF8.GetString(raw).Trim().Trim('\uFEFF');
+            string normalized = new([.. text.Where(c => !char.IsWhiteSpace(c))]);
+
             // Hex：偶数长度且全为十六进制字符
-            if (text.Length % 2 == 0 && text.All(Uri.IsHexDigit))
-                return Convert.FromHexString(text);
+            if (normalized.Length % 2 == 0 && normalized.All(Uri.IsHexDigit))
+                return Convert.FromHexString(normalized);
+
             // Base64：可解码
             try
             {
-                return Convert.FromBase64String(text);
+                return Convert.FromBase64String(normalized);
             }
             catch (FormatException)
             {

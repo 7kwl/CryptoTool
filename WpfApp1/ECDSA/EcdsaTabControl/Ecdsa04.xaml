@@ -19,12 +19,13 @@
              d:DesignHeight="450" d:DesignWidth="1800"
              Background="White">
 
-    <!-- ===== 根网格：三列 ===== -->
+    <!-- ===== 根网格：四列 ===== -->
     <Grid Margin="4">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="46*"/> <!-- 左列：文件签名 -->
-            <ColumnDefinition Width="46*"/> <!-- 中列：文件验签 -->
-            <ColumnDefinition Width="420"/> <!-- 右列：签名选项 -->
+            <ColumnDefinition Width="*"/>   <!-- 第 0 列：文件签名 -->
+            <ColumnDefinition Width="*"/>   <!-- 第 1 列：文件验签 -->
+            <ColumnDefinition Width="*"/>   <!-- 第 2 列：验签结果 -->
+            <ColumnDefinition Width="420"/> <!-- 第 3 列：签名选项 -->
         </Grid.ColumnDefinitions>
 
         <!-- ==================== 左列：文件签名区 ==================== -->
@@ -33,16 +34,11 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/> <!-- 0: 选择/另存按钮 -->
                     <RowDefinition Height="Auto"/> <!-- 1: 文件信息 -->
-                    <RowDefinition Height="86"/>   <!-- 2: 文件哈希 -->
-                    <RowDefinition Height="*"/>    <!-- 3: 签名预览 -->
+                    <RowDefinition Height="60"/>   <!-- 2: 文件哈希 -->
+                    <RowDefinition Height="60"/>    <!-- 3: 签名预览 -->
                     <RowDefinition Height="Auto"/> <!-- 4: 生成签名按钮 -->
+                    <RowDefinition Height="*"/>    <!-- 5: 导入/导出文件图标区 -->
                 </Grid.RowDefinitions>
-
-                <!-- 第 0 行：选择文件 + 另存签名文件 -->
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,4">
-                    <Button x:Name="btnSelectFile" Content="选择要签名的文件..." Height="30" MinWidth="170" VerticalAlignment="Center"/>
-                    <Button x:Name="btnSaveSignature" Content="另存签名文件 (.sig)" Height="30" MinWidth="140" VerticalAlignment="Center" Margin="8,0,0,0" IsEnabled="False"/>
-                </StackPanel>
 
                 <!-- 第 1 行：文件信息（只读） -->
                 <TextBox x:Name="textFileInfo" Grid.Row="1" IsReadOnly="True" TextWrapping="Wrap" AcceptsReturn="True"
@@ -90,18 +86,41 @@
 
                 <!-- 第 4 行：生成签名按钮 -->
                 <Button x:Name="btnSign" Grid.Row="4" Content="对文件生成签名" Height="34" FontWeight="Bold"/>
+
+                <!-- 第 5 行：导入/导出文件图标区 -->
+                <Grid Grid.Row="5" Margin="0,8,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border x:Name="borderImportFile" Grid.Column="0" Margin="0,0,4,0" MinHeight="80"
+                            Background="#FFF7F7F7" BorderBrush="#FFCCCCCC" BorderThickness="1" CornerRadius="4"
+                            Cursor="Hand" ToolTip="选择要签名的文件">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical">
+                            <Image x:Name="imgImportFile" Source="{StaticResource IconImport}" Width="32" Height="32"/>
+                            <TextBlock Text="导入文件" FontSize="12" Foreground="#FF333333" Margin="0,4,0,0" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                    <Border x:Name="borderExportSignature" Grid.Column="1" Margin="4,0,0,0" MinHeight="80"
+                            Background="#FFF7F7F7" BorderBrush="#FFCCCCCC" BorderThickness="1" CornerRadius="4"
+                            Cursor="Hand" ToolTip="另存签名文件">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical">
+                            <Image x:Name="imgExportSignature" Source="{StaticResource IconExport}" Width="32" Height="32"/>
+                            <TextBlock Text="导出签名" FontSize="12" Foreground="#FF333333" Margin="0,4,0,0" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
             </Grid>
         </GroupBox>
 
-        <!-- ==================== 中列：文件验签区 ==================== -->
+        <!-- ==================== 第 1 列：文件验签区 ==================== -->
         <GroupBox Grid.Column="1" Header="文件验签" Margin="2,0,2,0">
             <Grid Margin="6">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/> <!-- 0: 选择文件按钮 -->
                     <RowDefinition Height="Auto"/> <!-- 1: 路径信息 -->
                     <RowDefinition Height="110"/>  <!-- 2: 签名内容预览 -->
-                    <RowDefinition Height="Auto"/> <!-- 3: 验签按钮 -->
-                    <RowDefinition Height="*"/>    <!-- 4: 验签结果 -->
+                    <RowDefinition Height="*"/>    <!-- 3: 占位/留白，保持与左侧对齐 -->
                 </Grid.RowDefinitions>
 
                 <!-- 第 0 行：选择原文件 + 签名文件 -->
@@ -115,7 +134,7 @@
                          MinHeight="44" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC"
                          FontFamily="Consolas" FontSize="12" Padding="4,2,4,2" Background="#FFF7F7F7"
                          Foreground="#FF333333" Margin="0,0,0,4"
-                         Text="请选择原始文件与签名文件。验签时 Hash 算法 / k 生成方式必须与签名时一致（右侧选项区）。"/>
+                         Text="请选择原始文件与签名文件。验签时 Hash 算法 / k 生成方式必须与签名时一致（最右侧选项区）。"/>
 
                 <!-- 第 2 行：签名内容预览（只读 + 复制） -->
                 <Grid Grid.Row="2" Margin="0,0,0,4">
@@ -135,31 +154,33 @@
                     </StackPanel>
                 </Grid>
 
-                <!-- 第 3 行：验签按钮 -->
-                <Button x:Name="btnVerify" Grid.Row="3" Content="开始验签" Height="34" FontWeight="Bold" Margin="0,0,0,4"/>
-
-                <!-- 第 4 行：验签结果（只读 + 复制） -->
-                <Grid Grid.Row="4">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="32"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid Grid.Column="0" Margin="0,0,4,0">
-                        <TextBox x:Name="textVerifyResult" IsReadOnly="True" TextWrapping="Wrap" AcceptsReturn="True"
-                                 VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC"
-                                 FontFamily="Consolas" FontSize="14" Padding="4,22,4,4" Background="#FFFBFBFB"
-                                 Text="验签结果将在此显示。"/>
-                        <TextBlock Text="验签结果：" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,3,0,0" IsHitTestVisible="False"/>
-                    </Grid>
-                    <StackPanel Grid.Column="1" Margin="4,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">
-                        <Image x:Name="imgCopyVerifyResult" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0"/>
-                    </StackPanel>
-                </Grid>
+                <!-- 第 3 行：开始验签按钮 -->
+                <Button x:Name="btnVerify" Grid.Row="3" Content="开始验签" Height="34" FontWeight="Bold" VerticalAlignment="Top" Margin="0,8,0,0"/>
             </Grid>
         </GroupBox>
 
-        <!-- ==================== 右列：签名选项区 ==================== -->
-        <GroupBox Grid.Column="2" Header="签名选项" Margin="2,0,0,0">
+        <!-- ==================== 第 2 列：验签结果区 ==================== -->
+        <GroupBox Grid.Column="2" Header="验签结果" Margin="2,0,2,0">
+            <Grid Margin="6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="32"/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0" Margin="0,0,4,0">
+                    <TextBox x:Name="textVerifyResult" IsReadOnly="True" TextWrapping="Wrap" AcceptsReturn="True"
+                             VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC"
+                             FontFamily="Consolas" FontSize="14" Padding="4,22,4,4" Background="#FFFBFBFB"
+                             Text="验签结果将在此显示。"/>
+                    <TextBlock Text="验签结果：" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,3,0,0" IsHitTestVisible="False"/>
+                </Grid>
+                <StackPanel Grid.Column="1" Margin="4,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">
+                    <Image x:Name="imgCopyVerifyResult" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0"/>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+
+        <!-- ==================== 第 3 列：签名选项区 ==================== -->
+        <GroupBox Grid.Column="3" Header="签名选项" Margin="2,0,0,0">
             <Grid Margin="6">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/> <!-- 0: Hash 算法 -->

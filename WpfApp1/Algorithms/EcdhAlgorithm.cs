@@ -137,13 +137,13 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
             {
                 digest.Reset();
                 // counter (4 bytes, big-endian)
-                byte[] counterBytes = new byte[4]
-                {
+                byte[] counterBytes =
+                [
                     (byte)(counter >> 24),
                     (byte)(counter >> 16),
                     (byte)(counter >> 8),
-                    (byte)(counter)
-                };
+                    (byte)counter
+                ];
                 digest.BlockUpdate(counterBytes, 0, 4);
                 // Z (shared secret)
                 digest.BlockUpdate(sharedSecret, 0, sharedSecret.Length);
