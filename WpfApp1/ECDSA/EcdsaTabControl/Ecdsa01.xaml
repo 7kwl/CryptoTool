@@ -36,15 +36,15 @@
             <!-- 爱丽丝的钥匙 -->
             <GroupBox Grid.Row="0" Header="爱丽丝的钥匙 (Alice)" MinHeight="220" Margin="0,0,0,2">
                 <Grid Margin="6">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="50*"/> <!-- 私钥 -->
-                        <ColumnDefinition Width="50*"/> <!-- 公钥 -->
-                    </Grid.ColumnDefinitions>
-                    <Grid Grid.Column="0" Margin="0,0,4,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50*"/> <!-- 私钥 -->
+                        <RowDefinition Height="50*"/> <!-- 公钥 -->
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" Margin="0,0,0,4">
                         <TextBox x:Name="textEcdhAlicePrivate" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
                         <TextBlock Text="私钥 (PEM)：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
                     </Grid>
-                    <Grid Grid.Column="1" Margin="4,0,0,0">
+                    <Grid Grid.Row="1" Margin="0,4,0,0">
                         <TextBox x:Name="textEcdhAlicePublic" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
                         <TextBlock Text="公钥 (PEM)：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
                     </Grid>
@@ -54,15 +54,15 @@
             <!-- 鲍勃的钥匙 -->
             <GroupBox Grid.Row="1" Header="鲍勃的钥匙 (Bob)" MinHeight="220" Margin="0,2,0,0">
                 <Grid Margin="6">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="50*"/> <!-- 私钥 -->
-                        <ColumnDefinition Width="50*"/> <!-- 公钥 -->
-                    </Grid.ColumnDefinitions>
-                    <Grid Grid.Column="0" Margin="0,0,4,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50*"/> <!-- 私钥 -->
+                        <RowDefinition Height="50*"/> <!-- 公钥 -->
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" Margin="0,0,0,4">
                         <TextBox x:Name="textEcdhBobPrivate" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
                         <TextBlock Text="私钥 (PEM)：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
                     </Grid>
-                    <Grid Grid.Column="1" Margin="4,0,0,0">
+                    <Grid Grid.Row="1" Margin="0,4,0,0">
                         <TextBox x:Name="textEcdhBobPublic" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
                         <TextBlock Text="公钥 (PEM)：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
                     </Grid>
