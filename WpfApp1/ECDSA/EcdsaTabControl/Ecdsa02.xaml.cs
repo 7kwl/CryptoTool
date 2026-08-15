@@ -311,36 +311,33 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
 
         private void BtnPasteSignatureData_Click(object sender, RoutedEventArgs e) => TryPaste(textSignature, "签名");
 
+        /// <summary>只清空"签名"框，对其它两个签名相关文本框互不干扰。</summary>
         private void BtnClearSignatureData_Click(object sender, RoutedEventArgs e)
         {
-            _lastSignatureBytes = null; // 清缓存，避免切换格式时把已清空的签名"复活"
-            _lastSignatureR = null;     // 同步清 r/s 缓存
+            _lastSignatureBytes = null; // 同步清缓存，避免下拉框切换时把已清空的签名框"复活"
+            _lastSignatureR = null;
             _lastSignatureS = null;
             TryClear(textSignature, "签名");
-            TryClear(textSignatureRSBase64, "R|S (Base64)");
-            TryClear(textSignatureDerBase64, "DER (Base64)");
         }
 
-        /// <summary>清空 Base64(Raw 二进制) 框；同时清掉 DER 框与签名框（联动）。</summary>
+        /// <summary>只清空"Base64(Raw 二进制)"框，对其它两个签名相关文本框互不干扰。</summary>
         private void BtnClearSignatureRSBase64_Click(object sender, RoutedEventArgs e)
         {
+            // 即使 R/S 框只是局部被清空，也清缓存，避免下拉框切换触发 RefreshSignatureTextboxes 把已清空的 R|S 框重新填回去
             _lastSignatureBytes = null;
             _lastSignatureR = null;
             _lastSignatureS = null;
             TryClear(textSignatureRSBase64, "R|S (Base64)");
-            TryClear(textSignatureDerBase64, "DER (Base64)");
-            TryClear(textSignature, "签名");
         }
 
-        /// <summary>清空 Base64(DER 二进制) 框；同时清掉 Raw 框与签名框（联动）。</summary>
+        /// <summary>只清空"Base64(DER 二进制)"框，对其它两个签名相关文本框互不干扰。</summary>
         private void BtnClearSignatureDerBase64_Click(object sender, RoutedEventArgs e)
         {
+            // 同步清缓存，避免下拉框切换触发 RefreshSignatureTextboxes 把已清空的 DER 框重新填回去
             _lastSignatureBytes = null;
             _lastSignatureR = null;
             _lastSignatureS = null;
             TryClear(textSignatureDerBase64, "DER (Base64)");
-            TryClear(textSignatureRSBase64, "R|S (Base64)");
-            TryClear(textSignature, "签名");
         }
 
         /// <summary>
