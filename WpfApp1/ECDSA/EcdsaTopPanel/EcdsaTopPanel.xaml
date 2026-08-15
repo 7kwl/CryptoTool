@@ -152,7 +152,16 @@
                     <Button x:Name="btnClearAll" Content="清空全部" Grid.Row="4" Grid.Column="0" Height="30" VerticalAlignment="Center" Margin="0,0,6,0"/>
                     <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Margin="6,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="曲线类别：" Width="90" TextAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <ComboBox x:Name="comboCategory" Width="120" IsReadOnly="True" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="comboCategory" Width="150" IsReadOnly="True" VerticalAlignment="Center">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="{StaticResource IconJiami}" Width="14" Height="14" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding Text}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
                         <TextBlock Text="→" VerticalAlignment="Center" Margin="4,0" FontSize="16" FontWeight="Bold"/>
                         <ComboBox x:Name="comboCurve" Width="260" IsReadOnly="True" VerticalAlignment="Center"/>
                     </StackPanel>

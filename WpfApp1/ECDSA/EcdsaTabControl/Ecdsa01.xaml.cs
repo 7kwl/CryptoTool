@@ -89,14 +89,13 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
             if (_allCurveData.Count == 0)
                 _allCurveData = EcdsaCurveNames.GetAllCurvesByCategory();
 
-            comboEcdhCategory.DisplayMemberPath = "Text";
             comboEcdhCategory.SelectedValuePath = "Value";
             comboEcdhCategory.Items.Clear();
             foreach (var cat in _allCurveData)
             {
                 comboEcdhCategory.Items.Add(new
                 {
-                    Text = $"{cat.Value.Icon} {cat.Key}",
+                    Text = cat.Key, // 分类图标统一使用 IconJiami（见 ItemTemplate），此处仅显示分类名
                     Value = cat.Key
                 });
             }
@@ -174,6 +173,38 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
             IconToolTipHelper.SetIconToolTip(imgClearSharedKeyAlice, "清空共享密钥(Alice)");
             IconToolTipHelper.SetIconToolTip(imgClearSharedKeyBob, "清空共享密钥(Bob)");
             IconToolTipHelper.SetIconToolTip(imgClearIV, "清空 IV");
+
+            // 左列密钥对图标：复制（爱丽丝/鲍勃 × 私钥/公钥）
+            imgCopyEcdhAlicePrivate.MouseLeftButtonDown += (s, e) => CopyEcdhFieldToClipboard(textEcdhAlicePrivate, "爱丽丝私钥");
+            imgCopyEcdhAlicePublic.MouseLeftButtonDown += (s, e) => CopyEcdhFieldToClipboard(textEcdhAlicePublic, "爱丽丝公钥");
+            imgCopyEcdhBobPrivate.MouseLeftButtonDown += (s, e) => CopyEcdhFieldToClipboard(textEcdhBobPrivate, "鲍勃私钥");
+            imgCopyEcdhBobPublic.MouseLeftButtonDown += (s, e) => CopyEcdhFieldToClipboard(textEcdhBobPublic, "鲍勃公钥");
+
+            // 左列密钥对图标：粘贴
+            imgPasteEcdhAlicePrivate.MouseLeftButtonDown += (s, e) => PasteEcdhFieldFromClipboard(textEcdhAlicePrivate, "爱丽丝私钥");
+            imgPasteEcdhAlicePublic.MouseLeftButtonDown += (s, e) => PasteEcdhFieldFromClipboard(textEcdhAlicePublic, "爱丽丝公钥");
+            imgPasteEcdhBobPrivate.MouseLeftButtonDown += (s, e) => PasteEcdhFieldFromClipboard(textEcdhBobPrivate, "鲍勃私钥");
+            imgPasteEcdhBobPublic.MouseLeftButtonDown += (s, e) => PasteEcdhFieldFromClipboard(textEcdhBobPublic, "鲍勃公钥");
+
+            // 左列密钥对图标：清除
+            imgClearEcdhAlicePrivate.MouseLeftButtonDown += (s, e) => ClearEcdhField(textEcdhAlicePrivate, "爱丽丝私钥");
+            imgClearEcdhAlicePublic.MouseLeftButtonDown += (s, e) => ClearEcdhField(textEcdhAlicePublic, "爱丽丝公钥");
+            imgClearEcdhBobPrivate.MouseLeftButtonDown += (s, e) => ClearEcdhField(textEcdhBobPrivate, "鲍勃私钥");
+            imgClearEcdhBobPublic.MouseLeftButtonDown += (s, e) => ClearEcdhField(textEcdhBobPublic, "鲍勃公钥");
+
+            // 左列密钥对图标悬停提示
+            IconToolTipHelper.SetIconToolTip(imgCopyEcdhAlicePrivate, "复制爱丽丝私钥");
+            IconToolTipHelper.SetIconToolTip(imgCopyEcdhAlicePublic, "复制爱丽丝公钥");
+            IconToolTipHelper.SetIconToolTip(imgCopyEcdhBobPrivate, "复制鲍勃私钥");
+            IconToolTipHelper.SetIconToolTip(imgCopyEcdhBobPublic, "复制鲍勃公钥");
+            IconToolTipHelper.SetIconToolTip(imgPasteEcdhAlicePrivate, "粘贴爱丽丝私钥");
+            IconToolTipHelper.SetIconToolTip(imgPasteEcdhAlicePublic, "粘贴爱丽丝公钥");
+            IconToolTipHelper.SetIconToolTip(imgPasteEcdhBobPrivate, "粘贴鲍勃私钥");
+            IconToolTipHelper.SetIconToolTip(imgPasteEcdhBobPublic, "粘贴鲍勃公钥");
+            IconToolTipHelper.SetIconToolTip(imgClearEcdhAlicePrivate, "清空爱丽丝私钥");
+            IconToolTipHelper.SetIconToolTip(imgClearEcdhAlicePublic, "清空爱丽丝公钥");
+            IconToolTipHelper.SetIconToolTip(imgClearEcdhBobPrivate, "清空鲍勃私钥");
+            IconToolTipHelper.SetIconToolTip(imgClearEcdhBobPublic, "清空鲍勃公钥");
         }
 
         /// <summary>

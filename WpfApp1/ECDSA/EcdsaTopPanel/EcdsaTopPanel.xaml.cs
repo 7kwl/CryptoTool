@@ -179,14 +179,13 @@ AttachComboBoxWheel(comboCurve);
         {
             _allCurveData = EcdsaCurveNames.GetAllCurvesByCategory();
 
-            comboCategory.DisplayMemberPath = "Text";
             comboCategory.SelectedValuePath = "Value";
             comboCategory.Items.Clear();
             foreach (var cat in _allCurveData)
             {
                 comboCategory.Items.Add(new
                 {
-                    Text = $"{cat.Value.Icon} {cat.Key}",
+                    Text = cat.Key, // 分类图标统一使用 IconJiami（见 ItemTemplate），此处仅显示分类名
                     Value = cat.Key
                 });
             }

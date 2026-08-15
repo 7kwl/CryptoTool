@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <Resource Include="icon\favicon.ico" />
-    <Resource Include="font\iconfont.ttf" />
+    <Resource Include="font\font_5223423_y4fg39ohqqs\iconfont.ttf" />
   </ItemGroup>
 
 </Project>

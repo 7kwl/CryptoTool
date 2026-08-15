@@ -182,33 +182,17 @@ namespace CryptoTool.Win.Helpers
         /// </summary>
         public static Dictionary<string, (string Icon, List<KeyValuePair<string, string>> Curves)> GetAllCurvesByCategory()
         {
+            // 全部曲线分类统一使用阿里云 icon-jiami（加密锁）图标，见 IconLogic/AliyunIcons.xaml 的 IconJiami 资源
+            const string IconJiami = "\uE69B"; // iconfont 私有区 unicode（icon-jiami）
+
             var result = new Dictionary<string, (string, List<KeyValuePair<string, string>>)>
             {
-                // 1. NIST 推荐曲线（置顶，与参考网站一致）
-                ["NIST Curves (Recommended)"] = ("🏆", new List<KeyValuePair<string, string>>
+                // 1. SECG Curves（SEC2 标准 secp 系列，NIST 推荐三条置顶）
+                ["SECG Curves"] = (IconJiami, new List<KeyValuePair<string, string>>
                 {
                     KVP("secp256r1", "P-256 (secp256r1) - 128 位安全"),
                     KVP("secp384r1", "P-384 (secp384r1) - 192 位安全"),
                     KVP("secp521r1", "P-521 (secp521r1) - 256 位安全"),
-                }),
-
-                // 2. NIST Prime 曲线
-                ["prime"] = ("⭐", new List<KeyValuePair<string, string>>
-                {
-                    KVP("prime256v1", "prime256v1 (NIST P-256)"),
-                    KVP("secp192r1", "secp192r1 (NIST P-192)"),
-                    KVP("secp224r1", "secp224r1 (NIST P-224)"),
-                    KVP("prime192v1", "prime192v1 (NIST P-192)"),
-                    KVP("prime192v2", "prime192v2"),
-                    KVP("prime192v3", "prime192v3"),
-                    KVP("prime239v1", "prime239v1"),
-                    KVP("prime239v2", "prime239v2"),
-                    KVP("prime239v3", "prime239v3"),
-                }),
-
-                // 3. SECG Koblitz 曲线
-                ["secp"] = ("🔹", new List<KeyValuePair<string, string>>
-                {
                     KVP("secp112r1", "secp112r1 (SECG 112-bit)"),
                     KVP("secp112r2", "secp112r2 (SECG 112-bit)"),
                     KVP("secp128r1", "secp128r1 (SECG 128-bit)"),
@@ -221,8 +205,22 @@ namespace CryptoTool.Win.Helpers
                     KVP("secp256k1", "secp256k1 (Bitcoin)"),
                 }),
 
-                // 4. NIST B 二进制曲线
-                ["nist-b"] = ("🔸", new List<KeyValuePair<string, string>>
+                // 2. NIST Prime Curves（ANSI X9.62 prime-* 与 NIST P 系列别名）
+                ["NIST Prime Curves"] = (IconJiami, new List<KeyValuePair<string, string>>
+                {
+                    KVP("prime256v1", "prime256v1 (NIST P-256)"),
+                    KVP("secp192r1", "secp192r1 (NIST P-192)"),
+                    KVP("secp224r1", "secp224r1 (NIST P-224)"),
+                    KVP("prime192v1", "prime192v1 (NIST P-192)"),
+                    KVP("prime192v2", "prime192v2"),
+                    KVP("prime192v3", "prime192v3"),
+                    KVP("prime239v1", "prime239v1"),
+                    KVP("prime239v2", "prime239v2"),
+                    KVP("prime239v3", "prime239v3"),
+                }),
+
+                // 3. NIST Binary Curves（B-* 二进制域曲线）
+                ["NIST Binary Curves"] = (IconJiami, new List<KeyValuePair<string, string>>
                 {
                     KVP("B-163", "B-163 (NIST Binary 163)"),
                     KVP("B-233", "B-233 (NIST Binary 233)"),
@@ -231,8 +229,8 @@ namespace CryptoTool.Win.Helpers
                     KVP("B-571", "B-571 (NIST Binary 571)"),
                 }),
 
-                // 5. Brainpool 曲线
-                ["brainpool"] = ("🧠", new List<KeyValuePair<string, string>>
+                // 4. Brainpool Curves
+                ["Brainpool Curves"] = (IconJiami, new List<KeyValuePair<string, string>>
                 {
                     KVP("brainpoolP160r1", "brainpoolP160r1"),
                     KVP("brainpoolP160t1", "brainpoolP160t1"),
@@ -250,8 +248,8 @@ namespace CryptoTool.Win.Helpers
                     KVP("brainpoolP512t1", "brainpoolP512t1"),
                 }),
 
-                // 6. GOST 曲线
-                ["gost"] = ("🇷🇺", new List<KeyValuePair<string, string>>
+                // 5. GOST R 34.10 Curves
+                ["GOST R 34.10 Curves"] = (IconJiami, new List<KeyValuePair<string, string>>
                 {
                     KVP("GostR3410-2001-CryptoPro-A", "GOST CP-A"),
                     KVP("GostR3410-2001-CryptoPro-B", "GOST CP-B"),
@@ -259,8 +257,8 @@ namespace CryptoTool.Win.Helpers
                     KVP("GostR3410-2001-CryptoPro-D", "GOST CP-D"),
                 }),
 
-                // 7. X9.62 c2pnb 曲线
-                ["c2pnb"] = ("📶", new List<KeyValuePair<string, string>>
+                // 6. ANSI X9.62 Binary Polynomial Curves（c2pnb 系列）
+                ["ANSI X9.62 Binary Polynomial"] = (IconJiami, new List<KeyValuePair<string, string>>
                 {
                     KVP("c2pnb163v1", "c2pnb163v1"),
                     KVP("c2pnb163v2", "c2pnb163v2"),
@@ -272,8 +270,8 @@ namespace CryptoTool.Win.Helpers
                     KVP("c2pnb368w1", "c2pnb368w1"),
                 }),
 
-                // 8. X9.62 c2tnb 曲线
-                ["c2tnb"] = ("📡", new List<KeyValuePair<string, string>>
+                // 7. ANSI X9.62 Binary Trinomial Curves（c2tnb 系列）
+                ["ANSI X9.62 Binary Trinomial"] = (IconJiami, new List<KeyValuePair<string, string>>
                 {
                     KVP("c2tnb191v1", "c2tnb191v1"),
                     KVP("c2tnb191v2", "c2tnb191v2"),
@@ -284,8 +282,8 @@ namespace CryptoTool.Win.Helpers
                     KVP("c2tnb431r1", "c2tnb431r1"),
                 }),
 
-                // 9. WTLS 曲线
-                ["wtls"] = ("📱", new List<KeyValuePair<string, string>>
+                // 8. WTLS Curves
+                ["WTLS Curves"] = (IconJiami, new List<KeyValuePair<string, string>>
                 {
                     KVP("wtls1", "WTLS-1"),
                     KVP("wtls3", "WTLS-3"),
@@ -298,14 +296,14 @@ namespace CryptoTool.Win.Helpers
                     KVP("wtls10", "WTLS-10"),
                 }),
 
-                // 10. SM2 国密
-                ["sm2"] = ("🇨🇳", new List<KeyValuePair<string, string>>
+                // 9. SM2 Curves
+                ["SM2 Curves"] = (IconJiami, new List<KeyValuePair<string, string>>
                 {
                     KVP("sm2p256v1", "sm2p256v1 (国密 SM2)"),
                 }),
 
-                // 11. NIST P 别名
-                ["nist-p"] = ("🇺🇸", new List<KeyValuePair<string, string>>
+                // 10. NIST P Curves（RFC 5480 正式名称）
+                ["NIST P Curves"] = (IconJiami, new List<KeyValuePair<string, string>>
                 {
                     KVP("P-192", "P-192 (NIST)"),
                     KVP("P-224", "P-224 (NIST)"),
