@@ -137,11 +137,13 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
             {
                 digest.Reset();
                 // counter (4 bytes, big-endian)
-                byte[] counterBytes = new byte[4];
-                counterBytes[0] = (byte)(counter >> 24);
-                counterBytes[1] = (byte)(counter >> 16);
-                counterBytes[2] = (byte)(counter >> 8);
-                counterBytes[3] = (byte)(counter);
+                byte[] counterBytes = new byte[4]
+                {
+                    (byte)(counter >> 24),
+                    (byte)(counter >> 16),
+                    (byte)(counter >> 8),
+                    (byte)(counter)
+                };
                 digest.BlockUpdate(counterBytes, 0, 4);
                 // Z (shared secret)
                 digest.BlockUpdate(sharedSecret, 0, sharedSecret.Length);
@@ -221,9 +223,9 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
 
         private static byte[] FromHexString(string hex)
         {
-            if (string.IsNullOrWhiteSpace(hex)) return Array.Empty<byte>();
+            if (string.IsNullOrWhiteSpace(hex)) return [];
             // 过滤空白字符（含显示时按固定宽度插入的换行符）
-            hex = new string(hex.Where(c => !char.IsWhiteSpace(c)).ToArray());
+            hex = new string([.. hex.Where(c => !char.IsWhiteSpace(c))]);
             if (hex.Length % 2 != 0)
                 throw new FormatException("Hex 字符串长度必须是偶数");
             byte[] bytes = new byte[hex.Length / 2];

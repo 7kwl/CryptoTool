@@ -10,8 +10,8 @@ namespace CryptoTool.Win.Helpers
     public static class EcdsaCurveNames
     {
         // ===== 所有曲线（扁平列表，保持向后兼容）=====
-        private static readonly IReadOnlyList<string> _allCurves = new[]
-        {
+        private static readonly IReadOnlyList<string> _allCurves =
+        [
             // NIST / SECG prime 曲线
             "prime256v1", "secp256r1", "secp384r1", "secp521r1",
             "secp112r1", "secp112r2", "secp128r1", "secp128r2",
@@ -47,7 +47,7 @@ namespace CryptoTool.Win.Helpers
             // ANSI X9.62 prime
             "prime192v1", "prime192v2", "prime192v3",
             "prime239v1", "prime239v2", "prime239v3", "prime256v1"
-        };
+        ];
 
         /// <summary>
         /// 曲线Key → 所属分类Key的反向映射（静态构造初始化，O(1)查询）

@@ -48,7 +48,7 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
                 "KeyGen" => _subPages.TryGetValue(tag, out var kg) ? kg : new Ecdsa01 { AppendToHost = ResultAppender, AppendKeyToHost = KeyResultAppender },
                 "Ecdh" => _subPages.TryGetValue(tag, out var e2) ? e2 : new Ecdsa02 { AppendToHost = ResultAppender, PrivateKeyProvider = PrivateKeyProvider, PublicKeyProvider = PublicKeyProvider },
                 "Ecies" => new Ecdsa03 { AppendToHost = ResultAppender, PrivateKeyProvider = PrivateKeyProvider, PublicKeyProvider = PublicKeyProvider },
-                "FileSign" => _subPages.TryGetValue(tag, out var e4) ? e4 : new Ecdsa04(),
+                "FileSign" => _subPages.TryGetValue(tag, out var e4) ? e4 : new Ecdsa04 { AppendToHost = ResultAppender, PrivateKeyProvider = PrivateKeyProvider, PublicKeyProvider = PublicKeyProvider },
                 _ => null
             };
             if (sub != null)
