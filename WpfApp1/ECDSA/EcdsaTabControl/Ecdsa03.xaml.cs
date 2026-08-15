@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using CryptoTool.Algorithm.Algorithms.ECDSA;
+using CryptoTool.Algorithm.Utils;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Digests;
@@ -580,7 +581,7 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
 
             // 5) 输出 = 临时公钥(X9.62 未压缩) || IV || Cipher || Tag
             byte[] payload = [.. ephPubEnc, .. iv, .. cipher, .. tag];
-            textEncOutput.Text = EncodeByFmt(payload, OutputFmt());
+            textEncOutput.Text = StringUtil.WrapTextEvery(EncodeByFmt(payload, OutputFmt()), 50);
 
             // 6) 一次性合并日志为单段（对齐 WinForms：每次操作只输出一个时间戳段）
             var ivHex = Convert.ToHexString(iv);
@@ -723,7 +724,7 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
                 _lastEphemeralCurveName = null;
             }
 
-            textEncOutput.Text = EncodeByFmt(payload, OutputFmt());
+            textEncOutput.Text = StringUtil.WrapTextEvery(EncodeByFmt(payload, OutputFmt()), 50);
 
             LogOk($"{_lastAlgorithmName} 加密完成：明文 {plain.Length} 字节，密文 {_lastEncCipher.Length} 字节（IV {ivLen} 字节）");
         }

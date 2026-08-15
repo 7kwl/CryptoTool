@@ -18,8 +18,9 @@ namespace CryptoTool.Win.Helpers
             "secp160k1", "secp160r1", "secp160r2",
             "secp192k1", "secp192r1", "secp224k1", "secp224r1",
             "secp256k1",
-            // NIST B/P 曲线
+            // NIST P/K/B 曲线
             "P-192", "P-224", "P-256", "P-384", "P-521",
+            "K-163", "K-233", "K-283", "K-409", "K-571",
             "B-163", "B-233", "B-283", "B-409", "B-571",
             // Brainpool
             "brainpoolP160r1", "brainpoolP160t1",
@@ -107,9 +108,9 @@ namespace CryptoTool.Win.Helpers
                 { "secp160k1", "secp160k1 (SECG 160-bit Koblitz)" },
                 { "secp160r1", "secp160r1 (SECG 160-bit)" },
                 { "secp160r2", "secp160r2 (SECG 160-bit)" },
-                { "secp192k1", "secp192k1 (NIST K-192)" },
+                { "secp192k1", "secp192k1 (Koblitz 192)" },
                 { "secp192r1", "secp192r1 (NIST P-192)" },
-                { "secp224k1", "secp224k1 (NIST K-224)" },
+                { "secp224k1", "secp224k1 (Koblitz 224)" },
                 { "secp224r1", "secp224r1 (NIST P-224)" },
                 { "secp256k1", "secp256k1 (Bitcoin/secp256k1)" },
                 { "P-192", "P-192 (NIST)" },
@@ -122,6 +123,11 @@ namespace CryptoTool.Win.Helpers
                 { "B-283", "B-283 (NIST Binary)" },
                 { "B-409", "B-409 (NIST Binary)" },
                 { "B-571", "B-571 (NIST Binary)" },
+                { "K-163", "K-163 (NIST Koblitz)" },
+                { "K-233", "K-233 (NIST Koblitz)" },
+                { "K-283", "K-283 (NIST Koblitz)" },
+                { "K-409", "K-409 (NIST Koblitz)" },
+                { "K-571", "K-571 (NIST Koblitz)" },
                 { "brainpoolP160r1", "brainpoolP160r1" },
                 { "brainpoolP160t1", "brainpoolP160t1" },
                 { "brainpoolP192r1", "brainpoolP192r1" },
@@ -193,6 +199,8 @@ namespace CryptoTool.Win.Helpers
                     KVP("secp256r1", "P-256 (secp256r1) - 128 位安全"),
                     KVP("secp384r1", "P-384 (secp384r1) - 192 位安全"),
                     KVP("secp521r1", "P-521 (secp521r1) - 256 位安全"),
+                    KVP("secp192r1", "P-192 (secp192r1) - 96 位安全"),
+                    KVP("secp224r1", "P-224 (secp224r1) - 112 位安全"),
                     KVP("secp112r1", "secp112r1 (SECG 112-bit)"),
                     KVP("secp112r2", "secp112r2 (SECG 112-bit)"),
                     KVP("secp128r1", "secp128r1 (SECG 128-bit)"),
@@ -205,21 +213,27 @@ namespace CryptoTool.Win.Helpers
                     KVP("secp256k1", "secp256k1 (Bitcoin)"),
                 }),
 
-                // 2. NIST Prime Curves（ANSI X9.62 prime-* 与 NIST P 系列别名）
-                ["NIST Prime Curves"] = (IconJiami, new List<KeyValuePair<string, string>>
+                // 2. NIST P Curves（SP 800-186 P 系列 · 素域随机曲线，RFC 5480 正式名称）
+                ["NIST P Curves"] = (IconJiami, new List<KeyValuePair<string, string>>
                 {
-                    KVP("prime256v1", "prime256v1 (NIST P-256)"),
-                    KVP("secp192r1", "secp192r1 (NIST P-192)"),
-                    KVP("secp224r1", "secp224r1 (NIST P-224)"),
-                    KVP("prime192v1", "prime192v1 (NIST P-192)"),
-                    KVP("prime192v2", "prime192v2"),
-                    KVP("prime192v3", "prime192v3"),
-                    KVP("prime239v1", "prime239v1"),
-                    KVP("prime239v2", "prime239v2"),
-                    KVP("prime239v3", "prime239v3"),
+                    KVP("P-192", "P-192 (NIST)"),
+                    KVP("P-224", "P-224 (NIST)"),
+                    KVP("P-256", "P-256 (NIST)"),
+                    KVP("P-384", "P-384 (NIST)"),
+                    KVP("P-521", "P-521 (NIST)"),
                 }),
 
-                // 3. NIST Binary Curves（B-* 二进制域曲线）
+                // 3. NIST Koblitz Curves（SP 800-186 K 系列 · 二进制域 Koblitz 曲线）
+                ["NIST Koblitz Curves"] = (IconJiami, new List<KeyValuePair<string, string>>
+                {
+                    KVP("K-163", "K-163 (NIST Koblitz 163)"),
+                    KVP("K-233", "K-233 (NIST Koblitz 233)"),
+                    KVP("K-283", "K-283 (NIST Koblitz 283)"),
+                    KVP("K-409", "K-409 (NIST Koblitz 409)"),
+                    KVP("K-571", "K-571 (NIST Koblitz 571)"),
+                }),
+
+                // 4. NIST Binary Curves（SP 800-186 B 系列 · 二进制域随机曲线）
                 ["NIST Binary Curves"] = (IconJiami, new List<KeyValuePair<string, string>>
                 {
                     KVP("B-163", "B-163 (NIST Binary 163)"),
@@ -229,7 +243,19 @@ namespace CryptoTool.Win.Helpers
                     KVP("B-571", "B-571 (NIST Binary 571)"),
                 }),
 
-                // 4. Brainpool Curves
+                // 5. ANSI X9.62 Prime Curves（prime-* 命名，含 NIST P-192/P-256 别名）
+                ["ANSI X9.62 Prime Curves"] = (IconJiami, new List<KeyValuePair<string, string>>
+                {
+                    KVP("prime256v1", "prime256v1 (NIST P-256)"),
+                    KVP("prime192v1", "prime192v1 (NIST P-192)"),
+                    KVP("prime192v2", "prime192v2"),
+                    KVP("prime192v3", "prime192v3"),
+                    KVP("prime239v1", "prime239v1"),
+                    KVP("prime239v2", "prime239v2"),
+                    KVP("prime239v3", "prime239v3"),
+                }),
+
+                // 8. Brainpool Curves
                 ["Brainpool Curves"] = (IconJiami, new List<KeyValuePair<string, string>>
                 {
                     KVP("brainpoolP160r1", "brainpoolP160r1"),
@@ -248,7 +274,7 @@ namespace CryptoTool.Win.Helpers
                     KVP("brainpoolP512t1", "brainpoolP512t1"),
                 }),
 
-                // 5. GOST R 34.10 Curves
+                // 9. GOST R 34.10 Curves
                 ["GOST R 34.10 Curves"] = (IconJiami, new List<KeyValuePair<string, string>>
                 {
                     KVP("GostR3410-2001-CryptoPro-A", "GOST CP-A"),
@@ -282,7 +308,7 @@ namespace CryptoTool.Win.Helpers
                     KVP("c2tnb431r1", "c2tnb431r1"),
                 }),
 
-                // 8. WTLS Curves
+                // 10. WTLS Curves
                 ["WTLS Curves"] = (IconJiami, new List<KeyValuePair<string, string>>
                 {
                     KVP("wtls1", "WTLS-1"),
@@ -296,21 +322,12 @@ namespace CryptoTool.Win.Helpers
                     KVP("wtls10", "WTLS-10"),
                 }),
 
-                // 9. SM2 Curves
+                // 11. SM2 Curves
                 ["SM2 Curves"] = (IconJiami, new List<KeyValuePair<string, string>>
                 {
                     KVP("sm2p256v1", "sm2p256v1 (国密 SM2)"),
                 }),
 
-                // 10. NIST P Curves（RFC 5480 正式名称）
-                ["NIST P Curves"] = (IconJiami, new List<KeyValuePair<string, string>>
-                {
-                    KVP("P-192", "P-192 (NIST)"),
-                    KVP("P-224", "P-224 (NIST)"),
-                    KVP("P-256", "P-256 (NIST)"),
-                    KVP("P-384", "P-384 (NIST)"),
-                    KVP("P-521", "P-521 (NIST)"),
-                }),
             };
 
             return result;

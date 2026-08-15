@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using CryptoTool.Algorithm.Algorithms.ECDSA;
+using CryptoTool.Algorithm.Utils;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Security;
@@ -364,11 +365,10 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
             _lastSignatureR = r;
             _lastSignatureS = s;
 
-            textSignature.Text = FormatSignatureBytes(der, GetSignatureFormat());
-            textSignatureRSBase64.Text = (r != null && s != null)
-                ? Convert.ToBase64String(ConcatRs(r, s))
-                : Convert.ToBase64String(der);
-            textSignatureDerBase64.Text = Convert.ToBase64String(der);
+            textSignature.Text = StringUtil.WrapTextEvery(FormatSignatureBytes(der, GetSignatureFormat()), 50);
+            textSignatureRSBase64.Text = StringUtil.WrapTextEvery(
+                (r != null && s != null) ? Convert.ToBase64String(ConcatRs(r, s)) : Convert.ToBase64String(der), 50);
+            textSignatureDerBase64.Text = StringUtil.WrapTextEvery(Convert.ToBase64String(der), 50);
         }
 
         /// <summary>三框独立：TextChanged 联动已移除，按钮验签各自只读对应文本框，互不干扰。</summary>

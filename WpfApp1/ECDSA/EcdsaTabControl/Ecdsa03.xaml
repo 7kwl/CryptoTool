@@ -19,8 +19,8 @@
     <Grid Margin="4">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="30*"/> <!-- 左列：加密/解密输入输出 -->
-            <ColumnDefinition Width="20*"/> <!-- 中列：参数 -->
-            <ColumnDefinition Width="50*"/> <!-- 右列：操作与配置 -->
+            <ColumnDefinition Width="24*"/> <!-- 中列：参数 -->
+            <ColumnDefinition Width="46*"/> <!-- 右列：操作与配置 -->
         </Grid.ColumnDefinitions>
 
         <!-- ==================== 左列：加密 / 解密输入输出 ==================== -->

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Agreement;
@@ -221,7 +222,8 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
         private static byte[] FromHexString(string hex)
         {
             if (string.IsNullOrWhiteSpace(hex)) return Array.Empty<byte>();
-            hex = hex.Trim();
+            // 过滤空白字符（含显示时按固定宽度插入的换行符）
+            hex = new string(hex.Where(c => !char.IsWhiteSpace(c)).ToArray());
             if (hex.Length % 2 != 0)
                 throw new FormatException("Hex 字符串长度必须是偶数");
             byte[] bytes = new byte[hex.Length / 2];

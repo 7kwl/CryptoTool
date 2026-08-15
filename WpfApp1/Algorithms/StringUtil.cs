@@ -120,6 +120,27 @@ namespace CryptoTool.Algorithm.Utils
         }
 
         /// <summary>
+        /// 将长字符串按每 n 个字符插入换行符（\n），用于 Base64/Hex 输出按固定宽度换行显示。
+        /// 先移除已有的 \r\n，避免重复换行；按 n 字符硬切分，不按符号智能换行。
+        /// </summary>
+        /// <param name="text">原始字符串（可为 Base64/Hex/普通文本）</param>
+        /// <param name="n">每行字符数</param>
+        /// <returns>按固定宽度插入换行后的字符串</returns>
+        public static string WrapTextEvery(string? text, int n)
+        {
+            if (string.IsNullOrEmpty(text) || n <= 0) return text ?? string.Empty;
+            text = text.Replace("\r\n", "").Replace("\n", "").Replace("\r", "");
+            if (text.Length <= n) return text;
+            var sb = new StringBuilder(text.Length + text.Length / n + 1);
+            for (int i = 0; i < text.Length; i += n)
+            {
+                if (i > 0) sb.Append('\n');
+                sb.Append(text, i, Math.Min(n, text.Length - i));
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>
         /// Base64字符串转字节数组
         /// </summary>
         /// <param name="base64">Base64字符串</param>
