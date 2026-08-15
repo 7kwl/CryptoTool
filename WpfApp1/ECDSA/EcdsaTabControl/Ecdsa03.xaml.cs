@@ -2,9 +2,7 @@
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using System.Windows.Threading;
 using CryptoTool.Algorithm.Algorithms.ECDSA;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
@@ -12,6 +10,7 @@ using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
+using WpfApp1.IconLogic;
 
 namespace WpfApp1.ECDSA.EcdsaTabControl
 {
@@ -107,30 +106,30 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
                 imgClearEncTest.MouseLeftButtonDown += (s, e) => TryClear(textEncTest, "测试");
 
                 // ===== 图标悬停提示（红框白底 Popup）=====
-                SetIconToolTip(imgCopyEncInput, "复制明文输入");
-                SetIconToolTip(imgPasteEncInput, "粘贴明文输入");
-                SetIconToolTip(imgClearEncInput, "清空明文输入");
-                SetIconToolTip(imgCopyEncOutput, "复制密文结果");
-                SetIconToolTip(imgPasteEncOutput, "粘贴密文结果");
-                SetIconToolTip(imgClearEncOutput, "清空密文结果");
-                SetIconToolTip(imgCopyEncExtra, "复制临时私钥ePriv");
-                SetIconToolTip(imgPasteEncExtra, "粘贴临时私钥ePriv");
-                SetIconToolTip(imgClearEncExtra, "清空临时私钥ePriv");
-                SetIconToolTip(imgCopyEncEphemeralPub, "复制临时公钥ePub");
-                SetIconToolTip(imgPasteEncEphemeralPub, "粘贴临时公钥ePub");
-                SetIconToolTip(imgClearEncEphemeralPub, "清空临时公钥ePub");
-                SetIconToolTip(imgCopyEncKey, "复制对称密钥");
-                SetIconToolTip(imgPasteEncKey, "粘贴对称密钥");
-                SetIconToolTip(imgClearEncKey, "清空对称密钥");
-                SetIconToolTip(imgCopyEncIV, "复制初始向量(IV)");
-                SetIconToolTip(imgPasteEncIV, "粘贴初始向量(IV)");
-                SetIconToolTip(imgClearEncIV, "清空初始向量(IV)");
-                SetIconToolTip(imgCopyEncBobPublic, "复制 Bob 公钥");
-                SetIconToolTip(imgPasteEncBobPublic, "粘贴 Bob 公钥");
-                SetIconToolTip(imgClearEncBobPublic, "清空 Bob 公钥");
-                SetIconToolTip(imgCopyEncTest, "复制测试");
-                SetIconToolTip(imgPasteEncTest, "粘贴测试");
-                SetIconToolTip(imgClearEncTest, "清空测试");
+                IconToolTipHelper.SetIconToolTip(imgCopyEncInput, "复制明文输入");
+                IconToolTipHelper.SetIconToolTip(imgPasteEncInput, "粘贴明文输入");
+                IconToolTipHelper.SetIconToolTip(imgClearEncInput, "清空明文输入");
+                IconToolTipHelper.SetIconToolTip(imgCopyEncOutput, "复制密文结果");
+                IconToolTipHelper.SetIconToolTip(imgPasteEncOutput, "粘贴密文结果");
+                IconToolTipHelper.SetIconToolTip(imgClearEncOutput, "清空密文结果");
+                IconToolTipHelper.SetIconToolTip(imgCopyEncExtra, "复制临时私钥ePriv");
+                IconToolTipHelper.SetIconToolTip(imgPasteEncExtra, "粘贴临时私钥ePriv");
+                IconToolTipHelper.SetIconToolTip(imgClearEncExtra, "清空临时私钥ePriv");
+                IconToolTipHelper.SetIconToolTip(imgCopyEncEphemeralPub, "复制临时公钥ePub");
+                IconToolTipHelper.SetIconToolTip(imgPasteEncEphemeralPub, "粘贴临时公钥ePub");
+                IconToolTipHelper.SetIconToolTip(imgClearEncEphemeralPub, "清空临时公钥ePub");
+                IconToolTipHelper.SetIconToolTip(imgCopyEncKey, "复制对称密钥");
+                IconToolTipHelper.SetIconToolTip(imgPasteEncKey, "粘贴对称密钥");
+                IconToolTipHelper.SetIconToolTip(imgClearEncKey, "清空对称密钥");
+                IconToolTipHelper.SetIconToolTip(imgCopyEncIV, "复制初始向量(IV)");
+                IconToolTipHelper.SetIconToolTip(imgPasteEncIV, "粘贴初始向量(IV)");
+                IconToolTipHelper.SetIconToolTip(imgClearEncIV, "清空初始向量(IV)");
+                IconToolTipHelper.SetIconToolTip(imgCopyEncBobPublic, "复制 Bob 公钥");
+                IconToolTipHelper.SetIconToolTip(imgPasteEncBobPublic, "粘贴 Bob 公钥");
+                IconToolTipHelper.SetIconToolTip(imgClearEncBobPublic, "清空 Bob 公钥");
+                IconToolTipHelper.SetIconToolTip(imgCopyEncTest, "复制测试");
+                IconToolTipHelper.SetIconToolTip(imgPasteEncTest, "粘贴测试");
+                IconToolTipHelper.SetIconToolTip(imgClearEncTest, "清空测试");
             };
         }
 
@@ -1050,51 +1049,5 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
 
         #endregion
 
-        #region 图标悬停提示
-
-        /// <summary>
-        /// 为图标设置悬停提示：鼠标悬停时在图标右侧显示红色文字，移走自动消失。
-        /// 使用 Popup + 延迟关闭实现：
-        ///  - 鼠标从图标移到气泡上时不会立即关闭（延迟 250ms 内移入气泡即取消关闭），避免闪烁；
-        ///  - Popup 不拦截图标的点击事件，复制/粘贴可正常触发。
-        /// </summary>
-        private static void SetIconToolTip(FrameworkElement icon, string text)
-        {
-            var popup = new Popup
-            {
-                PlacementTarget = icon,
-                Placement = PlacementMode.Right,
-                HorizontalOffset = 6,
-                AllowsTransparency = true,
-                StaysOpen = true,
-                Child = new Border
-                {
-                    BorderBrush = Brushes.Red,
-                    BorderThickness = new Thickness(1),
-                    Child = new TextBlock
-                    {
-                        Text = text,
-                        Foreground = Brushes.Red,
-                        Background = Brushes.White,
-                        Padding = new Thickness(6, 2, 6, 2)
-                    }
-                }
-            };
-
-            var closeTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
-            closeTimer.Tick += (s, e) =>
-            {
-                closeTimer.Stop();
-                popup.IsOpen = false;
-            };
-
-            icon.MouseEnter += (s, e) => { closeTimer.Stop(); popup.IsOpen = true; };
-            icon.MouseLeave += (s, e) => { closeTimer.Stop(); closeTimer.Start(); };
-            popup.MouseEnter += (s, e) => { closeTimer.Stop(); };
-            popup.MouseLeave += (s, e) => { closeTimer.Stop(); closeTimer.Start(); };
-            icon.MouseLeftButtonDown += (s, e) => { closeTimer.Stop(); popup.IsOpen = false; };
-        }
-
-        #endregion
     }
 }

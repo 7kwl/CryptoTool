@@ -6,16 +6,15 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Media;
-using System.Windows.Threading;
 using CryptoTool.Algorithm.Algorithms.ECDSA;
 using CryptoTool.Win.Enums;
 using CryptoTool.Win.Helpers;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
+using WpfApp1.IconLogic;
 
 namespace WpfApp1.ECDSA.EcdsaTopPanel
 {
@@ -130,17 +129,17 @@ AttachComboBoxWheel(comboCurve);
 
             // ---- 悬停提示（Popup + 250ms 延迟关闭，规避 ToolTip 吞点击 / Popup 闪烁） ----
             // 私钥
-            SetIconToolTip(imgCopyPrivateKey, "复制私钥");
-            SetIconToolTip(imgPastePrivateKey, "粘贴私钥");
-            SetIconToolTip(imgClearPrivateKey, "清空私钥");
-            SetIconToolTip(imgImportPrivateKey, "导入私钥");
-            SetIconToolTip(imgExportPrivateKey, "导出私钥（保存到文件）");
+            IconToolTipHelper.SetIconToolTip(imgCopyPrivateKey, "复制私钥");
+            IconToolTipHelper.SetIconToolTip(imgPastePrivateKey, "粘贴私钥");
+            IconToolTipHelper.SetIconToolTip(imgClearPrivateKey, "清空私钥");
+            IconToolTipHelper.SetIconToolTip(imgImportPrivateKey, "导入私钥");
+            IconToolTipHelper.SetIconToolTip(imgExportPrivateKey, "导出私钥（保存到文件）");
             // 公钥
-            SetIconToolTip(imgCopyPublicKey, "复制公钥");
-            SetIconToolTip(imgPastePublicKey, "粘贴公钥");
-            SetIconToolTip(imgClearPublicKey, "清空公钥");
-            SetIconToolTip(imgImportPublicKey, "导入公钥");
-            SetIconToolTip(imgExportPublicKey, "导出公钥（保存到文件）");
+            IconToolTipHelper.SetIconToolTip(imgCopyPublicKey, "复制公钥");
+            IconToolTipHelper.SetIconToolTip(imgPastePublicKey, "粘贴公钥");
+            IconToolTipHelper.SetIconToolTip(imgClearPublicKey, "清空公钥");
+            IconToolTipHelper.SetIconToolTip(imgImportPublicKey, "导入公钥");
+            IconToolTipHelper.SetIconToolTip(imgExportPublicKey, "导出公钥（保存到文件）");
         }
 
         /// <summary>
@@ -953,49 +952,5 @@ AttachComboBoxWheel(comboCurve);
 
         #endregion
 
-        /// <summary>
-        /// 为图标设置悬停提示：鼠标悬停时在图标右侧显示红色文字，移走自动消失。
-        /// 使用 Popup + 延迟关闭实现：
-        ///  - 鼠标从图标移到气泡上时不会立即关闭（延迟 250ms 内移入气泡即取消关闭），避免闪烁；
-        ///  - Popup 不拦截图标的点击事件，复制/粘贴/清除可正常触发。
-        /// </summary>
-        private static void SetIconToolTip(FrameworkElement icon, string text)
-        {
-            var popup = new Popup
-            {
-                PlacementTarget = icon,
-                Placement = PlacementMode.Right,
-                HorizontalOffset = 6,
-                AllowsTransparency = true,
-                StaysOpen = true,
-                IsOpen = false
-            };
-            popup.Child = new Border
-            {
-                BorderBrush = Brushes.Red,
-                BorderThickness = new Thickness(1),
-                Child = new TextBlock
-                {
-                    Text = text,
-                    Foreground = Brushes.Red,
-                    Background = Brushes.White,
-                    Padding = new Thickness(6, 2, 6, 2)
-                }
-            };
-
-            var closeTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
-            closeTimer.Tick += (s, e) =>
-            {
-                closeTimer.Stop();
-                popup.IsOpen = false;
-            };
-
-            icon.MouseEnter += (s, e) => { closeTimer.Stop(); popup.IsOpen = true; };
-            icon.MouseLeave += (s, e) => { closeTimer.Stop(); closeTimer.Start(); };
-            popup.MouseEnter += (s, e) => { closeTimer.Stop(); };
-            popup.MouseLeave += (s, e) => { closeTimer.Stop(); closeTimer.Start(); };
-            // 点击图标时立即关闭气泡，避免点击操作后残留
-            icon.MouseLeftButtonDown += (s, e) => { closeTimer.Stop(); popup.IsOpen = false; };
-        }
     }
 }

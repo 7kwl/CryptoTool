@@ -1,13 +1,12 @@
 ﻿using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using System.Windows.Threading;
 using CryptoTool.Algorithm.Algorithms.ECDSA;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Security;
+using WpfApp1.IconLogic;
 
 namespace WpfApp1.ECDSA.EcdsaTabControl
 {
@@ -95,18 +94,18 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
 
                 // 注：三个签名相关文本框彼此独立，不再 TextChanged 联动，避免互相覆盖。
 
-                SetIconToolTip(imgCopyPlainData, "复制原始数据");
-                SetIconToolTip(imgPastePlainData, "粘贴原始数据");
-                SetIconToolTip(imgClearPlainData, "清空原始数据");
-                SetIconToolTip(imgCopySignatureData, "复制签名");
-                SetIconToolTip(imgPasteSignatureData, "粘贴签名");
-                SetIconToolTip(imgClearSignatureData, "清空签名");
-                SetIconToolTip(imgCopySignatureRSBase64, "复制 R|S (Base64) 签名");
-                SetIconToolTip(imgPasteSignatureRSBase64, "粘贴 R|S (Base64) 签名");
-                SetIconToolTip(imgClearSignatureRSBase64, "清空 R|S (Base64) 签名");
-                SetIconToolTip(imgCopySignatureDerBase64, "复制 DER (Base64) 签名");
-                SetIconToolTip(imgPasteSignatureDerBase64, "粘贴 DER (Base64) 签名");
-                SetIconToolTip(imgClearSignatureDerBase64, "清空 DER (Base64) 签名");
+                IconToolTipHelper.SetIconToolTip(imgCopyPlainData, "复制原始数据");
+                IconToolTipHelper.SetIconToolTip(imgPastePlainData, "粘贴原始数据");
+                IconToolTipHelper.SetIconToolTip(imgClearPlainData, "清空原始数据");
+                IconToolTipHelper.SetIconToolTip(imgCopySignatureData, "复制签名");
+                IconToolTipHelper.SetIconToolTip(imgPasteSignatureData, "粘贴签名");
+                IconToolTipHelper.SetIconToolTip(imgClearSignatureData, "清空签名");
+                IconToolTipHelper.SetIconToolTip(imgCopySignatureRSBase64, "复制 R|S (Base64) 签名");
+                IconToolTipHelper.SetIconToolTip(imgPasteSignatureRSBase64, "粘贴 R|S (Base64) 签名");
+                IconToolTipHelper.SetIconToolTip(imgClearSignatureRSBase64, "清空 R|S (Base64) 签名");
+                IconToolTipHelper.SetIconToolTip(imgCopySignatureDerBase64, "复制 DER (Base64) 签名");
+                IconToolTipHelper.SetIconToolTip(imgPasteSignatureDerBase64, "粘贴 DER (Base64) 签名");
+                IconToolTipHelper.SetIconToolTip(imgClearSignatureDerBase64, "清空 DER (Base64) 签名");
             };
         }
 
@@ -551,44 +550,5 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
 
         #endregion
 
-        /// <summary>
-        /// 为图标按钮绑定红框白底悬停提示（与 Ecdsa03 保持一致风格）。
-        /// - 鼠标从图标移到气泡上时不会立即关闭（延迟 250ms 内移入气泡即取消关闭），避免闪烁；
-        /// - Popup 不拦截图标的点击事件，复制/粘贴可正常触发。
-        /// </summary>
-        private static void SetIconToolTip(Image img, string text)
-        {
-#pragma warning disable IDE0017 // Roslyn 误报：对已无对象初始化器的 'new Popup()' 仍报 IDE0017
-            var popup = new Popup();
-            popup.PlacementTarget = img;
-            popup.HorizontalOffset = 6;
-            popup.AllowsTransparency = true;
-            popup.StaysOpen = true;
-            popup.Child = new Border
-            {
-                BorderBrush = Brushes.Red,
-                BorderThickness = new Thickness(1),
-                Child = new TextBlock
-                {
-                    Text = text,
-                    Foreground = Brushes.Red,
-                    Background = Brushes.White,
-                    Padding = new Thickness(6, 2, 6, 2)
-                }
-            };
-
-            var closeTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
-            closeTimer.Tick += (s, e) =>
-            {
-                closeTimer.Stop();
-                popup.IsOpen = false;
-            };
-
-            img.MouseEnter += (s, e) => { closeTimer.Stop(); popup.IsOpen = true; };
-            img.MouseLeave += (s, e) => { closeTimer.Stop(); closeTimer.Start(); };
-            popup.MouseEnter += (s, e) => { closeTimer.Stop(); };
-            popup.MouseLeave += (s, e) => { closeTimer.Stop(); closeTimer.Start(); };
-            img.MouseLeftButtonDown += (s, e) => { closeTimer.Stop(); popup.IsOpen = false; };
-        }
     }
 }

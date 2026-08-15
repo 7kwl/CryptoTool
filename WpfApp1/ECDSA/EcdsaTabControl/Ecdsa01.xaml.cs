@@ -4,14 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using System.Windows.Threading;
 using CryptoTool.Algorithm.Algorithms.ECDSA;
 using CryptoTool.Win.Enums;
 using CryptoTool.Win.Helpers;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
+using WpfApp1.IconLogic;
 
 namespace WpfApp1.ECDSA.EcdsaTabControl
 {
@@ -160,21 +159,21 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
             imgClearIV.MouseLeftButtonDown += (s, e) => ClearEcdhField(textEcdhIV, "IV");
 
             // 复制/粘贴图标悬停提示：鼠标悬停时在旁边显示对应文字，移走自动消失
-            SetIconToolTip(imgCopyInput, "复制明文");
-            SetIconToolTip(imgCopyOutput, "复制密文");
-            SetIconToolTip(imgCopySharedKeyAlice, "复制共享密钥(Alice)");
-            SetIconToolTip(imgCopySharedKeyBob, "复制共享密钥(Bob)");
-            SetIconToolTip(imgCopyIV, "复制 IV");
-            SetIconToolTip(imgPasteInput, "粘贴明文");
-            SetIconToolTip(imgPasteOutput, "粘贴密文");
-            SetIconToolTip(imgPasteSharedKeyAlice, "粘贴共享密钥(Alice)");
-            SetIconToolTip(imgPasteSharedKeyBob, "粘贴共享密钥(Bob)");
-            SetIconToolTip(imgPasteIV, "粘贴 IV");
-            SetIconToolTip(imgClearInput, "清空明文");
-            SetIconToolTip(imgClearOutput, "清空密文");
-            SetIconToolTip(imgClearSharedKeyAlice, "清空共享密钥(Alice)");
-            SetIconToolTip(imgClearSharedKeyBob, "清空共享密钥(Bob)");
-            SetIconToolTip(imgClearIV, "清空 IV");
+            IconToolTipHelper.SetIconToolTip(imgCopyInput, "复制明文");
+            IconToolTipHelper.SetIconToolTip(imgCopyOutput, "复制密文");
+            IconToolTipHelper.SetIconToolTip(imgCopySharedKeyAlice, "复制共享密钥(Alice)");
+            IconToolTipHelper.SetIconToolTip(imgCopySharedKeyBob, "复制共享密钥(Bob)");
+            IconToolTipHelper.SetIconToolTip(imgCopyIV, "复制 IV");
+            IconToolTipHelper.SetIconToolTip(imgPasteInput, "粘贴明文");
+            IconToolTipHelper.SetIconToolTip(imgPasteOutput, "粘贴密文");
+            IconToolTipHelper.SetIconToolTip(imgPasteSharedKeyAlice, "粘贴共享密钥(Alice)");
+            IconToolTipHelper.SetIconToolTip(imgPasteSharedKeyBob, "粘贴共享密钥(Bob)");
+            IconToolTipHelper.SetIconToolTip(imgPasteIV, "粘贴 IV");
+            IconToolTipHelper.SetIconToolTip(imgClearInput, "清空明文");
+            IconToolTipHelper.SetIconToolTip(imgClearOutput, "清空密文");
+            IconToolTipHelper.SetIconToolTip(imgClearSharedKeyAlice, "清空共享密钥(Alice)");
+            IconToolTipHelper.SetIconToolTip(imgClearSharedKeyBob, "清空共享密钥(Bob)");
+            IconToolTipHelper.SetIconToolTip(imgClearIV, "清空 IV");
         }
 
         /// <summary>
@@ -820,48 +819,6 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
             box.Clear();
             SetStatus($"{fieldLabel}已清空");
             AppendKeyToHost?.Invoke($"🧹 {fieldLabel}已清空", Brushes.Green);
-        }
-
-        /// <summary>
-        /// 为图标设置悬停提示：鼠标悬停时在图标右侧显示红色文字，移走自动消失。
-        /// 使用 Popup + 延迟关闭实现：
-        ///  - 鼠标从图标移到气泡上时不会立即关闭（延迟 250ms 内移入气泡即取消关闭），避免闪烁；
-        ///  - Popup 不拦截图标的点击事件，复制/粘贴可正常触发。
-        /// </summary>
-        private static void SetIconToolTip(FrameworkElement icon, string text)
-        {
-#pragma warning disable IDE0017 // Roslyn 误报：对已无对象初始化器的 'new Popup()' 仍报 IDE0017
-            var popup = new Popup();
-            popup.PlacementTarget = icon;
-            popup.HorizontalOffset = 6;
-            popup.AllowsTransparency = true;
-            popup.StaysOpen = true;
-            popup.Child = new Border
-            {
-                BorderBrush = Brushes.Red,
-                BorderThickness = new Thickness(1),
-                Child = new TextBlock
-                {
-                    Text = text,
-                    Foreground = Brushes.Red,
-                    Background = Brushes.White,
-                    Padding = new Thickness(6, 2, 6, 2)
-                }
-            };
-
-            var closeTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
-            closeTimer.Tick += (s, e) =>
-            {
-                closeTimer.Stop();
-                popup.IsOpen = false;
-            };
-
-            icon.MouseEnter += (s, e) => { closeTimer.Stop(); popup.IsOpen = true; };
-            icon.MouseLeave += (s, e) => { closeTimer.Stop(); closeTimer.Start(); };
-            popup.MouseEnter += (s, e) => { closeTimer.Stop(); };
-            popup.MouseLeave += (s, e) => { closeTimer.Stop(); closeTimer.Start(); };
-            // 点击图标时立即关闭气泡，避免点击操作后残留
-            icon.MouseLeftButtonDown += (s, e) => { closeTimer.Stop(); popup.IsOpen = false; };
         }
 
         /// <summary>
