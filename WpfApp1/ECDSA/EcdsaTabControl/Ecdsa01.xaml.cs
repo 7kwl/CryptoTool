@@ -830,15 +830,12 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
         /// </summary>
         private static void SetIconToolTip(FrameworkElement icon, string text)
         {
-            var popup = new Popup
-            {
-                PlacementTarget = icon,
-                Placement = PlacementMode.Right,
-                HorizontalOffset = 6,
-                AllowsTransparency = true,
-                StaysOpen = true,
-                IsOpen = false
-            };
+#pragma warning disable IDE0017 // Roslyn 误报：对已无对象初始化器的 'new Popup()' 仍报 IDE0017
+            var popup = new Popup();
+            popup.PlacementTarget = icon;
+            popup.HorizontalOffset = 6;
+            popup.AllowsTransparency = true;
+            popup.StaysOpen = true;
             popup.Child = new Border
             {
                 BorderBrush = Brushes.Red,

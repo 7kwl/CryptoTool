@@ -1,7 +1,8 @@
 ﻿<!--
     Ecdsa02.xaml — ECDSA 签名验签页面（对应 WinForms 的 ECDSA02 视图）
-    整体布局：两列（50% / 50%）
+    整体布局：三列
       ├─ 左列：签名验签输入区（原始数据 + 签名，各带数据操作按钮）
+      ├─ 中列：预留占位（后续扩展）
       └─ 右列：操作区（签名 / 验签 / 复制签名 + Hash 算法 / 签名格式设置）
 -->
 <UserControl x:Class="WpfApp1.ECDSA.EcdsaTabControl.Ecdsa02"
@@ -13,10 +14,11 @@
              d:DesignHeight="450" d:DesignWidth="1800"
              Background="White">
 
-    <!-- ===== 根网格：两列 ===== -->
+    <!-- ===== 根网格：三列 ===== -->
     <Grid Margin="4">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="600"/> <!-- 左列：签名验签输入区 -->
+            <ColumnDefinition Width="500"/> <!-- 左列：签名验签输入区 -->
+            <ColumnDefinition Width="300"/> <!-- 中列：预留占位（与左列同宽） -->
             <ColumnDefinition Width="50*"/> <!-- 右列：操作区 -->
         </Grid.ColumnDefinitions>
 
@@ -30,6 +32,8 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="50*"/> <!-- 原始数据 -->
                     <RowDefinition Height="50*"/> <!-- 签名 -->
+                    <RowDefinition Height="50*"/> <!-- R|S (Base64) 只读展示 -->
+                    <RowDefinition Height="50*"/> <!-- DER (Base64) 只读展示 -->
                 </Grid.RowDefinitions>
 
                 <!-- 原始数据区 -->
@@ -38,28 +42,59 @@
                     <TextBlock Text="原始数据：" Margin="3,4,6,0" Foreground="Red" HorizontalAlignment="left" VerticalAlignment="Top"/>
                 </Grid>
                 <StackPanel Grid.Row="0" Grid.Column="1" Margin="4,0,0,2" HorizontalAlignment="Center" VerticalAlignment="Top">
-                    
+
                     <Image x:Name="imgCopyPlainData" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0"/>
                     <Image x:Name="imgPastePlainData" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0"/>
                     <Image x:Name="imgClearPlainData" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0"/>
                 </StackPanel>
 
-                <!-- 签名区 -->
-                <Grid Grid.Row="1" Grid.Column="0" Margin="0,2,4,0">
+                <!-- 签名区（按下拉框所选格式呈现） -->
+                <Grid Grid.Row="1" Grid.Column="0" Margin="0,2,4,2">
                     <TextBox x:Name="textSignature" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
                     <TextBlock Text="签名：" Margin="3,4,6,0" Foreground="Red" HorizontalAlignment="left" VerticalAlignment="Top"/>
                 </Grid>
-                <StackPanel Grid.Row="1" Grid.Column="1" Margin="4,2,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">
-                    
+                <StackPanel Grid.Row="1" Grid.Column="1" Margin="4,2,0,2" HorizontalAlignment="Center" VerticalAlignment="Top">
+
                     <Image x:Name="imgCopySignatureData" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="复制签名"/>
                     <Image x:Name="imgPasteSignatureData" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0"/>
                     <Image x:Name="imgClearSignatureData" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0"/>
                 </StackPanel>
+
+                <!-- Base64(Raw 二进制) 可编辑：始终把 r ‖ s 各 32 字节硬拼后 Base64 -->
+                <Grid Grid.Row="2" Grid.Column="0" Margin="0,2,4,2">
+                    <TextBox x:Name="textSignatureRSBase64" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
+                    <TextBlock Text="Base64(Raw 二进制)：" Margin="3,4,6,0" Foreground="Red" HorizontalAlignment="left" VerticalAlignment="Top"/>
+                </Grid>
+                <StackPanel Grid.Row="2" Grid.Column="1" Margin="4,2,0,2" HorizontalAlignment="Center" VerticalAlignment="Top">
+
+                    <Image x:Name="imgCopySignatureRSBase64" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="复制 R|S (Base64) 签名"/>
+                    <Image x:Name="imgPasteSignatureRSBase64" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="粘贴 R|S (Base64) 签名"/>
+                    <Image x:Name="imgClearSignatureRSBase64" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="清空 R|S (Base64) 签名"/>
+                </StackPanel>
+
+                <!-- Base64(DER 二进制) 可编辑：始终把 ASN.1 DER 字节 Base64 -->
+                <Grid Grid.Row="3" Grid.Column="0" Margin="0,2,4,0">
+                    <TextBox x:Name="textSignatureDerBase64" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
+                    <TextBlock Text="Base64(DER 二进制)：" Margin="3,4,6,0" Foreground="Red" HorizontalAlignment="left" VerticalAlignment="Top"/>
+                </Grid>
+                <StackPanel Grid.Row="3" Grid.Column="1" Margin="4,2,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">
+
+                    <Image x:Name="imgCopySignatureDerBase64" Source="{StaticResource IconCopy}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="复制 DER (Base64) 签名"/>
+                    <Image x:Name="imgPasteSignatureDerBase64" Source="{StaticResource IconPaste}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="粘贴 DER (Base64) 签名"/>
+                    <Image x:Name="imgClearSignatureDerBase64" Source="{StaticResource IconClear}" Width="16" Height="16" Cursor="Hand" Margin="0,6,0,0" ToolTip="清空 DER (Base64) 签名"/>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+
+        <!-- ==================== 中列：预留占位（后续扩展） ==================== -->
+        <GroupBox Grid.Column="1" Header="预留" Margin="2,0,2,0">
+            <Grid Margin="6">
+                <TextBlock Text="（预留扩展区）" Foreground="Gray" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="13"/>
             </Grid>
         </GroupBox>
 
         <!-- ==================== 右列：操作区 ==================== -->
-        <GroupBox Grid.Column="1" Header="操作按钮" Margin="2,0,0,0">
+        <GroupBox Grid.Column="2" Header="操作按钮" Margin="2,0,0,0">
             <Grid Margin="6">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="170"/> <!-- 左：操作按钮 -->
@@ -69,12 +104,16 @@
                     <RowDefinition Height="35"/>
                     <RowDefinition Height="35"/>
                     <RowDefinition Height="35"/>
+                    <RowDefinition Height="35"/>
+                    <RowDefinition Height="35"/>
                     <RowDefinition Height="*"/> <!-- 吸收剩余空间 -->
                 </Grid.RowDefinitions>
 
-                <!-- 左列：签名 / 验签 / 复制签名，各占 35 高的行，按钮 30 高并垂直居中 -->
-                <Grid Grid.Column="0" Grid.RowSpan="4" Margin="0,0,5,0">
+                <!-- 左列：签名 / 验签 / 复制签名 / 验签 R|S / 验签 DER，各占 35 高的行，按钮 30 高并垂直居中 -->
+                <Grid Grid.Column="0" Grid.RowSpan="6" Margin="0,0,5,0">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="35"/>
+                        <RowDefinition Height="35"/>
                         <RowDefinition Height="35"/>
                         <RowDefinition Height="35"/>
                         <RowDefinition Height="35"/>
@@ -83,6 +122,8 @@
                     <Button x:Name="btnSign" Content="签名" Grid.Row="0" Height="30" VerticalAlignment="Center" Margin="0,0"/>
                     <Button x:Name="btnVerify" Content="验签" Grid.Row="1" Height="30" VerticalAlignment="Center" Margin="0,0"/>
                     <Button x:Name="btnCopySignature" Content="复制签名" Grid.Row="2" Height="30" VerticalAlignment="Center" Margin="0,0"/>
+                    <Button x:Name="btnVerifyRSBase64" Content="验签 R|S" Grid.Row="3" Height="30" VerticalAlignment="Center" Margin="0,0" ToolTip="对 Base64(Raw 二进制) 文本框内的签名做验签"/>
+                    <Button x:Name="btnVerifyDerBase64" Content="验签 DER" Grid.Row="4" Height="30" VerticalAlignment="Center" Margin="0,0" ToolTip="对 Base64(DER 二进制) 文本框内的签名做验签"/>
                 </Grid>
 
                 <!-- 右列：第 1 行 —— Hash 算法 -->
@@ -103,9 +144,44 @@
                 <!-- 右列：第 2 行 —— 签名格式 -->
                 <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="50,0,0,0" VerticalAlignment="Center">
                     <TextBlock Text="签名格式：" Width="120" TextAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                    <ComboBox x:Name="comboSignatureFormat" Width="120" IsReadOnly="True" VerticalAlignment="Center">
-                        <ComboBoxItem Content="Base64"/>
-                        <ComboBoxItem Content="Hex"/>
+                    <ComboBox x:Name="comboSignatureFormat" Width="130" IsReadOnly="True" VerticalAlignment="Center">
+                        <ComboBoxItem Content="Base64">
+                            <ComboBoxItem.ToolTip>
+                                <TextBlock Text="DER 字节的 Base64 编码" Foreground="Red"/>
+                            </ComboBoxItem.ToolTip>
+                        </ComboBoxItem>
+                        <ComboBoxItem Content="Hex">
+                            <ComboBoxItem.ToolTip>
+                                <TextBlock Text="DER 字节的十六进制字符串" Foreground="Red"/>
+                            </ComboBoxItem.ToolTip>
+                        </ComboBoxItem>
+                        <ComboBoxItem Content="DER">
+                            <ComboBoxItem.ToolTip>
+                                <TextBlock Text="原始 ASN.1 DER 字节（十六进制呈现，与 Hex 等价；ECDSA 签名标准编码格式）" Foreground="Red"/>
+                            </ComboBoxItem.ToolTip>
+                        </ComboBoxItem>
+                    </ComboBox>
+                </StackPanel>
+
+                <!-- 右列：第 3 行 —— k 生成方式（纯 CSPRNG / 混合熵 / RFC 6979 确定性） -->
+                <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="50,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="k 生成：" Width="120" TextAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    <ComboBox x:Name="comboKGeneration" Width="260" IsReadOnly="True" VerticalAlignment="Center">
+                        <ComboBoxItem Content="混合熵随机 k（私钥派生 + 随机盐）（默认）">
+                            <ComboBoxItem.ToolTip>
+                                <TextBlock Text="RFC 6979 with additional entropy / Hybrid deterministic ECDSA" Foreground="Red"/>
+                            </ComboBoxItem.ToolTip>
+                        </ComboBoxItem>
+                        <ComboBoxItem Content="RFC 6979 确定性 k">
+                            <ComboBoxItem.ToolTip>
+                                <TextBlock Text="Deterministic ECDSA (RFC 6979)" Foreground="Red"/>
+                            </ComboBoxItem.ToolTip>
+                        </ComboBoxItem>
+                        <ComboBoxItem Content="纯 CSPRNG 随机 k">
+                            <ComboBoxItem.ToolTip>
+                                <TextBlock Text="Randomized ECDSA（概率型 ECDSA）" Foreground="Red"/>
+                            </ComboBoxItem.ToolTip>
+                        </ComboBoxItem>
                     </ComboBox>
                 </StackPanel>
             </Grid>

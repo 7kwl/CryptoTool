@@ -1067,18 +1067,17 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
                 HorizontalOffset = 6,
                 AllowsTransparency = true,
                 StaysOpen = true,
-                IsOpen = false
-            };
-            popup.Child = new Border
-            {
-                BorderBrush = Brushes.Red,
-                BorderThickness = new Thickness(1),
-                Child = new TextBlock
+                Child = new Border
                 {
-                    Text = text,
-                    Foreground = Brushes.Red,
-                    Background = Brushes.White,
-                    Padding = new Thickness(6, 2, 6, 2)
+                    BorderBrush = Brushes.Red,
+                    BorderThickness = new Thickness(1),
+                    Child = new TextBlock
+                    {
+                        Text = text,
+                        Foreground = Brushes.Red,
+                        Background = Brushes.White,
+                        Padding = new Thickness(6, 2, 6, 2)
+                    }
                 }
             };
 
