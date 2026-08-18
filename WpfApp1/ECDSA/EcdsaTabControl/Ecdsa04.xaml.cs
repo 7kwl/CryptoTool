@@ -1,9 +1,5 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
+﻿using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -18,8 +14,7 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
 {
     /// <summary>
     /// ECDSA 文件签名/验签视图。
-    /// 行业流程（Hash-then-Sign，同 OpenSSL dgst）：对文件内容流式计算摘要 → 私钥签名 → 输出 DER(.sig)；
-    /// 验签用公钥校验 Hash(file) 与签名是否匹配。
+    /// 行业流程（Hash-then-Sign，同 OpenSSL dgst）：对文件内容流式计算摘要 → 私钥签名 → 公钥验签。
     /// 签名/验签所需的私钥/公钥取自顶部 ECDSA 面板（通过宿主注入的委托），或自动回退到顶部面板。
     /// 大文件采用 64KB 分块流式处理，不一次性读入内存。
     /// </summary>
@@ -38,17 +33,14 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
         /// <summary>待签名文件路径</summary>
         private string? _signFilePath;
 
-        /// <summary>验签用原始文件路径</summary>
-        private string? _verifyFilePath;
-
-        /// <summary>验签用签名文件路径</summary>
-        private string? _verifySigPath;
-
-        /// <summary>最近一次签名 DER 原始字节（用于切换格式时重新呈现与另存）</summary>
-        private byte[]? _lastSignature;
-
         /// <summary>流式处理分块大小（64KB）</summary>
         private const int BufferSize = 64 * 1024;
+
+        /// <summary>最近一次签名得到的原始 DER 字节，用于导出 .sig</summary>
+        private byte[]? _lastSignatureBytes;
+
+        /// <summary>左侧“文件验签”行所选原文件路径</summary>
+        private string? _leftVerifyFilePath;
 
         #endregion
 
@@ -87,35 +79,29 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
                 }
 
                 // ===== 按钮点击事件 =====
-                btnSign.Click += async (_, _) => await SignFileAsync();
-                btnSelectVerifyFile.Click += (_, _) => SelectVerifyFile();
-                btnSelectVerifySig.Click += (_, _) => SelectVerifySignature();
-                btnVerify.Click += async (_, _) => await VerifySignatureAsync();
+                btnSelectSignFile.Click += (_, _) => SelectSignFile();
+                btnSignFile.Click += async (_, _) => await SignFileAsync();
+                btnSelectVerifyFileForHash.Click += (_, _) => SelectVerifyFileForHash();
+                btnSelectSigFileForInfo.Click += (_, _) => SelectSigFileForInfo();
+                btnVerifyHashAndSig.Click += async (_, _) => await VerifyLeftHashAndSigAsync();
+                btnExportSignature.Click += (_, _) => ExportSignatureFile();
 
                 // ===== 图标按钮 =====
-                imgCopyFileHash.MouseLeftButtonDown += (s, e) => TryCopy(textFileHash.Text, "文件哈希");
-                imgCopySignature.MouseLeftButtonDown += (s, e) => TryCopy(textSignature.Text, "签名");
-                imgClearSignature.MouseLeftButtonDown += (s, e) => { textSignature.Text = ""; _lastSignature = null; SetExportEnabled(false); };
-                imgCopyVerifySig.MouseLeftButtonDown += (s, e) => TryCopy(textVerifySigPreview.Text, "签名内容");
-                imgCopyVerifyResult.MouseLeftButtonDown += (s, e) => TryCopy(textVerifyResult.Text, "验签结果");
+                imgCopyVerifyHash.MouseLeftButtonDown += (s, e) => TryCopy(textVerifyHash.Text, "文件验签");
+                imgExportVerifyHash.MouseLeftButtonDown += (s, e) => ExportHashFile();
+                imgCopyVerifySigInfo.MouseLeftButtonDown += (s, e) => TryCopy(textVerifySigInfo.Text, "签名信息");
+                imgCopyVerifyDetail.MouseLeftButtonDown += (s, e) => TryCopy(textVerifyDetail.Text, "验签详情");
 
-                borderImportFile.MouseLeftButtonDown += (_, _) => SelectFileForSign();
-                borderExportSignature.MouseLeftButtonDown += (_, _) => SaveSignatureFile();
+                IconToolTipHelper.SetIconToolTip(imgCopyVerifyHash, "复制文件验签信息");
+                IconToolTipHelper.SetIconToolTip(imgExportVerifyHash, "导出文件验签信息");
+                IconToolTipHelper.SetIconToolTip(imgCopyVerifySigInfo, "复制签名信息");
+                IconToolTipHelper.SetIconToolTip(imgCopyVerifyDetail, "复制验签详情");
+                IconToolTipHelper.SetIconToolTip(btnVerifyHashAndSig, "用顶部公钥和右侧 Hash 算法验签左侧文件");
+                IconToolTipHelper.SetIconToolTip(btnExportSignature, "将下方签名结果导出为 .sig 文件");
+                IconToolTipHelper.SetIconToolTip(btnIndustryFlow, "行业流程说明");
 
-                // 签名格式切换时重新呈现签名
-                if (comboSignatureFormat != null)
-                    comboSignatureFormat.SelectionChanged += (_, _) => ReRenderSignature();
-
-                IconToolTipHelper.SetIconToolTip(imgCopyFileHash, "复制文件哈希");
-                IconToolTipHelper.SetIconToolTip(imgCopySignature, "复制签名");
-                IconToolTipHelper.SetIconToolTip(imgClearSignature, "清空签名");
-                IconToolTipHelper.SetIconToolTip(imgCopyVerifySig, "复制签名内容");
-                IconToolTipHelper.SetIconToolTip(imgCopyVerifyResult, "复制验签结果");
-                IconToolTipHelper.SetIconToolTip(borderImportFile, "选择要签名的文件");
-                IconToolTipHelper.SetIconToolTip(borderExportSignature, "另存签名文件 (.sig)");
-
-                // 初始状态：未生成签名时导出不可用
-                SetExportEnabled(false);
+                btnIndustryFlow.MouseEnter += (_, _) => textIndustryFlow.Foreground = Brushes.Black;
+                btnIndustryFlow.MouseLeave += (_, _) => textIndustryFlow.Foreground = Brushes.Transparent;
             };
         }
 
@@ -142,34 +128,18 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
 
         #region 签名流程
 
-        /// <summary>选择待签名文件并显示文件信息与哈希</summary>
-        private async void SelectFileForSign()
+        /// <summary>选择待签名文件并把文件信息显示到第 0 行文本框</summary>
+        private void SelectSignFile()
         {
             var dlg = new OpenFileDialog { Title = "选择要签名的文件", Filter = "所有文件|*.*" };
             if (dlg.ShowDialog() != true) return;
 
             _signFilePath = dlg.FileName;
-            SetExportEnabled(false);
-            textSignature.Text = "（尚未生成签名）";
-            _lastSignature = null;
-            SetVerifyResult(null);
-
-            try
-            {
-                textFileInfo.Text = DescribeFile(_signFilePath);
-                LogInfo($"已选择签名文件：{_signFilePath}");
-                string hash = await ComputeFileHashAsync(_signFilePath);
-                textFileHash.Text = StringUtil.WrapTextEvery(hash, 50);
-                LogInfo($"文件 SHA-256：{hash}");
-            }
-            catch (Exception ex)
-            {
-                textFileInfo.Text = $"读取文件信息失败：{ex.Message}";
-                LogInfo($"⚠️ 读取文件信息失败：{ex.Message}");
-            }
+            textVerifyResult.Text = DescribeFile(_signFilePath);
+            LogInfo($"已选择待签名文件：{_signFilePath}");
         }
 
-        /// <summary>对选中的文件生成 ECDSA 签名（流式，不读入内存）</summary>
+        /// <summary>对选中的文件生成 ECDSA 签名，并将签名结果输出到第 4 行（验签详情）文本框</summary>
         private async Task SignFileAsync()
         {
             if (string.IsNullOrEmpty(_signFilePath) || !File.Exists(_signFilePath))
@@ -186,7 +156,7 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
 
             string hashAlg = GetSelectedHash();
             string kMode = GetSelectedKMode();
-            btnSign.IsEnabled = false;
+            btnSignFile.IsEnabled = false;
             try
             {
                 LogInfo($"正在对文件签名：{Path.GetFileName(_signFilePath)}（{hashAlg} / {kMode}）...");
@@ -199,128 +169,113 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
                     return signer.GenerateSignature();
                 });
 
-                _lastSignature = sig;
-                ReRenderSignature();
-                SetExportEnabled(true);
-                LogInfo($"✅ 文件签名完成（{sig.Length} 字节 DER），可另存为 .sig 文件。");
+                _lastSignatureBytes = sig;
+                textVerifyDetail.Text = FormatSignatureForDisplay(sig);
+                LogInfo($"✅ 文件签名完成（{sig.Length} 字节 DER），结果已显示在下方文本框。");
             }
             catch (Exception ex)
             {
+                textVerifyDetail.Text = $"签名失败：{ex.Message}";
                 LogInfo($"❌ 文件签名失败：{ex.Message}");
             }
             finally
             {
-                btnSign.IsEnabled = true;
+                btnSignFile.IsEnabled = true;
             }
         }
 
-        /// <summary>切换导出签名图标的可用状态（禁用时置灰）</summary>
-        private void SetExportEnabled(bool enabled)
+        /// <summary>当前所选 k 生成方式（前缀匹配 EcdsaKGenerator.CreateSigner）</summary>
+        private string GetSelectedKMode() => GetComboText(comboKGeneration) ?? "混合熵随机 k（默认）";
+
+        /// <summary>按当前签名格式将 DER 签名格式化为显示文本</summary>
+        private string FormatSignatureForDisplay(byte[] sig)
         {
-            double opacity = enabled ? 1.0 : 0.45;
-            borderExportSignature.Opacity = opacity;
-            imgExportSignature.Opacity = opacity;
+            string fmt = GetSelectedSigFormat();
+            return fmt == "Hex"
+                ? StringUtil.WrapTextEvery(Convert.ToHexString(sig).ToUpperInvariant(), 50)
+                : fmt == "DER（二进制）"
+                    ? Convert.ToHexString(sig).ToLowerInvariant()
+                    : StringUtil.WrapTextEvery(Convert.ToBase64String(sig), 50);
         }
 
-        /// <summary>将签名按当前格式另存为 .sig 文件</summary>
-        private void SaveSignatureFile()
+        /// <summary>生成文件信息描述文本</summary>
+        private static string DescribeFile(string path)
         {
-            if (_lastSignature == null || string.IsNullOrEmpty(_signFilePath))
-            {
-                LogInfo("⚠️ 请先生成签名后再导出。");
-                return;
-            }
+            var fi = new FileInfo(path);
+            return string.Join("\n",
+                $"文件名：{fi.Name}",
+                $"路径：{fi.FullName}",
+                $"大小：{FormatSize(fi.Length)}（{fi.Length:N0} 字节）",
+                $"修改：{fi.LastWriteTime:yyyy-MM-dd HH:mm:ss}");
+        }
 
-            var dlg = new SaveFileDialog
+        /// <summary>人类可读文件大小</summary>
+        private static string FormatSize(long bytes)
+        {
+            string[] units = ["B", "KB", "MB", "GB"];
+            double size = bytes;
+            int u = 0;
+            while (size >= 1024 && u < units.Length - 1)
             {
-                Title = "保存签名文件",
-                Filter = "签名文件 (*.sig)|*.sig|所有文件|*.*",
-                FileName = Path.GetFileNameWithoutExtension(_signFilePath) + ".sig"
-            };
-            if (dlg.ShowDialog() != true) return;
-
-            try
-            {
-                string fmt = GetSelectedSigFormat();
-                if (fmt == "DER（二进制）")
-                {
-                    File.WriteAllBytes(dlg.FileName, _lastSignature);
-                }
-                else
-                {
-                    string text = fmt == "Hex"
-                        ? Convert.ToHexString(_lastSignature).ToUpperInvariant()
-                        : Convert.ToBase64String(_lastSignature);
-                    File.WriteAllText(dlg.FileName, text, new UTF8Encoding(false));
-                }
-                LogInfo($"✅ 签名已保存：{dlg.FileName}");
+                size /= 1024;
+                u++;
             }
-            catch (Exception ex)
-            {
-                LogInfo($"❌ 保存签名文件失败：{ex.Message}");
-            }
+            return $"{size:0.##} {units[u]}";
         }
 
         #endregion
 
         #region 验签流程
 
-        /// <summary>选择验签用原始文件</summary>
-        private void SelectVerifyFile()
+        /// <summary>选择文件并显示文件信息到“文件验签”文本框</summary>
+        private void SelectVerifyFileForHash()
         {
-            var dlg = new OpenFileDialog { Title = "选择原始文件", Filter = "所有文件|*.*" };
+            var dlg = new OpenFileDialog { Title = "选择验签文件", Filter = "所有文件|*.*" };
             if (dlg.ShowDialog() != true) return;
-            _verifyFilePath = dlg.FileName;
-            SetVerifyResult(null);
-            RefreshVerifyPaths();
-            LogInfo($"已选择原始文件：{_verifyFilePath}");
+
+            _leftVerifyFilePath = dlg.FileName;
+            var fi = new FileInfo(dlg.FileName);
+            textVerifyHash.Text = string.Join("\n",
+                $"文件名：{fi.Name}",
+                $"路径：{fi.FullName}",
+                $"大小：{fi.Length:N0} 字节",
+                $"修改：{fi.LastWriteTime:yyyy-MM-dd HH:mm:ss}");
+            LogInfo($"已选择验签文件并显示信息：{dlg.FileName}");
         }
 
-        /// <summary>选择验签用签名文件并预览内容</summary>
-        private void SelectVerifySignature()
+        /// <summary>选择签名文件并显示内容到“签名信息”文本框</summary>
+        private void SelectSigFileForInfo()
         {
             var dlg = new OpenFileDialog { Title = "选择签名文件", Filter = "签名文件 (*.sig)|*.sig;*.txt|所有文件|*.*" };
             if (dlg.ShowDialog() != true) return;
-            _verifySigPath = dlg.FileName;
-            SetVerifyResult(null);
-            RefreshVerifyPaths();
 
             try
             {
-                byte[] sig = ReadSignatureBytes(_verifySigPath);
-                string fmt = GetSelectedSigFormat();
-                string preview = fmt == "Base64"
-                    ? Convert.ToBase64String(sig)
-                    : Convert.ToHexString(sig).ToLowerInvariant();
-                textVerifySigPreview.Text = StringUtil.WrapTextEvery(preview, 50);
-                LogInfo($"已选择签名文件：{_verifySigPath}（{sig.Length} 字节，{fmt}）");
+                string content = File.ReadAllText(dlg.FileName, new UTF8Encoding(false));
+                textVerifySigInfo.Text = content.Length > 600
+                    ? content[..600] + "..."
+                    : content;
+                LogInfo($"已选择签名文件并显示内容：{dlg.FileName}");
             }
             catch (Exception ex)
             {
-                textVerifySigPreview.Text = "";
+                textVerifySigInfo.Text = $"读取签名文件失败：{ex.Message}";
                 LogInfo($"⚠️ 读取签名文件失败：{ex.Message}");
             }
         }
 
-        /// <summary>刷新验签区路径信息文本</summary>
-        private void RefreshVerifyPaths()
+        /// <summary>使用左侧“文件验签”与“签名信息”行所选文件，基于顶部公钥和右侧 Hash 算法执行验签</summary>
+        private async Task VerifyLeftHashAndSigAsync()
         {
-            textVerifyPaths.Text = string.Join("\n",
-                $"原文件：{_verifyFilePath ?? "（未选择）"}",
-                $"签名文件：{_verifySigPath ?? "（未选择）"}");
-        }
-
-        /// <summary>验签：流式计算原文件摘要并用公钥校验签名</summary>
-        private async Task VerifySignatureAsync()
-        {
-            if (string.IsNullOrEmpty(_verifyFilePath) || !File.Exists(_verifyFilePath))
+            if (string.IsNullOrEmpty(_leftVerifyFilePath) || !File.Exists(_leftVerifyFilePath))
             {
-                LogInfo("⚠️ 请先选择原始文件。");
+                LogInfo("⚠️ 请先在左侧“文件验签”行选择原始文件。");
                 return;
             }
-            if (string.IsNullOrEmpty(_verifySigPath) || !File.Exists(_verifySigPath))
+            string sigText = textVerifySigInfo.Text?.Trim() ?? "";
+            if (string.IsNullOrEmpty(sigText))
             {
-                LogInfo("⚠️ 请先选择签名文件。");
+                LogInfo("⚠️ 请先在左侧“签名信息”框中粘贴或选择签名内容。");
                 return;
             }
             string pubPem = PublicKeyProvider?.Invoke() ?? "";
@@ -331,56 +286,47 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
             }
 
             string hashAlg = GetSelectedHash();
-            btnVerify.IsEnabled = false;
+            btnVerifyHashAndSig.IsEnabled = false;
             try
             {
-                LogInfo($"正在验签：{Path.GetFileName(_verifyFilePath)}（{hashAlg}）...");
+                LogInfo($"正在对文件验签：{Path.GetFileName(_leftVerifyFilePath)}（{hashAlg}）...");
                 var (sigBytes, valid) = await Task.Run(() =>
                 {
-                    byte[] sig = ReadSignatureBytes(_verifySigPath!);
+                    byte[] sig = ParseSignatureText(sigText);
                     var pub = EcdsaKeyHelper.ImportPublicKeyPem(pubPem);
-                    // 验签与 k 的生成方式无关，使用标准 ECDSA 验签器即可
                     ISigner verifier = SignerUtilities.GetSigner(EcdsaKGenerator.GetSignerAlgorithm(hashAlg));
                     verifier.Init(false, pub);
-                    StreamThrough(verifier.BlockUpdate, _verifyFilePath!);
+                    StreamThrough(verifier.BlockUpdate, _leftVerifyFilePath!);
                     return (sigBytes: sig, valid: verifier.VerifySignature(sig));
                 });
 
                 if (valid)
                 {
-                    SetVerifyResult($"✅ 签名验证通过\nHash：{hashAlg}\n签名 {sigBytes.Length} 字节",
-                        Brushes.Green);
+                    SetLeftVerifyResult($"✅ 通过\n{hashAlg}\n{sigBytes.Length} 字节", Brushes.Green);
                     LogInfo($"✅ 文件签名验证通过（{hashAlg}）。");
                 }
                 else
                 {
-                    SetVerifyResult($"❌ 签名验证失败\n文件内容或签名与公钥不匹配\n（请确认 Hash/k 与签名时一致）",
-                        Brushes.Red);
+                    SetLeftVerifyResult("❌ 验证失败\n请确认 Hash 一致", Brushes.Red);
                     LogInfo("❌ 文件签名验证失败。");
                 }
             }
             catch (Exception ex)
             {
-                SetVerifyResult($"❌ 验签异常：{ex.Message}", Brushes.Red);
+                SetLeftVerifyResult($"❌ 异常\n{ex.Message}", Brushes.Red);
                 LogInfo($"❌ 文件验签异常：{ex.Message}");
             }
             finally
             {
-                btnVerify.IsEnabled = true;
+                btnVerifyHashAndSig.IsEnabled = true;
             }
         }
 
-        /// <summary>设置验签结果文本框内容与颜色</summary>
-        private void SetVerifyResult(string? text, SolidColorBrush? brush = null)
+        /// <summary>更新红色框内验签结果文本，不动任何左侧文本框</summary>
+        private void SetLeftVerifyResult(string detail, SolidColorBrush? brush = null)
         {
-            if (text == null)
-            {
-                textVerifyResult.Text = "验签结果将在此显示。";
-                textVerifyResult.Foreground = Brushes.Black;
-                return;
-            }
-            textVerifyResult.Text = text;
-            textVerifyResult.Foreground = brush ?? Brushes.Black;
+            textLeftVerifyResult.Text = detail;
+            textLeftVerifyResult.Foreground = brush ?? Brushes.Black;
         }
 
         #endregion
@@ -390,34 +336,11 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
         /// <summary>当前所选 Hash 算法名</summary>
         private string GetSelectedHash() => GetComboText(comboHashAlgorithm) ?? "SHA-256";
 
-        /// <summary>当前所选 k 生成方式（前缀匹配 EcdsaKGenerator.CreateSigner）</summary>
-        private string GetSelectedKMode() => GetComboText(comboKGeneration) ?? "混合熵随机 k";
-
         /// <summary>当前所选签名格式</summary>
         private string GetSelectedSigFormat() => GetComboText(comboSignatureFormat) ?? "Base64";
 
         private static string? GetComboText(ComboBox? combo)
             => combo?.SelectedItem is ComboBoxItem item ? item.Content?.ToString() : combo?.SelectedItem?.ToString();
-
-        /// <summary>按当前格式重新呈现最近一次签名</summary>
-        private void ReRenderSignature()
-        {
-            if (_lastSignature == null) return;
-            string fmt = GetSelectedSigFormat();
-            textSignature.Text = StringUtil.WrapTextEvery(
-                fmt == "Hex" ? Convert.ToHexString(_lastSignature).ToUpperInvariant()
-                : fmt == "DER（二进制）" ? Convert.ToHexString(_lastSignature).ToLowerInvariant()
-                : Convert.ToBase64String(_lastSignature), 50);
-        }
-
-        /// <summary>流式计算文件 SHA-256 哈希（.NET ComputeHash(Stream) 本身为流式）</summary>
-        private static async Task<string> ComputeFileHashAsync(string path)
-            => await Task.Run(() =>
-            {
-                using var sha = SHA256.Create();
-                using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize);
-                return Convert.ToHexString(sha.ComputeHash(fs)).ToLowerInvariant();
-            });
 
         /// <summary>将文件按 64KB 分块喂给回调（用于签名器/验签器 BlockUpdate）</summary>
         private static void StreamThrough(Action<byte[], int, int> blockUpdate, string path)
@@ -429,14 +352,19 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
                 blockUpdate(buf, 0, n);
         }
 
-        /// <summary>读取签名文件并自动识别编码：Hex / Base64 / 原始 DER 二进制</summary>
-        private static byte[] ReadSignatureBytes(string path)
+        /// <summary>从签名字符串自动识别编码并转换为原始 DER 字节：Hex / Base64 / 原始 DER 二进制</summary>
+        private static byte[] ParseSignatureText(string text)
         {
-            byte[] raw = File.ReadAllBytes(path);
-            if (raw.Length == 0) throw new InvalidDataException("签名文件为空");
+            byte[] raw = Encoding.UTF8.GetBytes(text.Trim().Trim('\uFEFF'));
+            if (raw.Length == 0) throw new InvalidDataException("签名为空");
+            return ParseSignatureBytes(raw);
+        }
 
+        private static byte[] ParseSignatureBytes(byte[] raw)
+        {
             string text = Encoding.UTF8.GetString(raw).Trim().Trim('\uFEFF');
             string normalized = new([.. text.Where(c => !char.IsWhiteSpace(c))]);
+            if (normalized.Length == 0) throw new InvalidDataException("签名为空");
 
             // Hex：偶数长度且全为十六进制字符
             if (normalized.Length % 2 == 0 && normalized.All(Uri.IsHexDigit))
@@ -454,6 +382,82 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
             return raw;
         }
 
+        /// <summary>将验签得到的 Hash 算法文本导出为 .txt 文件</summary>
+        private void ExportHashFile()
+        {
+            if (string.IsNullOrWhiteSpace(textVerifyHash.Text))
+            {
+                LogInfo("⚠️ 尚无验签产生的 Hash 算法可导出。");
+                return;
+            }
+
+            var dlg = new SaveFileDialog
+            {
+                Title = "保存 Hash 算法",
+                Filter = "文本文件 (*.txt)|*.txt|所有文件|*.*",
+                FileName = "verify-hash.txt"
+            };
+            if (dlg.ShowDialog() != true) return;
+
+            try
+            {
+                File.WriteAllText(dlg.FileName, textVerifyHash.Text, new UTF8Encoding(false));
+                LogInfo($"✅ Hash 算法已保存：{dlg.FileName}");
+            }
+            catch (Exception ex)
+            {
+                LogInfo($"❌ 保存 Hash 算法失败：{ex.Message}");
+            }
+        }
+
+        /// <summary>将最近一次签名结果按当前格式导出为 .sig 文件</summary>
+        private void ExportSignatureFile()
+        {
+            if (_lastSignatureBytes == null || _lastSignatureBytes.Length == 0)
+            {
+                LogInfo("⚠️ 尚未生成签名，请先点击“开始签名”。");
+                return;
+            }
+
+            string defaultName = string.IsNullOrEmpty(_signFilePath)
+                ? "signature.sig"
+                : $"{Path.GetFileNameWithoutExtension(_signFilePath)}.sig";
+
+            var dlg = new SaveFileDialog
+            {
+                Title = "导出签名文件",
+                Filter = "签名文件 (*.sig)|*.sig|所有文件|*.*",
+                FileName = defaultName
+            };
+            if (dlg.ShowDialog() != true) return;
+
+            try
+            {
+                string fmt = GetSelectedSigFormat();
+                if (fmt == "DER（二进制）")
+                {
+                    File.WriteAllBytes(dlg.FileName, _lastSignatureBytes);
+                }
+                else if (fmt == "Hex")
+                {
+                    File.WriteAllText(dlg.FileName,
+                        Convert.ToHexString(_lastSignatureBytes).ToLowerInvariant(),
+                        new UTF8Encoding(false));
+                }
+                else // Base64
+                {
+                    File.WriteAllText(dlg.FileName,
+                        Convert.ToBase64String(_lastSignatureBytes),
+                        new UTF8Encoding(false));
+                }
+                LogInfo($"✅ 签名已导出（{fmt}）：{dlg.FileName}");
+            }
+            catch (Exception ex)
+            {
+                LogInfo($"❌ 导出签名文件失败：{ex.Message}");
+            }
+        }
+
         /// <summary>复制文本到剪贴板</summary>
         private void TryCopy(string text, string label)
         {
@@ -467,30 +471,6 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
             {
                 // 剪贴板被占用时静默失败
             }
-        }
-
-        /// <summary>生成文件信息描述文本</summary>
-        private static string DescribeFile(string path)
-        {
-            var fi = new FileInfo(path);
-            return string.Join("\n",
-                $"文件名：{fi.Name}",
-                $"路径：{fi.FullName}",
-                $"大小：{FormatSize(fi.Length)}（{fi.Length:N0} 字节） | 修改：{fi.LastWriteTime:yyyy-MM-dd HH:mm:ss}");
-        }
-
-        /// <summary>人类可读文件大小</summary>
-        private static string FormatSize(long bytes)
-        {
-            string[] units = ["B", "KB", "MB", "GB"];
-            double size = bytes;
-            int u = 0;
-            while (size >= 1024 && u < units.Length - 1)
-            {
-                size /= 1024;
-                u++;
-            }
-            return $"{size:0.##} {units[u]}";
         }
 
         #endregion
