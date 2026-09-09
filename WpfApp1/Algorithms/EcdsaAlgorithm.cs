@@ -6,11 +6,12 @@ using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Security;
 
+#pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配：保留 CryptoTool.Algorithm.Algorithms.ECDSA 以兼容历史引用
 namespace CryptoTool.Algorithm.Algorithms.ECDSA 
 {
     public class EcdsaAlgorithm
     {
-        private static readonly SecureRandom Random = new SecureRandom();
+        private static readonly SecureRandom Random = new();
 
         public static AsymmetricCipherKeyPair GenerateKeyPair(string curveName)
         {

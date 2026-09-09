@@ -2,6 +2,7 @@ using CryptoTool.Algorithm.Utils;
 using CryptoTool.Win.Enums;
 using System.Text;
 
+#pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配：保留 CryptoTool.Win.Helpers 以兼容历史引用
 namespace CryptoTool.Win.Helpers
 {
 
@@ -25,7 +26,7 @@ namespace CryptoTool.Win.Helpers
             if (string.IsNullOrEmpty(str))
                 throw new ArgumentException("输入字符串不能为空", nameof(str));
 
-            encoding = encoding ?? Encoding.UTF8;
+            encoding ??= Encoding.UTF8;
 
             return format switch
             {
@@ -48,7 +49,7 @@ namespace CryptoTool.Win.Helpers
             if (bytes == null || bytes.Length == 0)
                 throw new ArgumentException("字节数组不能为空", nameof(bytes));
 
-            encoding = encoding ?? Encoding.UTF8;
+            encoding ??= Encoding.UTF8;
 
             return format switch
             {

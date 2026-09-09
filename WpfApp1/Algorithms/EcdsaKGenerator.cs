@@ -29,6 +29,7 @@ using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Utilities;
 
+#pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配：保留 CryptoTool.Algorithm.Algorithms.ECDSA 以兼容历史引用
 namespace CryptoTool.Algorithm.Algorithms.ECDSA
 {
     /// <summary>
@@ -133,8 +134,8 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
             IDigest digest,
             byte[]? salt = null)
         {
-            if (messageHash == null) throw new ArgumentNullException(nameof(messageHash));
-            if (digest == null) throw new ArgumentNullException(nameof(digest));
+            ArgumentNullException.ThrowIfNull(messageHash);
+            ArgumentNullException.ThrowIfNull(digest);
 
             int hlen = digest.GetDigestSize();
             int qlen = groupOrderN.BitLength;
@@ -260,15 +261,9 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
     /// 等价于 RFC 6979 附录 A.1 的"标准确定性 + 额外熵"扩展实现。
     /// 可被任意需要自定义 k 派生策略的签名流程直接复用。
     /// </summary>
-    public sealed class HybridEntropyEcdsaSigner : IDsa
+    public sealed class HybridEntropyEcdsaSigner(IDigest digest) : IDsa
     {
-        private readonly IDigest _digest;
         private ECPrivateKeyParameters? _privKey;
-
-        public HybridEntropyEcdsaSigner(IDigest digest)
-        {
-            _digest = digest ?? throw new ArgumentNullException(nameof(digest));
-        }
 
         public string AlgorithmName => "ECDSA";
 
@@ -295,7 +290,7 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
             var n = _privKey.Parameters.N;
 
             // k = RFC6979(priv, h1) + 随机盐 —— 委托给 EcdsaKGenerator 的纯函数
-            BigInteger k = EcdsaKGenerator.GenerateRfc6979KWithSalt(_privKey.D, n, message, _digest);
+            BigInteger k = EcdsaKGenerator.GenerateRfc6979KWithSalt(_privKey.D, n, message, digest);
 
             // R = k × G,r = R.x mod n
             ECPoint point = _privKey.Parameters.G.Multiply(k).Normalize();

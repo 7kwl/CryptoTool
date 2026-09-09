@@ -1,3 +1,4 @@
+#pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配：保留 CryptoTool.Win.Enums 以兼容历史引用
 namespace CryptoTool.Win.Enums
 {
     /// <summary>

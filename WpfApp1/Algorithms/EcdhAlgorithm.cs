@@ -11,6 +11,7 @@ using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Security;
 
+#pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配：保留 CryptoTool.Algorithm.Algorithms.ECDSA 以兼容历史引用
 namespace CryptoTool.Algorithm.Algorithms.ECDSA
 {
     /// <summary>

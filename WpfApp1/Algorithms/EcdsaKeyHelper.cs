@@ -13,6 +13,7 @@ using Org.BouncyCastle.OpenSsl;
 using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.Security;
 
+#pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配：保留 CryptoTool.Algorithm.Algorithms.ECDSA 以兼容历史引用
 namespace CryptoTool.Algorithm.Algorithms.ECDSA 
 {
     public static class EcdsaKeyHelper
@@ -189,7 +190,7 @@ namespace CryptoTool.Algorithm.Algorithms.ECDSA
         /// <summary>
         /// BouncyCastle 曲线名称别名 → 规范化名称（用于统一的 GUI 显示）
         /// </summary>
-        private static readonly Dictionary<string, string> CurveAliasMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<string, string> CurveAliasMap = new(StringComparer.OrdinalIgnoreCase)
         {
             { "prime256v1", "secp256r1" },
             { "P-256", "secp256r1" },
