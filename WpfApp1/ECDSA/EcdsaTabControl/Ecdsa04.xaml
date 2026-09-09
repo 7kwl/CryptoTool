@@ -19,19 +19,18 @@
              d:DesignHeight="450" d:DesignWidth="1800"
              Background="White">
 
-    <!-- ===== 根网格：三列 ===== -->
+    <!-- ===== 根网格：两列 ===== -->
     <Grid Margin="4">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="30*"/> <!-- 第 0 列：验签结果 -->
-            <ColumnDefinition Width="30*"/> <!-- 第 1 列：文件验签 -->
-            <ColumnDefinition Width="40*"/> <!-- 第 2 列：签名选项 -->
+            <ColumnDefinition Width="600"/> <!-- 第 0 列：密钥对 -->
+            <ColumnDefinition Width="70*"/> <!-- 第 1 列：签名选项 -->
         </Grid.ColumnDefinitions>
 
-        <!-- ==================== 第 1 列：密钥对 ==================== -->
-        <GroupBox Grid.Column="1" Header="密钥对" MinHeight="220" Margin="2,0,2,0">
+        <!-- ==================== 第 0 列：密钥对 ==================== -->
+        <GroupBox Grid.Column="0" Header="密钥对" MinHeight="220" Margin="0,0,2,0">
             <Grid Margin="6">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="25*"/> <!-- 爱丽丝私钥 -->
+                    <RowDefinition Height="25*"/> <!-- 哈希值 -->
                     <RowDefinition Height="25*"/> <!-- 爱丽丝公钥 -->
                     <RowDefinition Height="25*"/> <!-- 鲍勃私钥 -->
                     <RowDefinition Height="25*"/> <!-- 鲍勃公钥 -->
@@ -42,7 +41,7 @@
                         <ColumnDefinition Width="24"/>  <!-- 图标 -->
                     </Grid.ColumnDefinitions>
                     <TextBox x:Name="textEcdhAlicePrivate" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
-                    <TextBlock Text="爱丽丝(Alice)的私钥(PEM)：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
+                    <TextBlock Text="哈希计算值：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
                     <StackPanel Grid.Column="1" Margin="4,0,0,0">
                         <Image x:Name="imgCopyEcdhAlicePrivate" Source="{StaticResource IconCopy}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,8,0,0" Cursor="Hand"/>
                         <Image x:Name="imgPasteEcdhAlicePrivate" Source="{StaticResource IconPaste}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,10,0,0" Cursor="Hand"/>
@@ -55,7 +54,7 @@
                         <ColumnDefinition Width="24"/>  <!-- 图标 -->
                     </Grid.ColumnDefinitions>
                     <TextBox x:Name="textEcdhAlicePublic" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
-                    <TextBlock Text="爱丽丝(Alice)的公钥(PEM)：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
+                    <TextBlock Text="已签名信息：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
                     <StackPanel Grid.Column="1" Margin="4,0,0,0">
                         <Image x:Name="imgCopyEcdhAlicePublic" Source="{StaticResource IconCopy}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,8,0,0" Cursor="Hand"/>
                         <Image x:Name="imgPasteEcdhAlicePublic" Source="{StaticResource IconPaste}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,10,0,0" Cursor="Hand"/>
@@ -68,7 +67,7 @@
                         <ColumnDefinition Width="24"/>  <!-- 图标 -->
                     </Grid.ColumnDefinitions>
                     <TextBox x:Name="textEcdhBobPrivate" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
-                    <TextBlock Text="鲍勃(Bob)的私钥(PEM)：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
+                    <TextBlock Text="执行文件签名：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
                     <StackPanel Grid.Column="1" Margin="4,0,0,0">
                         <Image x:Name="imgCopyEcdhBobPrivate" Source="{StaticResource IconCopy}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,8,0,0" Cursor="Hand"/>
                         <Image x:Name="imgPasteEcdhBobPrivate" Source="{StaticResource IconPaste}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,10,0,0" Cursor="Hand"/>
@@ -81,7 +80,7 @@
                         <ColumnDefinition Width="24"/>  <!-- 图标 -->
                     </Grid.ColumnDefinitions>
                     <TextBox x:Name="textEcdhBobPublic" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch" BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12" Padding="4,22,4,4"/>
-                    <TextBlock Text="鲍勃(Bob)的公钥(PEM)：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
+                    <TextBlock Text="执行文件验签：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
                     <StackPanel Grid.Column="1" Margin="4,0,0,0">
                         <Image x:Name="imgCopyEcdhBobPublic" Source="{StaticResource IconCopy}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,8,0,0" Cursor="Hand"/>
                         <Image x:Name="imgPasteEcdhBobPublic" Source="{StaticResource IconPaste}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,10,0,0" Cursor="Hand"/>
@@ -91,95 +90,12 @@
             </Grid>
         </GroupBox>
 
-        <!-- ==================== 第 0 列：验签结果区（4 行文本框，仿 Ecdsa01 布局） ==================== -->
-        <GroupBox Grid.Column="0" Header="签名验签" Margin="0,0,2,0">
-            <Grid Margin="6">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="25*"/> <!-- 0: 验签状态 -->
-                    <RowDefinition Height="25*"/> <!-- 1: Hash 算法 -->
-                    <RowDefinition Height="25*"/> <!-- 2: 签名信息 -->
-                    <RowDefinition Height="25*"/> <!-- 3: 验签详情 -->
-                </Grid.RowDefinitions>
-
-                <!-- 第 0 行：文件签名 -->
-                <Grid Grid.Row="0" Margin="0,0,0,4">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>  <!-- 文本框 -->
-                        <ColumnDefinition Width="Auto"/>  <!-- 操作按钮 -->
-                    </Grid.ColumnDefinitions>
-                    <TextBox x:Name="textVerifyResult" IsReadOnly="True" TextWrapping="Wrap" AcceptsReturn="True"
-                             VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch"
-                             BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12"
-                             Padding="4,22,4,4" Background="#FFFBFBFB" Text="请导入文件或拖入文件到这里"/>
-                    <TextBlock Text="文件签名：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
-                    <StackPanel Grid.Column="1" Margin="4,0,0,0" HorizontalAlignment="Center">
-                        <Button x:Name="btnSelectSignFile" Content="选择签名文件" Height="24" Margin="0,8,0,0" Padding="6,0" FontSize="11"/>
-                        <Button x:Name="btnSignFile" Content="开始签名" Height="24" Margin="0,8,0,0" Padding="6,0" FontSize="11" FontWeight="Bold"/>
-                    </StackPanel>
-                </Grid>
-
-                <!-- 第 1 行：文件验签 -->
-                <Grid Grid.Row="1" Margin="0,4,0,4">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>  <!-- 文本框 -->
-                        <ColumnDefinition Width="Auto"/>  <!-- 图标 + 按钮 -->
-                    </Grid.ColumnDefinitions>
-                    <TextBox x:Name="textVerifyHash" IsReadOnly="True" TextWrapping="Wrap" AcceptsReturn="True"
-                             VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch"
-                             BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12"
-                             Padding="4,22,4,4" Background="#FFFBFBFB" Text=""/>
-                    <TextBlock Text="文件验签：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
-                    <StackPanel Grid.Column="1" Margin="4,0,0,0" HorizontalAlignment="Center">
-                        <Image x:Name="imgCopyVerifyHash" Source="{StaticResource IconCopy}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,8,0,0" Cursor="Hand"/>
-                        <Image x:Name="imgExportVerifyHash" Source="{StaticResource IconExport}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,8,0,0" Cursor="Hand"/>
-                        <Button x:Name="btnSelectVerifyFileForHash" Content="选择验签文件..." Height="24" Margin="0,8,0,0" Padding="6,0" FontSize="11"/>
-                    </StackPanel>
-                </Grid>
-
-                <!-- 第 2 行：签名信息 -->
-                <Grid Grid.Row="2" Margin="0,4,0,4">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>  <!-- 文本框 -->
-                        <ColumnDefinition Width="Auto"/>  <!-- 图标 + 按钮 -->
-                    </Grid.ColumnDefinitions>
-                    <TextBox x:Name="textVerifySigInfo" IsReadOnly="True" TextWrapping="Wrap" AcceptsReturn="True"
-                             VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch"
-                             BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12"
-                             Padding="4,22,4,4" Background="#FFFBFBFB" Text=""/>
-                    <TextBlock Text="签名信息：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
-                    <StackPanel Grid.Column="1" Margin="4,0,0,0" HorizontalAlignment="Center">
-                        <Image x:Name="imgCopyVerifySigInfo" Source="{StaticResource IconCopy}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,8,0,0" Cursor="Hand"/>
-                        <Button x:Name="btnSelectSigFileForInfo" Content="选择签名文件..." Height="24" Margin="0,8,0,0" Padding="6,0" FontSize="11"/>
-                        <Button x:Name="btnVerifyHashAndSig" Content="开始验签" Height="24" Margin="0,8,0,0" Padding="6,0" FontSize="11" FontWeight="Bold"/>
-                        <TextBlock x:Name="textLeftVerifyResult" TextWrapping="Wrap" Width="80" FontSize="11" TextAlignment="Center" Margin="0,6,0,0"/>
-                    </StackPanel>
-                </Grid>
-
-                <!-- 第 3 行：验签详情 -->
-                <Grid Grid.Row="3" Margin="0,4,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>  <!-- 文本框 -->
-                        <ColumnDefinition Width="Auto"/>  <!-- 图标 + 导出按钮 -->
-                    </Grid.ColumnDefinitions>
-                    <TextBox x:Name="textVerifyDetail" IsReadOnly="True" TextWrapping="Wrap" AcceptsReturn="True"
-                             VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Stretch"
-                             BorderBrush="#FFCCCCCC" FontFamily="Consolas" FontSize="12"
-                             Padding="4,22,4,4" Background="#FFFBFBFB" Text=""/>
-                    <TextBlock Text="验签详情：" Margin="4,4,0,0" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
-                    <StackPanel Grid.Column="1" Margin="4,0,0,0" HorizontalAlignment="Center">
-                        <Image x:Name="imgCopyVerifyDetail" Source="{StaticResource IconCopy}" Width="16" Height="16" HorizontalAlignment="Center" Margin="0,8,0,0" Cursor="Hand"/>
-                        <Button x:Name="btnExportSignature" Content="导出签名sig" Height="24" Margin="0,8,0,0" Padding="6,0" FontSize="11"/>
-                    </StackPanel>
-                </Grid>
-            </Grid>
-        </GroupBox>
-
-        <!-- ==================== 第 2 列：签名选项区 ==================== -->
-        <GroupBox Grid.Column="2" Header="签名选项" Margin="2,0,0,0">
+        <!-- ==================== 第 1 列：签名选项区 ==================== -->
+        <GroupBox Grid.Column="1" Header="签名选项" Margin="2,0,0,0">
             <Grid Margin="6">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="60*"/>   <!-- 0: 选项内容 -->
-                    <ColumnDefinition Width="40*"/> <!-- 1: 操作按钮列 -->
+                    <ColumnDefinition Width="Auto" MinWidth="120" MaxWidth="140"/> <!-- 0: 操作按钮列 -->
+                    <ColumnDefinition Width="*"/> <!-- 1: 选项内容 -->
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/> <!-- 0: Hash 算法 -->
@@ -189,8 +105,22 @@
                     <RowDefinition Height="*"/>    <!-- 4: 行业流程说明 -->
                 </Grid.RowDefinitions>
 
+                <!-- 左侧操作按钮列 -->
+                <StackPanel Grid.Column="0" Grid.RowSpan="5" Margin="0,2,10,0">
+                    <TextBlock Text="验签操作" FontWeight="Bold" Foreground="#FF444444" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                    <Button x:Name="btnSideVerifyFile" Content="选择原文件" Height="32" Margin="0,0,0,6"/>
+                    <Button x:Name="btnSideVerifySig" Content="选择签名文件" Height="32" Margin="0,0,0,6"/>
+                    <Button x:Name="btnSideVerify" Content="开始验签" Height="32" Margin="0,0,0,6" FontWeight="Bold"/>
+                    <Button x:Name="btnSideClear" Content="清空结果" Height="32" Margin="0,0,0,6"/>
+                    <Separator Margin="4,4,4,8"/>
+                    <TextBlock Text="签名操作" FontWeight="Bold" Foreground="Red" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                    <Button x:Name="btnSideSelectSignFile" Content="选择原文件" Height="32" Margin="0,0,0,6"/>
+                    <Button x:Name="btnSideComputeHash" Content="计算哈希" Height="32" Margin="0,0,0,6"/>
+                    <Button x:Name="btnSideSignFile" Content="开始签名" Height="32" Margin="0,0,0,6" FontWeight="Bold"/>
+                </StackPanel>
+
                 <!-- 第 0 行：Hash 算法 -->
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,2,0,8">
+                <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" Margin="0,2,0,8">
                     <TextBlock Text="Hash 算法：" Width="100" TextAlignment="Right" VerticalAlignment="Center" Margin="0,0,6,0"/>
                     <ComboBox x:Name="comboHashAlgorithm" Width="240" IsReadOnly="True" VerticalAlignment="Center">
                         <ComboBoxItem Content="SHA-224"/>
@@ -205,7 +135,7 @@
                 </StackPanel>
 
                 <!-- 第 1 行：k 生成方式 -->
-                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,2,0,8">
+                <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal" Margin="0,2,0,8">
                     <TextBlock Text="k 生成方式：" Width="100" TextAlignment="Right" VerticalAlignment="Center" Margin="0,0,6,0"/>
                     <ComboBox x:Name="comboKGeneration" Width="240" IsReadOnly="True" VerticalAlignment="Center">
                         <ComboBoxItem Content="混合熵随机 k（默认）">
@@ -227,7 +157,7 @@
                 </StackPanel>
 
                 <!-- 第 2 行：签名格式 -->
-                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,2,0,8">
+                <StackPanel Grid.Column="1" Grid.Row="2" Orientation="Horizontal" Margin="0,2,0,8">
                     <TextBlock Text="签名格式：" Width="100" TextAlignment="Right" VerticalAlignment="Center" Margin="0,0,6,0"/>
                     <ComboBox x:Name="comboSignatureFormat" Width="240" IsReadOnly="True" VerticalAlignment="Center">
                         <ComboBoxItem Content="Base64">
@@ -249,10 +179,10 @@
                 </StackPanel>
 
                 <!-- 第 3 行：分隔线 -->
-                <Separator Grid.Row="3" Margin="4,2,4,8"/>
+                <Separator Grid.Column="1" Grid.Row="3" Margin="4,2,4,8"/>
 
                 <!-- 第 4 行：行业流程说明 -->
-                <ScrollViewer Grid.Row="4" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer Grid.Column="1" Grid.Row="4" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="4,0,0,0">
                         <TextBlock Text="行业流程（Hash-then-Sign，同 OpenSSL dgst）：" FontWeight="Bold" Foreground="#FF444444" TextWrapping="Wrap"/>
                         <TextBlock x:Name="textIndustryFlow" Margin="0,6,0,0" TextWrapping="Wrap" LineHeight="20" Foreground="Transparent">
@@ -281,17 +211,6 @@
                         </Button>
                     </StackPanel>
                 </ScrollViewer>
-
-                <!-- 右侧操作按钮列 -->
-                <StackPanel Grid.Column="1" Grid.RowSpan="5" Margin="10,2,0,0">
-                    <TextBlock Text="验签操作" FontWeight="Bold" Foreground="#FF444444" HorizontalAlignment="Center" Margin="0,0,0,6"/>
-                    <Button x:Name="btnSideVerifyFile" Content="选择原文件" Height="32" Margin="0,0,0,6"/>
-                    <Button x:Name="btnSideVerifySig" Content="选择签名文件" Height="32" Margin="0,0,0,6"/>
-                    <Button x:Name="btnSideVerify" Content="开始验签" Height="32" Margin="0,0,0,6" FontWeight="Bold"/>
-                    <Button x:Name="btnSideClear" Content="清空结果" Height="32" Margin="0,0,0,6"/>
-                    <Separator Margin="4,4,4,8"/>
-                    <TextBlock Text="签名格式影响导出/显示，验签自动识别。" FontSize="11" Foreground="#FF888888" TextWrapping="Wrap" HorizontalAlignment="Center"/>
-                </StackPanel>
             </Grid>
         </GroupBox>
     </Grid>

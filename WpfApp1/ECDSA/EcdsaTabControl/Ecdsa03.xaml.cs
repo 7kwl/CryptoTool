@@ -679,7 +679,7 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
 
         private void SymmetricEncrypt(byte[] plain, EncryptionAlgorithm algo)
         {
-            byte[] key = GetEncKeyFromBox();
+            byte[] key = GetEncKeyFromBox(out bool autoDerivedKey);
             int ivLen = algo == EncryptionAlgorithm.AesCbc ? 16 : 12;
             byte[] iv = GetEncIV(ivLen);
 
@@ -726,14 +726,41 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
 
             textEncOutput.Text = StringUtil.WrapTextEvery(EncodeByFmt(payload, OutputFmt()), 50);
 
-            LogOk($"{_lastAlgorithmName} 加密完成：明文 {plain.Length} 字节，密文 {_lastEncCipher.Length} 字节（IV {ivLen} 字节）");
+            LogOk($"{_lastAlgorithmName} 加密完成：明文 {plain.Length} 字节，密文 {_lastEncCipher.Length} 字节（IV {ivLen} 字节）" +
+                  (autoDerivedKey
+                      ? "\r\n对称密钥：参数区为空，已自动用当前 ECDSA 私钥派生（HKDF-SHA256）并回填到参数区"
+                      : ""));
         }
 
-        private byte[] GetEncKeyFromBox()
+        /// <summary>
+        /// 取对称密钥（对称模式 AES-GCM / AES-CBC / ChaCha20 的加密与解密共用）：
+        ///   - 参数区"对称密钥"已填写：按 Base64/Hex 智能解码并校验为 32 字节；
+        ///   - 为空时不再抛错阻断执行（对齐 CryptoTool.Win ECDSA03 的 GetEncKey）：
+        ///     改用当前顶部 ECDSA 私钥的标量值 + info 经 HKDF-SHA256 派生 32 字节
+        ///     AES-256 密钥并回填参数区展示，保证"清空共享密钥后再点加密/解密"仍可执行。
+        /// </summary>
+        private byte[] GetEncKeyFromBox(out bool autoDerived)
         {
+            autoDerived = false;
             var keyText = (textEncKey?.Text ?? string.Empty).Trim();
             if (string.IsNullOrEmpty(keyText))
-                throw new ArgumentException("对称加密模式必须填写 32 字节对称密钥（参数区）");
+            {
+                var privPem = PrivateKeyProvider?.Invoke()?.Trim() ?? string.Empty;
+                if (string.IsNullOrEmpty(privPem))
+                    throw new InvalidOperationException(
+                        "参数区对称密钥为空，且当前没有可用的 ECDSA 私钥：请先在顶部生成/导入密钥对，或手动填写 32 字节对称密钥。");
+
+                ECPrivateKeyParameters priv;
+                try { priv = EcdsaKeyHelper.ImportPrivateKeyPem(privPem); }
+                catch (Exception ex) { throw new InvalidOperationException($"当前 ECDSA 私钥解析失败: {ex.Message}"); }
+
+                byte[] derived = HkdfDerive(priv.D.ToByteArrayUnsigned(), GetEncInfoBytes(), 32, true);
+                if (textEncKey != null)
+                    textEncKey.Text = Convert.ToBase64String(derived);
+                autoDerived = true;
+                return derived;
+            }
+
             if (keyText.StartsWith("-----"))
                 throw new ArgumentException("对称密钥字段不支持 PEM，请填写 Base64 / Hex 编码的 32 字节密钥");
             var keyBytes = SmartDecode(keyText, "Base64", "对称密钥");
@@ -833,7 +860,7 @@ namespace WpfApp1.ECDSA.EcdsaTabControl
 
         private byte[] SymmetricDecrypt(byte[] payload, int ivLen, bool hasTag)
         {
-            byte[] key = GetEncKeyFromBox();
+            byte[] key = GetEncKeyFromBox(out _);
             int minLen = ivLen + (hasTag ? 16 : 0);
             if (payload.Length < minLen)
                 throw new ArgumentException($"密文长度不足：至少 {minLen} 字节，当前 {payload.Length} 字节");
